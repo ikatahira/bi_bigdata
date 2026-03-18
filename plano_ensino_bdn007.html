@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plano de Ensino - BDN007 Business Intelligence e Big Data</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 5px solid white;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #764ba2;
+        }
+
+        .section h3 {
+            color: #667eea;
+            font-size: 1.5em;
+            margin: 25px 0 15px 0;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #667eea;
+        }
+
+        .info-box h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .module-card {
+            background: #f8f9fa;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #667eea;
+        }
+
+        .module-card h4 {
+            color: #667eea;
+            font-size: 1.3em;
+            margin-bottom: 10px;
+        }
+
+        .week-list {
+            list-style: none;
+            padding-left: 20px;
+        }
+
+        .week-list li {
+            padding: 8px 0;
+            color: #666;
+        }
+
+        .week-list li:before {
+            content: "📅 ";
+            margin-right: 5px;
+        }
+
+        .competencias {
+            background: #e8eaf6;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .competencias ul {
+            padding-left: 30px;
+        }
+
+        .competencias li {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .bibliografia {
+            background: #fff3cd;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .bibliografia h4 {
+            color: #856404;
+            margin-bottom: 15px;
+        }
+
+        .bibliografia ul {
+            padding-left: 30px;
+        }
+
+        .bibliografia li {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .btn-container {
+            text-align: center;
+            margin: 40px 0;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.1em;
+            margin: 10px;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="foto_professor.png" alt="Professor">
+            <h1>Plano de Ensino</h1>
+            <p>BDN007 - Business Intelligence e Big Data</p>
+            <p>Curso Superior de Tecnologia em Análise e Desenvolvimento de Sistemas</p>
+        </div>
+
+        <div class="content">
+            <!-- IDENTIFICAÇÃO -->
+            <div class="section">
+                <h2>📋 Identificação da Disciplina</h2>
+                <div class="info-grid">
+                    <div class="info-box">
+                        <h4>Código</h4>
+                        <p>BDN007</p>
+                    </div>
+                    <div class="info-box">
+                        <h4>Disciplina</h4>
+                        <p>Business Intelligence e Big Data</p>
+                    </div>
+                    <div class="info-box">
+                        <h4>Carga Horária</h4>
+                        <p>160 horas</p>
+                    </div>
+                    <div class="info-box">
+                        <h4>Modalidade</h4>
+                        <p>Presencial</p>
+                    </div>
+                    <div class="info-box">
+                        <h4>Instituição</h4>
+                        <p>FATEC Ourinhos</p>
+                    </div>
+                    <div class="info-box">
+                        <h4>Curso</h4>
+                        <p>AMS - Análise e Desenvolvimento de Sistemas</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EMENTA -->
+            <div class="section">
+                <h2>📖 Ementa</h2>
+                <p>
+                    Estudo e aplicação prática de conceitos, técnicas e ferramentas de Business Intelligence (BI) e Big Data. 
+                    Aborda desde os fundamentos de BI, Data Warehousing e modelagem dimensional até tecnologias modernas de 
+                    Big Data como Hadoop, Spark e ferramentas de streaming. Inclui práticas com ferramentas de ETL, visualização 
+                    de dados (Power BI, Tableau), bancos NoSQL e processamento distribuído. Desenvolve competências para projetar, 
+                    implementar e gerenciar soluções completas de BI e Big Data em ambientes corporativos.
+                </p>
+            </div>
+
+            <!-- OBJETIVOS -->
+            <div class="section">
+                <h2>🎯 Objetivos</h2>
+                
+                <h3>Objetivo Geral</h3>
+                <p>
+                    Capacitar o aluno para projetar, implementar e gerenciar soluções completas de Business Intelligence e Big Data, 
+                    utilizando ferramentas e tecnologias modernas para análise de dados em escala, suporte à decisão e geração de 
+                    valor para as organizações.
+                </p>
+
+                <h3>Objetivos Específicos</h3>
+                <div class="competencias">
+                    <ul>
+                        <li>Compreender os conceitos fundamentais de Business Intelligence e sua aplicação nas organizações</li>
+                        <li>Projetar e implementar Data Warehouses utilizando modelagem dimensional</li>
+                        <li>Desenvolver processos ETL/ELT utilizando ferramentas open-source e comerciais</li>
+                        <li>Criar dashboards e visualizações efetivas com Power BI, Tableau e ferramentas open-source</li>
+                        <li>Compreender arquiteturas e tecnologias de Big Data</li>
+                        <li>Trabalhar com o ecossistema Hadoop (HDFS, MapReduce, Hive, Pig, HBase)</li>
+                        <li>Processar e analisar grandes volumes de dados com Apache Spark</li>
+                        <li>Implementar pipelines de dados em tempo real com Kafka e Spark Streaming</li>
+                        <li>Aplicar técnicas de Machine Learning em Big Data com PySpark MLlib</li>
+                        <li>Compreender e aplicar princípios de governança e segurança de dados</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- COMPETÊNCIAS -->
+            <div class="section">
+                <h2>💡 Competências a Serem Desenvolvidas</h2>
+                <div class="competencias">
+                    <ul>
+                        <li><strong>Análise e Design:</strong> Projetar arquiteturas de BI e Big Data adequadas aos requisitos de negócio</li>
+                        <li><strong>Implementação:</strong> Desenvolver soluções end-to-end de BI e Big Data</li>
+                        <li><strong>Ferramentas:</strong> Utilizar ferramentas líderes de mercado e open-source</li>
+                        <li><strong>Processamento de Dados:</strong> Trabalhar com dados estruturados, semi-estruturados e não-estruturados</li>
+                        <li><strong>Visualização:</strong> Criar dashboards e relatórios efetivos para diferentes audiências</li>
+                        <li><strong>Performance:</strong> Otimizar queries, processos ETL e pipelines de dados</li>
+                        <li><strong>Escalabilidade:</strong> Projetar soluções que escalem horizontalmente</li>
+                        <li><strong>Governança:</strong> Aplicar boas práticas de qualidade, segurança e governança de dados</li>
+                        <li><strong>Trabalho em Equipe:</strong> Colaborar em projetos multidisciplinares</li>
+                        <li><strong>Comunicação:</strong> Apresentar soluções técnicas para stakeholders não-técnicos</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- CONTEÚDO PROGRAMÁTICO -->
+            <div class="section">
+                <h2>📚 Conteúdo Programático</h2>
+
+                <div class="module-card">
+                    <h4>MÓDULO 1: Fundamentos de Business Intelligence (Semanas 1-5)</h4>
+                    <ul class="week-list">
+                        <li>Semana 1: Introdução ao Business Intelligence</li>
+                        <li>Semana 2: Arquitetura de Business Intelligence</li>
+                        <li>Semana 3: Modelagem Dimensional</li>
+                        <li>Semana 4: OLAP e Cubos Multidimensionais</li>
+                        <li>Semana 5: Projeto de Solução de BI - Metodologia</li>
+                    </ul>
+                </div>
+
+                <div class="module-card">
+                    <h4>MÓDULO 2: Data Warehousing (Semanas 6-10)</h4>
+                    <ul class="week-list">
+                        <li>Semana 6: Conceitos Fundamentais de Data Warehouse</li>
+                        <li>Semana 7: Schema Star e Snowflake</li>
+                        <li>Semana 8: Tabelas Fato e Dimensão - Detalhamento</li>
+                        <li>Semana 9: SCD - Slowly Changing Dimensions</li>
+                        <li>Semana 10: Data Marts e Integração</li>
+                    </ul>
+                </div>
+
+                <div class="module-card">
+                    <h4>MÓDULO 3: ETL e Integração de Dados (Semanas 11-15)</h4>
+                    <ul class="week-list">
+                        <li>Semana 11: Fundamentos de ETL</li>
+                        <li>Semana 12: Pentaho Data Integration (Kettle)</li>
+                        <li>Semana 13: Talend Open Studio</li>
+                        <li>Semana 14: Apache NiFi - Data Pipeline</li>
+                        <li>Semana 15: Data Quality e Governança de Dados</li>
+                    </ul>
+                </div>
+
+                <div class="module-card">
+                    <h4>MÓDULO 4: Ferramentas de BI e Visualização (Semanas 16-20)</h4>
+                    <ul class="week-list">
+                        <li>Semana 16: Power BI Desktop - Fundamentos</li>
+                        <li>Semana 17: DAX e Modelagem Avançada no Power BI</li>
+                        <li>Semana 18: Tableau Desktop - Fundamentos</li>
+                        <li>Semana 19: Metabase e Apache Superset</li>
+                        <li>Semana 20: Dashboards Interativos - Best Practices</li>
+                    </ul>
+                </div>
+
+                <div class="module-card">
+                    <h4>MÓDULO 5: Fundamentos de Big Data (Semanas 21-25)</h4>
+                    <ul class="week-list">
+                        <li>Semana 21: Introdução ao Big Data</li>
+                        <li>Semana 22: Os 5 Vs do Big Data</li>
+                        <li>Semana 23: Arquiteturas Distribuídas para Big Data</li>
+                        <li>Semana 24: Data Lakes - Conceito e Implementação</li>
+                        <li>Semana 25: Lambda Architecture e Kappa Architecture</li>
+                    </ul>
+                </div>
+
+                <div class="module-card">
+                    <h4>MÓDULO 6: Hadoop Ecosystem (Semanas 26-30)</h4>
+                    <ul class="week-list">
+                        <li>Semana 26: Introdução ao Apache Hadoop</li>
+                        <li>Semana 27: HDFS e MapReduce</li>
+                        <li>Semana 28: Apache Hive - SQL on Hadoop</li>
+                        <li>Semana 29: Apache Pig - Data Flow Language</li>
+                        <li>Semana 30: HBase e Sqoop</li>
+                    </ul>
+                </div>
+
+                <div class="module-card">
+                    <h4>MÓDULO 7: NoSQL e Stream Processing (Semanas 31-35)</h4>
+                    <ul class="week-list">
+                        <li>Semana 31: Bancos de Dados NoSQL - Visão Geral</li>
+                        <li>Semana 32: MongoDB - Document Database</li>
+                        <li>Semana 33: Apache Spark - Fundamentos</li>
+                        <li>Semana 34: Spark SQL e DataFrames</li>
+                        <li>Semana 35: Apache Kafka e Stream Processing</li>
+                    </ul>
+                </div>
+
+                <div class="module-card">
+                    <h4>MÓDULO 8: Analytics Avançado e Projeto Final (Semanas 36-40)</h4>
+                    <ul class="week-list">
+                        <li>Semana 36: Advanced Analytics com Big Data</li>
+                        <li>Semana 37: Machine Learning com PySpark MLlib</li>
+                        <li>Semana 38: Data Governance e Data Security</li>
+                        <li>Semana 39: Projeto Final - Parte 1: Planejamento e Arquitetura</li>
+                        <li>Semana 40: Projeto Final - Parte 2: Implementação e Apresentação</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- METODOLOGIA -->
+            <div class="section">
+                <h2>🎓 Metodologia</h2>
+                <p>A disciplina adota metodologia ativa e prática, com foco em hands-on learning:</p>
+                <div class="competencias">
+                    <ul>
+                        <li><strong>Aulas Expositivas:</strong> Apresentação de conceitos teóricos com exemplos reais do mercado</li>
+                        <li><strong>Laboratórios Práticos:</strong> Exercícios hands-on com ferramentas e tecnologias</li>
+                        <li><strong>Projetos:</strong> Desenvolvimento de projetos práticos individuais e em grupo</li>
+                        <li><strong>Estudos de Caso:</strong> Análise de casos reais de implementação em empresas</li>
+                        <li><strong>Vídeos e Tutoriais:</strong> Material complementar para estudo assíncrono</li>
+                        <li><strong>Discussões:</strong> Debates sobre arquiteturas, ferramentas e boas práticas</li>
+                        <li><strong>Peer Review:</strong> Avaliação e feedback entre pares</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- AVALIAÇÃO -->
+            <div class="section">
+                <h2>📊 Critérios de Avaliação</h2>
+                <div class="info-grid">
+                    <div class="info-box">
+                        <h4>Atividades Práticas</h4>
+                        <p>30% da nota final</p>
+                        <p>Exercícios e laboratórios semanais</p>
+                    </div>
+                    <div class="info-box">
+                        <h4>Projetos Modulares</h4>
+                        <p>40% da nota final</p>
+                        <p>Projetos ao final de cada módulo</p>
+                    </div>
+                    <div class="info-box">
+                        <h4>Projeto Final</h4>
+                        <p>30% da nota final</p>
+                        <p>Solução completa de BI/Big Data</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BIBLIOGRAFIA -->
+            <div class="section">
+                <h2>📚 Bibliografia</h2>
+
+                <div class="bibliografia">
+                    <h4>Bibliografia Básica</h4>
+                    <ul>
+                        <li>KIMBALL, Ralph; ROSS, Margy. <strong>The Data Warehouse Toolkit: The Definitive Guide to Dimensional Modeling</strong>. 3rd Edition. Wiley, 2013.</li>
+                        <li>WHITE, Tom. <strong>Hadoop: The Definitive Guide</strong>. 4th Edition. O'Reilly Media, 2015.</li>
+                        <li>KARAU, Holden et al. <strong>Learning Spark: Lightning-Fast Data Analytics</strong>. 2nd Edition. O'Reilly Media, 2020.</li>
+                    </ul>
+                </div>
+
+                <div class="bibliografia">
+                    <h4>Bibliografia Complementar</h4>
+                    <ul>
+                        <li>INMON, William H. <strong>Building the Data Warehouse</strong>. 4th Edition. Wiley, 2005.</li>
+                        <li>KLEPPMANN, Martin. <strong>Designing Data-Intensive Applications</strong>. O'Reilly Media, 2017.</li>
+                        <li>MAYER-SCHÖNBERGER, Viktor; CUKIER, Kenneth. <strong>Big Data: A Revolution That Will Transform How We Live, Work, and Think</strong>. Mariner Books, 2014.</li>
+                        <li>FEW, Stephen. <strong>Information Dashboard Design: Displaying Data for At-a-Glance Monitoring</strong>. Analytics Press, 2013.</li>
+                        <li>KNAFLIC, Cole Nussbaumer. <strong>Storytelling with Data: A Data Visualization Guide for Business Professionals</strong>. Wiley, 2015.</li>
+                        <li>FOWLER, Martin; SADALAGE, Pramod J. <strong>NoSQL Distilled: A Brief Guide to the Emerging World of Polyglot Persistence</strong>. Addison-Wesley, 2012.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- RECURSOS -->
+            <div class="section">
+                <h2>🛠️ Recursos Necessários</h2>
+                <div class="competencias">
+                    <h3>Infraestrutura</h3>
+                    <ul>
+                        <li>Laboratório de informática com computadores adequados (mínimo 8GB RAM, processador quad-core)</li>
+                        <li>Conexão de internet de alta velocidade</li>
+                        <li>Projetor e quadro branco</li>
+                    </ul>
+
+                    <h3>Software</h3>
+                    <ul>
+                        <li>Sistemas Operacionais: Windows 10/11 ou Linux (Ubuntu 20.04+)</li>
+                        <li>Bancos de Dados: MySQL, PostgreSQL, MongoDB</li>
+                        <li>ETL: Pentaho Data Integration, Talend Open Studio, Apache NiFi</li>
+                        <li>BI Tools: Power BI Desktop, Tableau Desktop (trial), Metabase, Apache Superset</li>
+                        <li>Big Data: Hadoop, Spark, Kafka (Docker containers ou VMs)</li>
+                        <li>IDEs: VS Code, PyCharm, Jupyter Notebook</li>
+                        <li>Python 3.8+ com bibliotecas: pandas, pyspark, matplotlib, seaborn</li>
+                    </ul>
+
+                    <h3>Cloud (opcional)</h3>
+                    <ul>
+                        <li>Créditos educacionais AWS, Azure ou Google Cloud</li>
+                        <li>Para experimentação com serviços gerenciados de Big Data</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- BOTÕES -->
+            <div class="btn-container">
+                <a href="index.html" class="btn">🏠 Voltar à Página Inicial</a>
+                <a href="semana01.html" class="btn">🚀 Começar Semana 1</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

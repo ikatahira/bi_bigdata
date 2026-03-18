@@ -267,7 +267,7 @@ pre{background:#04100f;border:1px solid rgba(0,151,157,.25);border-top:none;bord
     <li>Compreender a estrutura de um <strong>cubo multidimensional</strong></li>
     <li>Dominar as 5 operações: <span class="itag">Slice</span> <span class="itag">Dice</span> <span class="itag">Roll-up</span> <span class="itag">Drill-down</span> <span class="itag">Pivot</span></li>
     <li>Conhecer os tipos <span class="itag">MOLAP</span> <span class="itag">ROLAP</span> <span class="itag">HOLAP</span></li>
-    <li>Conectar OLAP com sensores reais via Arduino (projeto integrado)</li>
+    <li>Conectar OLAP com sensores reais via ESP32 (projeto integrado)</li>
   </ul>
 </div>
 
@@ -452,9 +452,9 @@ pre{background:#04100f;border:1px solid rgba(0,151,157,.25);border-top:none;bord
 
 <!-- ARDUINO -->
 <div class="card arduino-card" id="ard">
-  <div class="card-label">&#x1F50C; Projeto Integrado &mdash; Arduino + Sensores</div>
+  <div class="card-label">&#x1F50C; Projeto Integrado &mdash; ESP32 + Sensores</div>
   <h2>Estação Climática com Cubo de Dados</h2>
-  <p style="color:#7ab8bc;">Este projeto conecta o conceito de <strong>cubo OLAP</strong> com sensores físicos. Em vez de dados de vendas, você coleta temperatura, umidade e luminosidade &mdash; e os organiza em uma estrutura multidimensional.</p>
+  <p style="color:#7ab8bc;">Este projeto conecta o conceito de <strong>cubo OLAP</strong> com sensores físicos. Em vez de dados de vendas, você coleta temperatura (via DS18B20 à prova d'água) e luminosidade (LDR) &mdash; e os organiza em uma estrutura multidimensional com ESP32.</p>
 
   <div style="margin-top:20px;">
     <div class="card-label" style="margin-bottom:12px;color:#00979d;">&#x1F5FA;&#xFE0F; Projeto Evolutivo &mdash; 4 Semanas</div>
@@ -470,7 +470,7 @@ pre{background:#04100f;border:1px solid rgba(0,151,157,.25);border-top:none;bord
     </div>
     <div class="evo-detail" id="evoDetail">
       <strong style="color:var(--arduino)">Semana 04 &mdash; Coleta de dados com sensores</strong><br><br>
-      Monte o circuito com DHT11 e LDR. O Arduino coleta temperatura, umidade e luminosidade a cada 5 segundos e envia via Serial em formato CSV. Esses dados são as <strong>medidas</strong> do nosso cubo OLAP. A função <code>exibirAnaliseOLAP()</code> demonstra o conceito de Roll-up diretamente no hardware.
+      Monte o circuito com DS18B20 (OneWire) e LDR. O ESP32 coleta temperatura e luminosidade a cada 5 segundos e envia via Serial em formato CSV. Esses dados são as <strong>medidas</strong> do nosso cubo OLAP. A função <code>exibirAnaliseOLAP()</code> demonstra o conceito de Roll-up diretamente no hardware.
     </div>
   </div>
 
@@ -478,10 +478,10 @@ pre{background:#04100f;border:1px solid rgba(0,151,157,.25);border-top:none;bord
     <div class="proj-icon">&#x1F321;&#xFE0F;</div>
     <div>
       <div class="proj-title">Estação Climática Multidimensional</div>
-      <div class="proj-desc">Colete dados de temperatura, umidade e luminosidade. Esses dados formarão as <em>medidas</em> do seu cubo OLAP, com dimensões de Tempo, Sensor e Local.</div>
+      <div class="proj-desc">Colete dados de temperatura (DS18B20 à prova d'água) e luminosidade (LDR) com ESP32. Esses dados formarão as <em>medidas</em> do seu cubo OLAP, com dimensões de Tempo, Sensor e Local.</div>
       <div class="proj-badges">
         <span class="proj-badge pb-level">Nível: Iniciante</span>
-        <span class="proj-badge pb-sensor">DHT11 &middot; LDR</span>
+        <span class="proj-badge pb-sensor">DS18B20 &middot; LDR</span>
         <span class="proj-badge pb-lang">C++ / Arduino IDE</span>
         <span class="proj-badge pb-lang">Serial Monitor</span>
       </div>
@@ -490,99 +490,120 @@ pre{background:#04100f;border:1px solid rgba(0,151,157,.25);border-top:none;bord
 
   <div class="card-label" style="margin-bottom:10px;color:#00979d;">&#x1F9F0; Componentes Necessários</div>
   <div class="components">
-    <div class="comp-item"><div class="comp-icon">&#x1F7E6;</div><div><div class="comp-name">Arduino Uno</div><div class="comp-qty">1 unidade</div></div></div>
-    <div class="comp-item"><div class="comp-icon">&#x1F321;&#xFE0F;</div><div><div class="comp-name">Sensor DHT11</div><div class="comp-qty">1 unidade</div></div></div>
-    <div class="comp-item"><div class="comp-icon">&#x1F4A1;</div><div><div class="comp-name">Resistor LDR</div><div class="comp-qty">1 unidade</div></div></div>
-    <div class="comp-item"><div class="comp-icon">&#x1F534;</div><div><div class="comp-name">Resistor 10k&#x2126;</div><div class="comp-qty">2 unidades</div></div></div>
+    <div class="comp-item"><div class="comp-icon">&#x1F7E9;</div><div><div class="comp-name">ESP32 (DevKit)</div><div class="comp-qty">1 unidade</div></div></div>
+    <div class="comp-item"><div class="comp-icon">&#x1F321;&#xFE0F;</div><div><div class="comp-name">DS18B20 À Prova d'Água</div><div class="comp-qty">1 unidade</div></div></div>
+    <div class="comp-item"><div class="comp-icon">&#x1F4A1;</div><div><div class="comp-name">LDR (fotoresistor)</div><div class="comp-qty">1 unidade</div></div></div>
+    <div class="comp-item"><div class="comp-icon">&#x1F534;</div><div><div class="comp-name">Resistor 4,7k&#x2126;</div><div class="comp-qty">1 unidade (pull-up DS18B20)</div></div></div>
+    <div class="comp-item"><div class="comp-icon">&#x1F7E0;</div><div><div class="comp-name">Resistor 10k&#x2126;</div><div class="comp-qty">1 unidade (divisor LDR)</div></div></div>
     <div class="comp-item"><div class="comp-icon">&#x1F50C;</div><div><div class="comp-name">Protoboard</div><div class="comp-qty">1 unidade</div></div></div>
-    <div class="comp-item"><div class="comp-icon">&#x1F517;</div><div><div class="comp-name">Jumpers M-M</div><div class="comp-qty">10 unidades</div></div></div>
+    <div class="comp-item"><div class="comp-icon">&#x1F517;</div><div><div class="comp-name">Jumpers M-M</div><div class="comp-qty">12 unidades</div></div></div>
+    <div class="comp-item"><div class="comp-icon">&#x1F4F1;</div><div><div class="comp-name">Cabo USB-C / Micro-USB</div><div class="comp-qty">1 unidade (conforme modelo ESP32)</div></div></div>
   </div>
 
   <div class="card-label" style="margin-bottom:10px;color:#00979d;">&#x26A1; Tabela de Conexões</div>
   <table class="conn-table">
-    <tr><th>Componente</th><th>Pino do Componente</th><th>Pino do Arduino</th><th>Observação</th></tr>
-    <tr><td>DHT11</td><td>VCC (pino 1)</td><td>5V</td><td>Alimentação</td></tr>
-    <tr><td>DHT11</td><td>DATA (pino 2)</td><td>Digital 2</td><td>Sinal de dados</td></tr>
-    <tr><td>DHT11</td><td>GND (pino 4)</td><td>GND</td><td>Terra</td></tr>
-    <tr><td>LDR</td><td>Terminal 1</td><td>5V</td><td>Divisor de tensão</td></tr>
-    <tr><td>LDR</td><td>Terminal 2</td><td>A0 + GND via 10k&#x2126;</td><td>Resistor pull-down</td></tr>
-    <tr><td>Resistor 10k&#x2126;</td><td>Terminal A</td><td>Pino DATA do DHT11</td><td>Pull-up para 5V</td></tr>
+    <tr><th>Componente</th><th>Pino do Componente</th><th>Pino do ESP32</th><th>Observação</th></tr>
+    <tr><td>DS18B20</td><td>VCC (fio vermelho)</td><td>3.3V</td><td>Alimentação 3,3V</td></tr>
+    <tr><td>DS18B20</td><td>DATA (fio amarelo)</td><td>GPIO 4</td><td>OneWire &mdash; sinal de dados</td></tr>
+    <tr><td>DS18B20</td><td>GND (fio preto)</td><td>GND</td><td>Terra</td></tr>
+    <tr><td>Resistor 4,7k&#x2126;</td><td>&mdash;</td><td>DATA &harr; 3.3V</td><td>Pull-up obrigatório para OneWire</td></tr>
+    <tr><td>LDR</td><td>Terminal A</td><td>3.3V</td><td>Divisor de tensão</td></tr>
+    <tr><td>LDR</td><td>Terminal B</td><td>GPIO 34 (ADC1_CH6)</td><td>Nó central do divisor</td></tr>
+    <tr><td>Resistor 10k&#x2126;</td><td>&mdash;</td><td>GPIO 34 &harr; GND</td><td>Pull-down do divisor LDR</td></tr>
   </table>
 
   <div class="card-label" style="margin-bottom:10px;color:#00979d;margin-top:20px;">&#x1F5FA;&#xFE0F; Diagrama de Conexão</div>
   <div class="circuit-diagram">
-    <div class="cd-title">Arduino Uno &mdash; Estação Climática</div>
-    <div><span class="cd-pin-a">5V         </span> &rarr; <span class="cd-pin-b">DHT11 [VCC pino1]  &amp;  LDR [Terminal A]</span></div>
-    <div><span class="cd-pin-a">GND        </span> &rarr; <span class="cd-pin-b">DHT11 [GND pino4]  &amp;  Resistor 10k&Omega; [terminal B]</span></div>
-    <div><span class="cd-pin-a">Digital 2  </span> &rarr; <span class="cd-pin-b">DHT11 [DATA pino2]</span></div>
-    <div><span class="cd-pin-a">             </span>   <span style="color:var(--muted)">└─ Resistor 10k&Omega; pull-up: DATA &harr; 5V</span></div>
-    <div><span class="cd-pin-a">Analog A0  </span> &rarr; <span class="cd-pin-b">Nó entre LDR e Resistor 10k&Omega; pull-down</span></div>
+    <div class="cd-title">ESP32 DevKit &mdash; Estação Climática (DS18B20 + LDR)</div>
+    <div><span class="cd-pin-a">3.3V       </span> &rarr; <span class="cd-pin-b">DS18B20 [VCC fio vermelho]  &amp;  LDR [Terminal A]</span></div>
+    <div><span class="cd-pin-a">GND        </span> &rarr; <span class="cd-pin-b">DS18B20 [GND fio preto]  &amp;  Resistor 10k&Omega; [terminal B]</span></div>
+    <div><span class="cd-pin-a">GPIO 4     </span> &rarr; <span class="cd-pin-b">DS18B20 [DATA fio amarelo]</span></div>
+    <div><span class="cd-pin-a">             </span>   <span style="color:var(--muted)">└─ Resistor 4,7k&Omega; pull-up: DATA &harr; 3.3V (obrigatório OneWire!)</span></div>
+    <div><span class="cd-pin-a">GPIO 34    </span> &rarr; <span class="cd-pin-b">Nó entre LDR e Resistor 10k&Omega; pull-down</span></div>
     <div class="cd-note">
-      &#x26A0;&#xFE0F; Pull-up DHT11: conecte um resistor 10k&Omega; entre o pino DATA e o 5V.<br>
-      &#x26A0;&#xFE0F; O LDR forma um divisor de tensão com o resistor 10k&Omega; &mdash; A0 lê a tensão no nó central.<br>
-      &#x1F4A1; Quanto mais luz, menor a resistência do LDR, maior a leitura em A0 (0&ndash;1023).
+      &#x26A0;&#xFE0F; <strong>Pull-up DS18B20:</strong> o resistor 4,7k&Omega; entre DATA e 3.3V é <em>obrigatório</em> para o protocolo OneWire funcionar.<br>
+      &#x26A0;&#xFE0F; <strong>GPIO 34 é input-only</strong> (sem pull interno) &mdash; ideal para leitura analógica do LDR.<br>
+      &#x26A0;&#xFE0F; O ESP32 opera a <strong>3,3V</strong>. Nunca aplique 5V nos pinos GPIO &mdash; pode danificar o chip.<br>
+      &#x1F4A1; O DS18B20 usa protocolo <strong>OneWire</strong>: um único fio de dados transmite temperatura com resolução de 12 bits (±0,5°C).
     </div>
   </div>
 
   <div class="card-label" style="margin-bottom:10px;color:#00979d;margin-top:22px;">&#x1F4BB; Código Completo &mdash; Semana 04</div>
   <div class="code-wrap">
     <div class="code-header">
-      <span class="code-lang">Arduino C++ &mdash; estacao_climatica_s04.ino</span>
+      <span class="code-lang">ESP32 C++ &mdash; estacao_climatica_s04.ino</span>
       <button class="copy-btn" onclick="copyCode()">&#x1F4CB; Copiar</button>
     </div>
     <pre id="codeBlock">/*
  * BDN007 - Semana 04: Estacao Climatica Multidimensional
  * Projeto Evolutivo - Parte 1: Coleta de Dados
+ * Hardware: ESP32 DevKit + DS18B20 (OneWire) + LDR
  *
  * Conceito OLAP aplicado:
- *   MEDIDAS   -> temperatura, umidade, luminosidade
+ *   MEDIDAS   -> temperatura (DS18B20), luminosidade (LDR)
  *   DIM TEMPO -> millis() / timestamp serial
  *   DIM LOCAL -> fixo (sala de aula) - expandido na S05
  *
- * Biblioteca necessaria: DHT sensor library (Adafruit)
+ * Bibliotecas necessarias:
+ *   1. OneWire          (Paul Stoffregen)
+ *   2. DallasTemperature (Miles Burton)
  * Instalar: Arduino IDE -> Ferramentas -> Gerenciar Bibliotecas
+ *
+ * Configuracao da placa:
+ *   Ferramentas -> Placa -> ESP32 Arduino -> ESP32 Dev Module
+ *   (Instalar suporte ESP32: adicionar URL no Gerenciador de Placas)
+ *   URL: https://raw.githubusercontent.com/espressif/arduino-esp32/
+ *        gh-pages/package_esp32_index.json
  */
 
-#include &lt;DHT.h&gt;
+#include &lt;OneWire.h&gt;
+#include &lt;DallasTemperature.h&gt;
 
 // ── Configuracao dos pinos ────────────────────
-#define DHTPIN     2      // Pino digital do DHT11
-#define DHTTYPE    DHT11  // Modelo do sensor
-#define LDRPIN     A0     // Pino analogico do LDR
-#define INTERVALO  5000   // Coleta a cada 5 segundos
+#define DS18B20_PIN  4     // GPIO 4  -> DATA do DS18B20 (fio amarelo)
+                           // Resistor 4,7kΩ pull-up entre DATA e 3.3V
+#define LDR_PIN     34     // GPIO 34 -> ADC1_CH6 (input-only, sem pull)
+#define INTERVALO 5000     // Coleta a cada 5 segundos (ms)
 
-// ── Objetos e variaveis ───────────────────────
-DHT dht(DHTPIN, DHTTYPE);
+// ── Objetos OneWire / DallasTemperature ──────
+OneWire           oneWire(DS18B20_PIN);
+DallasTemperature sensors(&oneWire);
 
+// ── Variaveis de controle ─────────────────────
 unsigned long ultimaLeitura = 0;
-int contadorLeitura = 0;
+int           contadorLeitura = 0;
 
-// Estrutura para guardar uma leitura (celula do cubo)
+// Estrutura para guardar uma leitura (celula do cubo OLAP)
 struct LeituraCubo {
   unsigned long timestamp;    // DIM_TEMPO
-  float         temperatura;  // MEDIDA 1
-  float         umidade;      // MEDIDA 2
-  int           luminosidade; // MEDIDA 3
-  String        local;        // DIM_LOCAL (fixo por ora)
+  float         temperatura;  // MEDIDA 1 — DS18B20 (°C, 12 bits, ±0.5°C)
+  int           luminosidade; // MEDIDA 2 — LDR (0-4095, ADC 12 bits ESP32)
+  String        local;        // DIM_LOCAL (fixo por ora, S05 expande)
 };
 
-// Buffer circular das ultimas 10 leituras
+// Buffer circular das ultimas 10 leituras (Roll-up OLAP)
 LeituraCubo buffer[10];
 int bufferIdx = 0;
 
 // ── setup() ──────────────────────────────────
 void setup() {
-  Serial.begin(9600);
-  dht.begin();
+  Serial.begin(115200);  // ESP32 usa 115200 baud por padrao
+  sensors.begin();       // Inicializa barramento OneWire
+
+  // Configurar resolucao do DS18B20: 12 bits (mais preciso)
+  sensors.setResolution(12);
 
   Serial.println("================================");
   Serial.println("BDN007 - Estacao Climatica S04");
-  Serial.println("Cubo: Temperatura x Umidade x Luz");
+  Serial.println("ESP32 + DS18B20 (OneWire) + LDR");
+  Serial.println("Cubo OLAP: Temperatura x Luz x Local");
   Serial.println("================================");
-  Serial.println("ID | Tempo(ms) | Temp(C) | Umid(%) | Luz(0-1023) | Local");
-  Serial.println("---+----------+---------+---------+-------------+------");
+  Serial.println("ID | Tempo(ms) | Temp(C) | Luz(0-4095) | Local");
+  Serial.println("---+----------+---------+-------------+------");
 
-  delay(2000); // DHT11 precisa de estabilizacao
+  // DS18B20 nao precisa de delay de estabilizacao como o DHT
+  // mas aguardamos 1s para a primeira conversao de temperatura
+  delay(1000);
 }
 
 // ── loop() ───────────────────────────────────
@@ -592,71 +613,88 @@ void loop() {
   if (agora - ultimaLeitura >= INTERVALO) {
     ultimaLeitura = agora;
 
-    // 1. Ler sensores
-    float temp = dht.readTemperature();
-    float umid = dht.readHumidity();
-    int   luz  = analogRead(LDRPIN);
+    // 1. Solicitar leitura ao(s) sensor(es) DS18B20
+    sensors.requestTemperatures();
 
-    // 2. Validar leituras (DHT11 pode falhar)
-    if (isnan(temp) || isnan(umid)) {
-      Serial.println("ERRO: Falha na leitura do DHT11!");
+    // 2. Ler temperatura do primeiro sensor no barramento
+    float temp = sensors.getTempCByIndex(0);
+
+    // 3. Ler luminosidade do LDR
+    //    ESP32 ADC: 12 bits -> valores de 0 a 4095
+    int luz = analogRead(LDR_PIN);
+
+    // 4. Validar leitura do DS18B20
+    //    DEVICE_DISCONNECTED_C = -127.0 (sensor desconectado)
+    if (temp == DEVICE_DISCONNECTED_C) {
+      Serial.println("ERRO: DS18B20 nao encontrado! Verifique o pull-up 4.7k.");
+      delay(2000);
       return;
     }
 
-    // 3. Criar celula do cubo
+    // 5. Criar celula do cubo OLAP
     LeituraCubo celula;
     celula.timestamp    = agora;
     celula.temperatura  = temp;
-    celula.umidade      = umid;
     celula.luminosidade = luz;
     celula.local        = "Sala-A1"; // DIM_LOCAL fixo (S05 expande)
 
-    // 4. Armazenar no buffer circular
+    // 6. Armazenar no buffer circular (ultimas 10 leituras)
     buffer[bufferIdx % 10] = celula;
     bufferIdx++;
     contadorLeitura++;
 
-    // 5. Imprimir no Serial Monitor (formato CSV)
+    // 7. Imprimir no Serial Monitor (formato CSV para planilha)
     Serial.print(contadorLeitura);
     Serial.print("  | ");
     Serial.print(agora);
     Serial.print("   | ");
-    Serial.print(temp, 1);
+    Serial.print(temp, 2);   // 2 casas decimais (DS18B20 e preciso!)
     Serial.print("C  | ");
-    Serial.print(umid, 1);
-    Serial.print("%   | ");
     Serial.print(luz);
-    Serial.print("         | ");
+    Serial.print("          | ");
     Serial.println(celula.local);
 
-    // 6. A cada 10 leituras: exibir mini-analise OLAP (Roll-up)
+    // 8. A cada 10 leituras: exibir mini-analise OLAP (Roll-up)
     if (contadorLeitura % 10 == 0) {
       exibirAnaliseOLAP();
     }
   }
 }
 
-// ── Analise OLAP local (Roll-up das 10 ultimas) ──
+// ── Analise OLAP local (Roll-up das 10 ultimas leituras) ──
 void exibirAnaliseOLAP() {
-  float somaTemp = 0, somaUmid = 0;
-  float maxTemp  = -999, minTemp = 999;
-  int   somaLuz  = 0;
+  float somaTemp = 0;
+  float maxTemp  = -999.0, minTemp = 999.0;
+  long  somaLuz  = 0;
+  int   maxLuz   = 0,      minLuz  = 4095;
 
   for (int i = 0; i &lt; 10; i++) {
     somaTemp += buffer[i].temperatura;
-    somaUmid += buffer[i].umidade;
     somaLuz  += buffer[i].luminosidade;
+
     if (buffer[i].temperatura &gt; maxTemp) maxTemp = buffer[i].temperatura;
     if (buffer[i].temperatura &lt; minTemp) minTemp = buffer[i].temperatura;
+    if (buffer[i].luminosidade &gt; maxLuz) maxLuz  = buffer[i].luminosidade;
+    if (buffer[i].luminosidade &lt; minLuz) minLuz  = buffer[i].luminosidade;
   }
 
-  Serial.println("\n─── ROLL-UP: Resumo das ultimas 10 leituras ───");
-  Serial.print("  Temp Media : "); Serial.print(somaTemp / 10.0, 1); Serial.println("C");
-  Serial.print("  Temp Max   : "); Serial.print(maxTemp, 1);          Serial.println("C");
-  Serial.print("  Temp Min   : "); Serial.print(minTemp, 1);          Serial.println("C");
-  Serial.print("  Umid Media : "); Serial.print(somaUmid / 10.0, 1); Serial.println("%");
-  Serial.print("  Luz Media  : "); Serial.println(somaLuz / 10);
-  Serial.println("───────────────────────────────────────────────\n");
+  // Classificar luminosidade media em categorias (DIM_CONDICAO)
+  int avgLuz = (int)(somaLuz / 10);
+  String condicao;
+  if      (avgLuz &lt; 500)  condicao = "Escuro";
+  else if (avgLuz &lt; 2000) condicao = "Meia-luz";
+  else if (avgLuz &lt; 3500) condicao = "Claro";
+  else                     condicao = "Muito claro";
+
+  Serial.println("\n--- ROLL-UP: Resumo das ultimas 10 leituras ---");
+  Serial.print("  Temp Media   : "); Serial.print(somaTemp / 10.0, 2); Serial.println(" C");
+  Serial.print("  Temp Max     : "); Serial.print(maxTemp, 2);          Serial.println(" C");
+  Serial.print("  Temp Min     : "); Serial.print(minTemp, 2);          Serial.println(" C");
+  Serial.print("  Luz Media    : "); Serial.print(avgLuz);              Serial.println(" (0-4095)");
+  Serial.print("  Luz Max      : "); Serial.println(maxLuz);
+  Serial.print("  Luz Min      : "); Serial.println(minLuz);
+  Serial.print("  Cond. Luz    : "); Serial.println(condicao);
+  Serial.println("-----------------------------------------------\n");
 }</pre>
   </div>
 
@@ -664,11 +702,11 @@ void exibirAnaliseOLAP() {
   <div class="card-label" style="margin-bottom:10px;color:#00979d;margin-top:22px;">&#x1F3AE; Simulador &mdash; Teste Sem Hardware</div>
   <p style="font-size:.88em;color:#7ab8bc;margin-bottom:14px;">Sem Arduino em mãos? Simule a saída do Serial Monitor aqui:</p>
   <div class="sim-panel">
-    <div class="sim-title">&#x1F4DF; Serial Monitor Simulado &mdash; 9600 baud</div>
+    <div class="sim-title">&#x1F4DF; Serial Monitor Simulado &mdash; 115200 baud</div>
     <div class="sensors-row">
-      <div class="sensor-box"><div class="s-icon">&#x1F321;&#xFE0F;</div><div class="s-name">DHT11 &middot; Temp</div><div class="s-val" id="simT">--</div><div class="s-unit">&deg;C</div></div>
-      <div class="sensor-box"><div class="s-icon">&#x1F4A7;</div><div class="s-name">DHT11 &middot; Umid</div><div class="s-val" id="simU">--</div><div class="s-unit">%</div></div>
-      <div class="sensor-box"><div class="s-icon">&#x2600;&#xFE0F;</div><div class="s-name">LDR &middot; Luz</div><div class="s-val" id="simL">--</div><div class="s-unit">/ 1023</div></div>
+      <div class="sensor-box"><div class="s-icon">&#x1F321;&#xFE0F;</div><div class="s-name">DS18B20 &middot; Temp</div><div class="s-val" id="simT">--</div><div class="s-unit">&deg;C</div></div>
+      <div class="sensor-box"><div class="s-icon">&#x2600;&#xFE0F;</div><div class="s-name">LDR &middot; Luz</div><div class="s-val" id="simL">--</div><div class="s-unit">/ 4095</div></div>
+      <div class="sensor-box"><div class="s-icon">&#x1F4CA;</div><div class="s-name">Cond. Luz</div><div class="s-val" id="simC" style="font-size:1em;">--</div><div class="s-unit">&nbsp;</div></div>
     </div>
     <div class="sim-controls">
       <button class="sim-btn start" id="simBtn" onclick="simToggle()">&#x25B6; Iniciar Simulação</button>
@@ -680,23 +718,24 @@ void exibirAnaliseOLAP() {
   <!-- COMO REPLICAR -->
   <div class="card-label" style="margin-bottom:10px;color:#00979d;margin-top:22px;">&#x1F4CB; Como Replicar &mdash; Passo a Passo</div>
   <ol style="padding-left:20px;line-height:2.1;color:#7ab8bc;font-size:.9em;">
-    <li>Abra o <strong>Arduino IDE</strong> (versão 1.8+ ou 2.x)</li>
-    <li>Vá em <strong>Ferramentas &rarr; Gerenciar Bibliotecas</strong> e instale <code style="background:var(--surf3);padding:1px 6px;border-radius:4px;">DHT sensor library</code> da Adafruit</li>
-    <li>Monte o circuito conforme a <strong>tabela de conexões</strong> acima</li>
+    <li>Abra o <strong>Arduino IDE</strong> (versão 2.x recomendada)</li>
+    <li>Adicione o suporte ao ESP32: <strong>Arquivo &rarr; Preferências &rarr; URLs adicionais</strong> e cole: <code style="background:var(--surf3);padding:1px 6px;border-radius:4px;font-size:.85em;">https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json</code>. Depois vá em <strong>Ferramentas &rarr; Gerenciar Placas</strong> e instale <em>esp32 by Espressif</em></li>
+    <li>Instale as bibliotecas: <strong>Ferramentas &rarr; Gerenciar Bibliotecas</strong> &rarr; instale <code style="background:var(--surf3);padding:1px 6px;border-radius:4px;">OneWire</code> (Paul Stoffregen) e <code style="background:var(--surf3);padding:1px 6px;border-radius:4px;">DallasTemperature</code> (Miles Burton)</li>
+    <li>Monte o circuito conforme a <strong>tabela de conexões</strong> acima &mdash; não esqueça do resistor <strong>4,7k&#x2126;</strong> entre DATA e 3.3V!</li>
     <li>Clique em <strong>"Copiar"</strong> no código acima e cole em um novo sketch no Arduino IDE</li>
-    <li>Selecione <strong>Ferramentas &rarr; Placa &rarr; Arduino Uno</strong> e a porta COM correta</li>
-    <li>Clique em <strong>Upload (&rarr;)</strong> e aguarde</li>
-    <li>Abra o <strong>Monitor Serial</strong> (Ctrl+Shift+M) a <code style="background:var(--surf3);padding:1px 6px;border-radius:4px;">9600 baud</code></li>
-    <li>Veja as leituras em formato CSV. <strong>Copie para uma planilha</strong> e monte seu cubo!</li>
+    <li>Selecione <strong>Ferramentas &rarr; Placa &rarr; ESP32 Arduino &rarr; ESP32 Dev Module</strong> e a porta COM correta</li>
+    <li>Clique em <strong>Upload (&rarr;)</strong> e aguarde a gravação</li>
+    <li>Abra o <strong>Monitor Serial</strong> (Ctrl+Shift+M) configurado para <code style="background:var(--surf3);padding:1px 6px;border-radius:4px;">115200 baud</code></li>
+    <li>Veja as leituras em formato CSV. <strong>Copie para uma planilha</strong> e monte seu cubo OLAP!</li>
   </ol>
 
   <div style="background:rgba(0,151,157,.07);border:1px solid rgba(0,151,157,.2);border-radius:12px;padding:20px;margin-top:20px;">
     <div class="card-label" style="margin-bottom:10px;color:var(--arduino);">&#x1F3C6; Desafio Extra &middot; +100 XP</div>
-    <p style="font-size:.9em;color:#7ab8bc;margin-bottom:10px;">Modifique o código para implementar os conceitos OLAP diretamente no Arduino:</p>
+    <p style="font-size:.9em;color:#7ab8bc;margin-bottom:10px;">Modifique o código para implementar os conceitos OLAP diretamente no ESP32:</p>
     <ul style="padding-left:18px;font-size:.88em;color:#6b8fa0;line-height:1.9;">
-      <li><strong>Slice:</strong> exibir no Serial apenas leituras onde temperatura &gt; 25&deg;C</li>
-      <li><strong>Drill-down:</strong> quando a média do Roll-up for alta, exibir os 3 maiores valores individuais</li>
-      <li><strong>Segundo local:</strong> simular com uma variável aleatória alternando entre "Sala-A1" e "Sala-B2"</li>
+      <li><strong>Slice:</strong> exibir no Serial apenas leituras onde temperatura &gt; 28&deg;C</li>
+      <li><strong>Drill-down:</strong> quando a média do Roll-up for alta, exibir as 3 leituras individuais mais quentes</li>
+      <li><strong>Segundo sensor DS18B20:</strong> conecte outro DS18B20 no mesmo barramento OneWire (endereço diferente) e altere <code style="background:var(--surf3);padding:1px 6px;border-radius:4px;">getDeviceCount()</code> para ler os dois, alternando o campo <code>local</code> entre "Sala-A1" e "Lab"</li>
     </ul>
     <div style="margin-top:12px;display:inline-flex;align-items:center;gap:6px;background:rgba(255,214,10,.1);border:1px solid rgba(255,214,10,.2);border-radius:20px;padding:4px 14px;font-family:'JetBrains Mono',monospace;font-size:.7em;color:var(--gold);">&#x26A1; +100 XP ao entregar o código modificado no Moodle</div>
   </div>
@@ -756,15 +795,16 @@ function showResult(){document.getElementById('qbody').style.display='none';cons
 function resetQuiz(){curQ=0;scores.fill(null);document.getElementById('qresult').classList.remove('on');document.getElementById('qbody').style.display='';document.querySelectorAll('.q-block').forEach((b,i)=>{b.classList.toggle('on',i===0);const ta=b.querySelector('.answer-area');if(ta){ta.value='';ta.disabled=false;}const gab=b.querySelector('.gabarito');if(gab)gab.classList.remove('show');const rb=b.querySelector('.reveal-btn');if(rb){rb.classList.remove('open');rb.querySelector('.arr').textContent='▶';}const sc=b.querySelector('.self-check');if(sc){sc.style.display='none';sc.querySelectorAll('.self-btn').forEach(btn=>btn.classList.remove('got-it','missed'));}const nb=b.querySelector('[id^="nb"]');if(nb)nb.disabled=true;});buildProg();}
 
 // ── EVO BAR ────────────────────────────────────
-const evoTxt=['<strong style="color:var(--arduino)">Semana 04 — Coleta de dados</strong><br><br>Monte o circuito com DHT11 e LDR. O Arduino coleta temperatura, umidade e luminosidade a cada 5s e envia via Serial em CSV. Esses dados são as <strong>medidas</strong> do cubo OLAP. A função <code>exibirAnaliseOLAP()</code> demonstra Roll-up no hardware.','<strong style="color:var(--arduino)">Semana 05 — Estrutura dimensional</strong><br><br>Adicionamos um segundo sensor em local diferente. Criamos a estrutura formal: DIM_TEMPO (timestamp formatado), DIM_LOCAL (Sala-A1 vs Lab), DIM_SENSOR. Exportamos dados para importar no Excel e montar o modelo dimensional.','<strong style="color:var(--arduino)">Semana 06 — Armazenamento DW</strong><br><br>Um script Python recebe as leituras via Serial e insere em um banco SQLite (DW simplificado). Implementamos FATO_LEITURAS e dimensões. Conceito: Staging Area no buffer do Arduino, carregamento periódico no DW.','<strong style="color:var(--arduino)">Semana 07 — Dashboard Web</strong><br><br>Python serve uma página HTML com Chart.js que lê o SQLite e exibe gráficos. O aluno experimenta OLAP visualmente: Drill-down clicando em um período, Slice filtrando por local, Pivot alternando eixos. Projeto final do módulo!'];
+const evoTxt=['<strong style="color:var(--arduino)">Semana 04 — Coleta de dados com sensores</strong><br><br>Monte o circuito com DS18B20 (OneWire) e LDR. O ESP32 coleta temperatura e luminosidade a cada 5s e envia via Serial em CSV. Esses dados são as <strong>medidas</strong> do cubo OLAP. A função <code>exibirAnaliseOLAP()</code> demonstra Roll-up no hardware e classifica a luminosidade em categorias (DIM_CONDICAO).','<strong style="color:var(--arduino)">Semana 05 — Estrutura dimensional</strong><br><br>Adicionamos um segundo sensor DS18B20 no mesmo barramento OneWire (endereço diferente). Criamos a estrutura formal: DIM_TEMPO (timestamp formatado), DIM_LOCAL (Sala-A1 vs Lab), DIM_SENSOR. Exportamos dados para importar no Excel e montar o modelo dimensional.','<strong style="color:var(--arduino)">Semana 06 — Armazenamento DW</strong><br><br>Um script Python recebe as leituras via Serial e insere em um banco SQLite (DW simplificado). Implementamos FATO_LEITURAS e dimensões. Conceito: Staging Area no buffer do ESP32, carregamento periódico no DW.','<strong style="color:var(--arduino)">Semana 07 — Dashboard Web</strong><br><br>Python serve uma página HTML com Chart.js que lê o SQLite e exibe gráficos. O aluno experimenta OLAP visualmente: Drill-down clicando em um período, Slice filtrando por local, Pivot alternando eixos. Projeto final do módulo!'];
 function evoShow(idx){document.querySelectorAll('.evo-step').forEach((s,i)=>s.classList.toggle('active',i===idx));document.getElementById('evoDetail').innerHTML=evoTxt[idx];addXP(8);}
 
 // ── SIMULADOR ──────────────────────────────────
-let simTmr=null,simCnt=0,simRun=false,simBuf={t:[],u:[],l:[]};
-function simToggle(){const btn=document.getElementById('simBtn');if(!simRun){simRun=true;btn.textContent='⏹ Parar';btn.classList.add('running');simCnt=0;simBuf={t:[],u:[],l:[]};document.getElementById('simLog').textContent='================================\nBDN007 - Estacao Climatica S04\n================================\nID | Tempo(ms) | Temp(C) | Umid(%) | Luz | Local\n';simTmr=setInterval(simStep,1200);}else{simStop();}}
-function simStep(){simCnt++;const t=(22+Math.random()*8).toFixed(1);const u=(55+Math.random()*30).toFixed(1);const l=Math.floor(200+Math.random()*700);const ms=simCnt*5000;simBuf.t.push(parseFloat(t));simBuf.u.push(parseFloat(u));simBuf.l.push(l);document.getElementById('simT').textContent=t;document.getElementById('simU').textContent=u;document.getElementById('simL').textContent=l;const log=document.getElementById('simLog');log.textContent+=simCnt+'  | '+ms+'   | '+t+'C  | '+u+'%   | '+l+' | Sala-A1\n';log.scrollTop=log.scrollHeight;if(simCnt%10===0&&simBuf.t.length>=10){const l10t=simBuf.t.slice(-10);const l10u=simBuf.u.slice(-10);const l10l=simBuf.l.slice(-10);const avgT=(l10t.reduce((a,b)=>a+b,0)/10).toFixed(1);const maxT=Math.max(...l10t).toFixed(1);const minT=Math.min(...l10t).toFixed(1);const avgU=(l10u.reduce((a,b)=>a+b,0)/10).toFixed(1);const avgL=Math.floor(l10l.reduce((a,b)=>a+b,0)/10);log.textContent+='\n>>> ROLL-UP: ultimas 10 leituras\n  Temp Media : '+avgT+'C | Max: '+maxT+'C | Min: '+minT+'C\n  Umid Media : '+avgU+'% | Luz Media: '+avgL+'\n<<<\n\n';log.scrollTop=log.scrollHeight;addXP(15);showToast('📊','Roll-up Executado!');}if(simCnt>=20)simStop();}
+let simTmr=null,simCnt=0,simRun=false,simBuf={t:[],l:[]};
+function simToggle(){const btn=document.getElementById('simBtn');if(!simRun){simRun=true;btn.textContent='⏹ Parar';btn.classList.add('running');simCnt=0;simBuf={t:[],l:[]};document.getElementById('simLog').textContent='================================\nBDN007 - Estacao Climatica S04\nESP32 + DS18B20 (OneWire) + LDR\n================================\nID | Tempo(ms) | Temp(C) | Luz(0-4095) | Local\n';simTmr=setInterval(simStep,1200);}else{simStop();}}
+function simCondicao(l){return l<500?'Escuro':l<2000?'Meia-luz':l<3500?'Claro':'Muito claro';}
+function simStep(){simCnt++;const t=(20+Math.random()*12).toFixed(2);const l=Math.floor(100+Math.random()*3900);const ms=simCnt*5000;simBuf.t.push(parseFloat(t));simBuf.l.push(l);document.getElementById('simT').textContent=t;document.getElementById('simL').textContent=l;document.getElementById('simC').textContent=simCondicao(l);const log=document.getElementById('simLog');log.textContent+=simCnt+'  | '+ms+'   | '+t+'C  | '+l+'         | Sala-A1\n';log.scrollTop=log.scrollHeight;if(simCnt%10===0&&simBuf.t.length>=10){const l10t=simBuf.t.slice(-10);const l10l=simBuf.l.slice(-10);const avgT=(l10t.reduce((a,b)=>a+b,0)/10).toFixed(2);const maxT=Math.max(...l10t).toFixed(2);const minT=Math.min(...l10t).toFixed(2);const avgL=Math.floor(l10l.reduce((a,b)=>a+b,0)/10);const maxL=Math.max(...l10l);const minL=Math.min(...l10l);log.textContent+='\n>>> ROLL-UP: ultimas 10 leituras\n  Temp Media   : '+avgT+'C | Max: '+maxT+'C | Min: '+minT+'C\n  Luz Media    : '+avgL+' | Max: '+maxL+' | Min: '+minL+'\n  Cond. Luz    : '+simCondicao(avgL)+'\n<<<\n\n';log.scrollTop=log.scrollHeight;addXP(15);showToast('📊','Roll-up Executado!');}if(simCnt>=20)simStop();}
 function simStop(){clearInterval(simTmr);simRun=false;const btn=document.getElementById('simBtn');btn.textContent='▶ Iniciar Simulação';btn.classList.remove('running');}
-function simClear(){simStop();simCnt=0;simBuf={t:[],u:[],l:[]};document.getElementById('simLog').textContent='Log limpo.';['simT','simU','simL'].forEach(id=>document.getElementById(id).textContent='--');}
+function simClear(){simStop();simCnt=0;simBuf={t:[],l:[]};document.getElementById('simLog').textContent='Log limpo.';['simT','simL','simC'].forEach(id=>document.getElementById(id).textContent='--');}
 
 function copyCode(){const code=document.getElementById('codeBlock').textContent;navigator.clipboard.writeText(code).then(()=>{const btn=document.querySelector('.copy-btn');btn.textContent='✅ Copiado!';setTimeout(()=>btn.textContent='📋 Copiar',2000);addXP(5);});}
 

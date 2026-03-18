@@ -1,0 +1,2040 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semana 03 — Modelagem Dimensional | BDN007</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0e1a;
+            --surface: #111827;
+            --surface2: #1a2235;
+            --border: #1e2d45;
+            --accent: #00d4ff;
+            --accent2: #7c3aed;
+            --accent3: #10b981;
+            --accent4: #f59e0b;
+            --danger: #ef4444;
+            --text: #e2e8f0;
+            --muted: #64748b;
+            --gold: #fbbf24;
+            --xp-color: #a78bfa;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* HERO */
+        .hero {
+            position: relative;
+            background: linear-gradient(135deg, #0a0e1a 0%, #1a0a2e 50%, #0a1628 100%);
+            padding: 60px 20px 80px;
+            text-align: center;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 20% 50%, rgba(0,212,255,0.08) 0%, transparent 60%),
+                        radial-gradient(ellipse at 80% 20%, rgba(124,58,237,0.12) 0%, transparent 50%);
+        }
+        .hero-grid {
+            position: absolute;
+            inset: 0;
+            background-image: linear-gradient(rgba(0,212,255,0.04) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(0,212,255,0.04) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+        .hero-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent2), var(--accent));
+            color: white;
+            padding: 6px 18px;
+            border-radius: 100px;
+            font-size: 0.8em;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 24px;
+            position: relative;
+        }
+        .hero h1 {
+            font-size: clamp(2em, 5vw, 3.8em);
+            font-weight: 700;
+            line-height: 1.1;
+            position: relative;
+            background: linear-gradient(135deg, #fff 0%, var(--accent) 50%, var(--accent2) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+        }
+        .hero p {
+            font-size: 1.2em;
+            color: var(--muted);
+            position: relative;
+            margin-bottom: 40px;
+        }
+
+        /* XP BAR */
+        .xp-bar-container {
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+        .xp-bar-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85em;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+        .xp-bar {
+            background: var(--surface2);
+            height: 12px;
+            border-radius: 100px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        .xp-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent2), var(--accent));
+            border-radius: 100px;
+            transition: width 1.5s ease;
+            box-shadow: 0 0 10px rgba(0,212,255,0.5);
+        }
+        .xp-status {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 24px;
+        }
+        .xp-stat {
+            text-align: center;
+        }
+        .xp-stat .val {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: var(--xp-color);
+        }
+        .xp-stat .lbl {
+            font-size: 0.75em;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* MAIN LAYOUT */
+        .main {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 20px 80px;
+        }
+
+        /* PHASE TABS */
+        .phase-nav {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 40px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+        .phase-btn {
+            flex-shrink: 0;
+            padding: 10px 20px;
+            border-radius: 8px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--muted);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.9em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .phase-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .phase-btn.active {
+            background: linear-gradient(135deg, var(--accent2), var(--accent));
+            border-color: transparent;
+            color: white;
+            box-shadow: 0 0 20px rgba(0,212,255,0.3);
+        }
+        .phase-btn.locked { opacity: 0.4; cursor: not-allowed; }
+        .phase-btn.done { border-color: var(--accent3); color: var(--accent3); }
+
+        /* SECTIONS */
+        .phase-section { display: none; animation: fadeIn 0.4s ease; }
+        .phase-section.visible { display: block; }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+        /* SECTION HEADER */
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        .section-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6em;
+            flex-shrink: 0;
+        }
+        .icon-blue { background: rgba(0,212,255,0.15); border: 1px solid rgba(0,212,255,0.3); }
+        .icon-purple { background: rgba(124,58,237,0.15); border: 1px solid rgba(124,58,237,0.3); }
+        .icon-green { background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); }
+        .icon-orange { background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3); }
+        .section-header h2 { font-size: 1.8em; font-weight: 700; }
+        .section-header p { color: var(--muted); font-size: 0.95em; margin-top: 4px; }
+
+        /* CARDS */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 24px;
+            transition: border-color 0.2s;
+        }
+        .card:hover { border-color: var(--accent); }
+        .card h3 {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--accent);
+        }
+        .card p { color: #94a3b8; line-height: 1.7; margin-bottom: 12px; }
+
+        /* CONCEPT BOX */
+        .concept-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+        .concept-card {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            border-top: 3px solid var(--accent);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .concept-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .concept-card.purple-top { border-top-color: var(--accent2); }
+        .concept-card.green-top { border-top-color: var(--accent3); }
+        .concept-card.orange-top { border-top-color: var(--accent4); }
+        .concept-card h4 { font-size: 1em; font-weight: 600; margin-bottom: 8px; }
+        .concept-card p { font-size: 0.9em; color: #94a3b8; margin: 0; }
+
+        /* SCHEMA VISUAL */
+        .schema-visual {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+            overflow-x: auto;
+        }
+        .schema-visual pre {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85em;
+            color: #a5f3fc;
+            line-height: 1.6;
+        }
+        .schema-visual .comment { color: var(--muted); }
+        .schema-visual .key { color: var(--gold); }
+        .schema-visual .table-name { color: var(--accent); font-weight: 600; }
+
+        /* COMPARISON TABLE */
+        .compare-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 24px 0;
+            font-size: 0.95em;
+        }
+        .compare-table th {
+            background: var(--surface2);
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--accent);
+            color: var(--accent);
+        }
+        .compare-table th:first-child { color: var(--text); }
+        .compare-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            color: #94a3b8;
+        }
+        .compare-table td:first-child { font-weight: 500; color: var(--text); }
+        .compare-table tr:hover td { background: var(--surface2); }
+        .tag-good { color: var(--accent3); font-weight: 600; }
+        .tag-bad { color: var(--danger); font-weight: 600; }
+
+        /* FACT TYPES */
+        .fact-type-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+        .fact-card {
+            background: var(--surface2);
+            border-radius: 12px;
+            padding: 22px;
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+        .fact-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+        }
+        .fact-card.transacional::before { background: var(--accent); }
+        .fact-card.snapshot::before { background: var(--accent2); }
+        .fact-card.acumulado::before { background: var(--accent3); }
+        .fact-card h4 { font-size: 1.05em; font-weight: 600; margin-bottom: 12px; }
+        .fact-card ul { list-style: none; }
+        .fact-card ul li { font-size: 0.9em; color: #94a3b8; padding: 4px 0; padding-left: 16px; position: relative; }
+        .fact-card ul li::before { content: '›'; position: absolute; left: 0; color: var(--muted); }
+
+        /* QUIZ */
+        .quiz-container { margin: 32px 0; }
+        .quiz-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .quiz-card.active { display: block; }
+        .quiz-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .quiz-number { font-size: 0.85em; color: var(--muted); }
+        .quiz-xp { background: rgba(167,139,250,0.2); color: var(--xp-color); padding: 4px 12px; border-radius: 100px; font-size: 0.8em; font-weight: 600; }
+        .quiz-question { font-size: 1.15em; font-weight: 500; margin-bottom: 20px; line-height: 1.5; }
+        .quiz-options { display: grid; gap: 10px; }
+        .quiz-option {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px 18px;
+            cursor: pointer;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.95em;
+            color: var(--text);
+            text-align: left;
+            transition: all 0.2s;
+        }
+        .quiz-option:hover:not(:disabled) { border-color: var(--accent); background: rgba(0,212,255,0.05); }
+        .quiz-option.correct { border-color: var(--accent3) !important; background: rgba(16,185,129,0.1) !important; color: var(--accent3) !important; }
+        .quiz-option.wrong { border-color: var(--danger) !important; background: rgba(239,68,68,0.1) !important; color: var(--danger) !important; }
+        .quiz-feedback {
+            margin-top: 16px;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            display: none;
+            line-height: 1.6;
+        }
+        .quiz-feedback.show { display: block; }
+        .quiz-feedback.success { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: #6ee7b7; }
+        .quiz-feedback.error { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; }
+        .quiz-next {
+            margin-top: 16px;
+            padding: 10px 24px;
+            background: linear-gradient(135deg, var(--accent2), var(--accent));
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            display: none;
+            transition: opacity 0.2s;
+        }
+        .quiz-next.show { display: inline-block; }
+        .quiz-next:hover { opacity: 0.9; }
+
+        /* QUIZ RESULT */
+        .quiz-result {
+            text-align: center;
+            padding: 40px 28px;
+            display: none;
+        }
+        .quiz-result.show { display: block; }
+        .result-score { font-size: 4em; font-weight: 700; color: var(--accent); }
+        .result-msg { font-size: 1.2em; color: var(--muted); margin: 12px 0 24px; }
+        .restart-btn {
+            padding: 12px 32px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .restart-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+        /* QUIZ PROGRESS */
+        .quiz-progress {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 24px;
+        }
+        .qp-dot {
+            width: 32px; height: 6px;
+            border-radius: 100px;
+            background: var(--border);
+            transition: background 0.3s;
+        }
+        .qp-dot.done { background: var(--accent3); }
+        .qp-dot.active { background: var(--accent); }
+        .qp-dot.wrong-d { background: var(--danger); }
+
+        /* DRAG AND DROP */
+        .dnd-area {
+            margin: 24px 0;
+        }
+        .dnd-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 24px;
+            min-height: 60px;
+            padding: 16px;
+            background: var(--surface2);
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+        }
+        .chip {
+            background: var(--surface);
+            border: 1px solid var(--accent2);
+            color: var(--text);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: grab;
+            font-size: 0.9em;
+            font-weight: 500;
+            user-select: none;
+            transition: all 0.2s;
+        }
+        .chip:hover { background: rgba(124,58,237,0.15); }
+        .chip.dragging { opacity: 0.4; }
+        .dnd-zones {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .dnd-zone {
+            background: var(--surface2);
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            min-height: 120px;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .dnd-zone.over { border-color: var(--accent); background: rgba(0,212,255,0.05); }
+        .dnd-zone h4 {
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--muted);
+            margin-bottom: 12px;
+        }
+        .dnd-zone.fact h4 { color: var(--accent); }
+        .dnd-zone.dim h4 { color: var(--accent2); }
+        .dropped-chips { display: flex; flex-wrap: wrap; gap: 8px; min-height: 40px; }
+        .dnd-check-btn {
+            margin-top: 16px;
+            padding: 10px 28px;
+            background: linear-gradient(135deg, var(--accent2), var(--accent));
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .dnd-check-btn:hover { opacity: 0.9; }
+        .dnd-result { margin-top: 14px; font-size: 0.95em; padding: 12px; border-radius: 8px; display: none; }
+        .dnd-result.ok { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: #6ee7b7; display: block; }
+        .dnd-result.fail { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; display: block; }
+
+        /* CODING CHALLENGE */
+        .challenge-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 24px;
+        }
+        .challenge-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            gap: 16px;
+        }
+        .challenge-header h3 { font-size: 1.15em; font-weight: 600; color: var(--accent); }
+        .difficulty {
+            flex-shrink: 0;
+            padding: 4px 12px;
+            border-radius: 100px;
+            font-size: 0.78em;
+            font-weight: 600;
+        }
+        .diff-easy { background: rgba(16,185,129,0.2); color: var(--accent3); }
+        .diff-medium { background: rgba(245,158,11,0.2); color: var(--accent4); }
+        .diff-hard { background: rgba(239,68,68,0.2); color: var(--danger); }
+        .challenge-desc { color: #94a3b8; margin-bottom: 16px; line-height: 1.7; }
+        .challenge-context {
+            background: var(--surface2);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border-left: 3px solid var(--accent4);
+        }
+        .challenge-context p { font-size: 0.9em; color: #94a3b8; margin-bottom: 6px; }
+        .challenge-context strong { color: var(--accent4); }
+        .code-editor {
+            width: 100%;
+            min-height: 200px;
+            background: #0d1117;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.88em;
+            color: #e2e8f0;
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.2s;
+            line-height: 1.6;
+        }
+        .code-editor:focus { border-color: var(--accent); }
+        .editor-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+            align-items: center;
+        }
+        .run-btn {
+            padding: 10px 24px;
+            background: var(--accent3);
+            border: none;
+            border-radius: 8px;
+            color: #000;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.9em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .run-btn:hover { opacity: 0.9; }
+        .hint-btn {
+            padding: 10px 24px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--muted);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .hint-btn:hover { border-color: var(--accent4); color: var(--accent4); }
+        .hint-box {
+            background: rgba(245,158,11,0.08);
+            border: 1px solid rgba(245,158,11,0.25);
+            border-radius: 8px;
+            padding: 14px;
+            margin-top: 12px;
+            font-size: 0.9em;
+            color: #fde68a;
+            display: none;
+            line-height: 1.6;
+        }
+        .hint-box.show { display: block; }
+        .solution-box {
+            background: #0d1117;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            margin-top: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85em;
+            color: #a5f3fc;
+            white-space: pre-wrap;
+            display: none;
+            line-height: 1.6;
+        }
+        .solution-box .kw { color: #c084fc; }
+        .solution-box .fn { color: #60a5fa; }
+        .solution-box .str { color: #86efac; }
+        .solution-box .comment { color: #475569; }
+        .solution-box.show { display: block; }
+        .show-solution-btn {
+            padding: 10px 24px;
+            background: transparent;
+            border: 1px solid rgba(124,58,237,0.4);
+            border-radius: 8px;
+            color: var(--accent2);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .show-solution-btn:hover { background: rgba(124,58,237,0.1); }
+
+        /* ACHIEVEMENT */
+        .achievements {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+            margin: 24px 0;
+        }
+        .ach {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 18px;
+            text-align: center;
+            transition: all 0.3s;
+            filter: grayscale(100%) opacity(0.4);
+        }
+        .ach.unlocked {
+            filter: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 20px rgba(251,191,36,0.2);
+        }
+        .ach-icon { font-size: 2.5em; margin-bottom: 8px; }
+        .ach-name { font-size: 0.85em; font-weight: 600; color: var(--text); }
+        .ach-desc { font-size: 0.75em; color: var(--muted); margin-top: 4px; }
+
+        /* NAVIGATE */
+        .bottom-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-top: 40px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+        }
+        .nav-btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .nav-btn-ghost {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--muted);
+        }
+        .nav-btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+        .nav-btn-primary {
+            background: linear-gradient(135deg, var(--accent2), var(--accent));
+            border: none;
+            color: white;
+        }
+        .nav-btn-primary:hover { opacity: 0.9; }
+
+        /* PHASE UNLOCK MSG */
+        .unlock-msg {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--muted);
+        }
+        .unlock-msg .lock-icon { font-size: 4em; margin-bottom: 16px; }
+        .unlock-msg h3 { font-size: 1.4em; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            background: var(--surface);
+            border: 1px solid var(--accent3);
+            border-radius: 12px;
+            padding: 16px 20px;
+            font-size: 0.95em;
+            color: var(--accent3);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            z-index: 9999;
+            transform: translateX(120%);
+            transition: transform 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+            max-width: 320px;
+        }
+        .toast.show { transform: translateX(0); }
+        .toast-title { font-weight: 700; margin-bottom: 4px; }
+        .toast-msg { color: var(--muted); font-size: 0.9em; }
+
+        /* HIGHLIGHT */
+        .highlight {
+            background: var(--surface2);
+            border-left: 3px solid var(--accent);
+            padding: 16px 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 16px 0;
+            color: #94a3b8;
+            font-size: 0.95em;
+            line-height: 1.7;
+        }
+        .highlight strong { color: var(--accent); }
+
+        /* PILLS */
+        .pill-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+        .pill {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            padding: 4px 14px;
+            font-size: 0.85em;
+            color: #94a3b8;
+        }
+        .pill.blue { border-color: var(--accent); color: var(--accent); }
+        .pill.purple { border-color: var(--accent2); color: #c4b5fd; }
+        .pill.green { border-color: var(--accent3); color: #6ee7b7; }
+        .pill.orange { border-color: var(--accent4); color: #fde68a; }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+        @media (max-width: 600px) {
+            .dnd-zones { grid-template-columns: 1fr; }
+            .concept-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="toast" id="toast">
+    <div class="toast-title" id="toast-title">🏆 Conquista!</div>
+    <div class="toast-msg" id="toast-msg"></div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-badge">BDN007 · Módulo 1 · Semana 03</div>
+    <h1>Modelagem Dimensional</h1>
+    <p>Do conceito à implementação — aprenda construindo, errando e progredindo</p>
+
+    <div class="xp-bar-container">
+        <div class="xp-bar-label">
+            <span id="xp-level">Nível 1 — Iniciante</span>
+            <span id="xp-points">0 / 300 XP</span>
+        </div>
+        <div class="xp-bar"><div class="xp-fill" id="xp-fill"></div></div>
+        <div class="xp-status">
+            <div class="xp-stat"><div class="val" id="stat-xp">0</div><div class="lbl">XP Total</div></div>
+            <div class="xp-stat"><div class="val" id="stat-streak">0</div><div class="lbl">Sequência</div></div>
+            <div class="xp-stat"><div class="val" id="stat-ach">0</div><div class="lbl">Conquistas</div></div>
+        </div>
+    </div>
+</div>
+
+<div class="main">
+
+    <!-- PHASE NAV -->
+    <div class="phase-nav">
+        <button class="phase-btn active" onclick="goPhase(0)" id="pbtn-0">📖 Fase 1: Conceitos</button>
+        <button class="phase-btn locked" onclick="goPhase(1)" id="pbtn-1">🧩 Fase 2: Identificar</button>
+        <button class="phase-btn locked" onclick="goPhase(2)" id="pbtn-2">❓ Fase 3: Quiz</button>
+        <button class="phase-btn locked" onclick="goPhase(3)" id="pbtn-3">💻 Fase 4: Codificar</button>
+        <button class="phase-btn locked" onclick="goPhase(4)" id="pbtn-4">🏆 Conquistas</button>
+    </div>
+
+    <!-- ======== FASE 1: CONCEITOS ======== -->
+    <div class="phase-section visible" id="phase-0">
+        <div class="section-header">
+            <div class="section-icon icon-blue">📊</div>
+            <div>
+                <h2>Fundamentos de Modelagem Dimensional</h2>
+                <p>Aprenda os blocos fundamentais antes de construir qualquer Data Warehouse</p>
+            </div>
+        </div>
+
+        <!-- O QUE É -->
+        <div class="card">
+            <h3>🔍 O que é Modelagem Dimensional?</h3>
+            <p>É uma técnica de design de banco de dados criada por <strong style="color:var(--accent)">Ralph Kimball</strong> especificamente para Data Warehouses. Enquanto sistemas transacionais (OLTP) são otimizados para <em>gravar</em> dados rapidamente, o modelo dimensional é otimizado para <em>consultar e analisar</em>.</p>
+            <div class="highlight">
+                <strong>Pense assim:</strong> um sistema de vendas precisa registrar um pedido em milissegundos. Já um relatório gerencial precisa somar todos os pedidos do trimestre por região, produto e cliente — dois propósitos muito diferentes, dois modelos de dados diferentes.
+            </div>
+            <div class="concept-grid">
+                <div class="concept-card">
+                    <h4>⚡ Performance</h4>
+                    <p>Queries analíticas rápidas com menos JOINs complexos</p>
+                </div>
+                <div class="concept-card purple-top">
+                    <h4>👁️ Compreensibilidade</h4>
+                    <p>Estrutura intuitiva para usuários de negócio, não só técnicos</p>
+                </div>
+                <div class="concept-card green-top">
+                    <h4>🔄 Flexibilidade</h4>
+                    <p>Fácil adição de novas dimensões sem refatorar tudo</p>
+                </div>
+                <div class="concept-card orange-top">
+                    <h4>🧭 Navegabilidade</h4>
+                    <p>Drill-down e slice-and-dice naturais para análise</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- FATOS E DIMENSÕES -->
+        <div class="card">
+            <h3>⚖️ Os dois ingredientes: Fatos e Dimensões</h3>
+            <div class="concept-grid">
+                <div class="concept-card" style="border-top-color:#ef4444">
+                    <h4 style="color:#ef4444">📈 Tabela FATO</h4>
+                    <p>Armazena as <strong>métricas quantitativas</strong> do negócio. São os "números" que queremos analisar.</p>
+                    <div class="pill-list" style="margin-top:10px">
+                        <span class="pill">Valor de venda</span>
+                        <span class="pill">Quantidade</span>
+                        <span class="pill">Custo</span>
+                        <span class="pill">Lucro</span>
+                    </div>
+                </div>
+                <div class="concept-card" style="border-top-color:#3b82f6">
+                    <h4 style="color:#3b82f6">🗂️ Tabelas DIMENSÃO</h4>
+                    <p>Fornecem o <strong>contexto</strong> aos fatos. Respondem quem, o quê, onde, quando, como e por quê.</p>
+                    <div class="pill-list" style="margin-top:10px">
+                        <span class="pill blue">Cliente</span>
+                        <span class="pill blue">Produto</span>
+                        <span class="pill blue">Tempo</span>
+                        <span class="pill blue">Loja</span>
+                    </div>
+                </div>
+            </div>
+            <div class="highlight" style="margin-top:16px">
+                <strong>Analogia:</strong> Se você tem uma venda de R$250,00 (fato), a dimensão dirá que foi o <em>cliente João</em>, comprou o <em>produto X</em>, na <em>loja de SP</em>, no <em>dia 15/01/2025</em>.
+            </div>
+        </div>
+
+        <!-- STAR SCHEMA -->
+        <div class="card">
+            <h3>⭐ Star Schema (Esquema Estrela)</h3>
+            <p>A estrutura mais comum e recomendada. A tabela fato fica no centro, rodeada pelas dimensões — formando uma estrela.</p>
+            <ul style="margin: 12px 0 12px 20px; color:#94a3b8; line-height:2">
+                <li><strong style="color:var(--accent)">Centro:</strong> Tabela fato com as métricas</li>
+                <li><strong style="color:var(--accent)">Pontas:</strong> Tabelas dimensão diretamente conectadas</li>
+                <li><strong style="color:var(--accent)">Dimensões desnormalizadas:</strong> Todos os atributos numa única tabela</li>
+                <li><strong style="color:var(--accent)">Apenas 1 nível de JOIN:</strong> Fato → Dimensão</li>
+            </ul>
+            <div class="schema-visual">
+<pre>
+<span class="table-name">         DIM_TEMPO</span>
+              |
+<span class="table-name">DIM_LOJA</span> -- <span class="table-name">FATO_VENDAS</span> -- <span class="table-name">DIM_PRODUTO</span>
+              |
+<span class="table-name">         DIM_CLIENTE</span>
+
+<span class="comment">-- FATO_VENDAS (centro da estrela)</span>
+<span class="key">venda_id</span>    INT   PRIMARY KEY
+<span class="key">data_id</span>     INT   FK → DIM_TEMPO
+<span class="key">produto_id</span>  INT   FK → DIM_PRODUTO
+<span class="key">cliente_id</span>  INT   FK → DIM_CLIENTE
+<span class="key">loja_id</span>     INT   FK → DIM_LOJA
+quantidade  INT
+valor_venda DECIMAL
+custo       DECIMAL
+lucro       DECIMAL  <span class="comment">-- derivado: valor - custo</span>
+</pre>
+            </div>
+            <div class="pill-list">
+                <span class="pill green">✅ Menos JOINs</span>
+                <span class="pill green">✅ Queries mais rápidas</span>
+                <span class="pill green">✅ Fácil entendimento</span>
+                <span class="pill" style="border-color:var(--danger);color:#fca5a5">❌ Mais redundância</span>
+                <span class="pill" style="border-color:var(--danger);color:#fca5a5">❌ Mais espaço em disco</span>
+            </div>
+        </div>
+
+        <!-- SNOWFLAKE -->
+        <div class="card">
+            <h3>❄️ Snowflake Schema (Esquema Floco de Neve)</h3>
+            <p>Uma variação do Star Schema onde as dimensões são <strong style="color:var(--accent)">normalizadas</strong> — quebradas em sub-dimensões, formando uma estrutura ramificada como um floco de neve.</p>
+            <div class="schema-visual">
+<pre>
+<span class="comment">-- Star Schema (desnormalizado):</span>
+<span class="table-name">DIM_PRODUTO</span>
+├── produto_id
+├── nome_produto
+├── categoria      <span class="comment">← repetido para cada produto</span>
+├── subcategoria   <span class="comment">← repetido para cada produto</span>
+└── fornecedor     <span class="comment">← repetido para cada produto</span>
+
+<span class="comment">-- Snowflake Schema (normalizado):</span>
+<span class="table-name">DIM_PRODUTO</span>        <span class="table-name">DIM_SUBCATEGORIA</span>  <span class="table-name">DIM_CATEGORIA</span>
+├── produto_id     ├── subcat_id        ├── cat_id
+├── nome_produto   ├── nome_subcat      └── nome_cat
+└── subcat_id ──→  └── cat_id ──────→
+</pre>
+            </div>
+            <table class="compare-table">
+                <tr><th>Aspecto</th><th>⭐ Star Schema</th><th>❄️ Snowflake</th></tr>
+                <tr><td>Estrutura</td><td class="tag-good">Desnormalizada</td><td>Normalizada</td></tr>
+                <tr><td>JOINs</td><td class="tag-good">Menos (1 nível)</td><td class="tag-bad">Mais (multi-nível)</td></tr>
+                <tr><td>Performance</td><td class="tag-good">Mais rápida</td><td class="tag-bad">Mais lenta</td></tr>
+                <tr><td>Espaço em disco</td><td class="tag-bad">Maior redundância</td><td class="tag-good">Menor redundância</td></tr>
+                <tr><td>Complexidade SQL</td><td class="tag-good">Simples</td><td class="tag-bad">Complexa</td></tr>
+                <tr><td>Uso típico</td><td class="tag-good">Maioria dos DW</td><td>Casos específicos</td></tr>
+            </table>
+        </div>
+
+        <!-- TIPOS DE FATO -->
+        <div class="card">
+            <h3>🗂️ Tipos de Tabelas Fato</h3>
+            <p>Nem todos os fatos são iguais — a escolha do tipo correto depende do processo de negócio que você quer modelar.</p>
+            <div class="fact-type-grid">
+                <div class="fact-card transacional">
+                    <h4 style="color:var(--accent)">⚡ Fato Transacional</h4>
+                    <ul>
+                        <li>Registra <strong>cada evento individualmente</strong></li>
+                        <li>Granularidade: nível de transação</li>
+                        <li>Volume: altíssimo (milhões de linhas)</li>
+                        <li>Totalmente aditiva</li>
+                        <li>Exemplos: venda, chamada, transação bancária</li>
+                    </ul>
+                </div>
+                <div class="fact-card snapshot">
+                    <h4 style="color:var(--accent2)">📸 Fato Snapshot Periódico</h4>
+                    <ul>
+                        <li>Captura <strong>estado em intervalos regulares</strong></li>
+                        <li>Granularidade: por período (diário/mensal)</li>
+                        <li>Volume: moderado e previsível</li>
+                        <li>Parcialmente aditiva (não some saldos no tempo)</li>
+                        <li>Exemplos: saldo de conta, estoque diário</li>
+                    </ul>
+                </div>
+                <div class="fact-card acumulado">
+                    <h4 style="color:var(--accent3)">📋 Fato Snapshot Acumulado</h4>
+                    <ul>
+                        <li>Rastreia <strong>processos com múltiplos marcos</strong></li>
+                        <li>Linha é <em>atualizada</em> conforme avança</li>
+                        <li>Múltiplos timestamps (início, marcos, fim)</li>
+                        <li>Mede tempo entre etapas</li>
+                        <li>Exemplos: pedido (aprovação → envio → entrega)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- MÉTRICAS -->
+        <div class="card">
+            <h3>📐 Tipos de Métricas</h3>
+            <div class="concept-grid">
+                <div class="concept-card green-top">
+                    <h4 style="color:var(--accent3)">✅ Aditivas (70–80%)</h4>
+                    <p>Podem ser somadas em <strong>todas</strong> as dimensões.<br>Ex: quantidade, receita, custo</p>
+                    <p style="margin-top:8px; font-size:0.82em; color:var(--muted)">SUM(quantidade) por qualquer dimensão = válido</p>
+                </div>
+                <div class="concept-card orange-top">
+                    <h4 style="color:var(--accent4)">⚠️ Semi-Aditivas</h4>
+                    <p>Somáveis em algumas dimensões, mas <strong>não no tempo</strong>.<br>Ex: saldo, estoque, headcount</p>
+                    <p style="margin-top:8px; font-size:0.82em; color:var(--muted)">SUM(saldo) por banco = válido · SUM(saldo) no tempo = errado</p>
+                </div>
+                <div class="concept-card" style="border-top-color:var(--danger)">
+                    <h4 style="color:var(--danger)">❌ Não-Aditivas</h4>
+                    <p>Jamais podem ser somadas. São derivadas de outras métricas.<br>Ex: margem %, taxa de conversão</p>
+                    <p style="margin-top:8px; font-size:0.82em; color:var(--muted)">Margem = Lucro / Receita * 100</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- DIMENSÕES ESPECIAIS -->
+        <div class="card">
+            <h3>🎯 Dimensões Especiais que Você Precisa Conhecer</h3>
+            <div class="concept-grid">
+                <div class="concept-card">
+                    <h4>🕐 Dimensão Tempo</h4>
+                    <p>A mais universal. Contém dia, mês, trimestre, ano, feriado, dia útil. <em>Toda</em> tabela fato precisa dela.</p>
+                </div>
+                <div class="concept-card purple-top">
+                    <h4>👻 Dimensão Degenerada</h4>
+                    <p>Atributo dimensional que mora na própria tabela fato (sem tabela separada). Ex: número da nota fiscal.</p>
+                </div>
+                <div class="concept-card green-top">
+                    <h4>🗑️ Dimensão Junk</h4>
+                    <p>Agrupa flags e booleanos que seriam muitos campos soltos. Ex: à_vista/prazo, com/sem desconto, online/presencial.</p>
+                </div>
+                <div class="concept-card orange-top">
+                    <h4>🤝 Dimensão Conformada</h4>
+                    <p>Compartilhada entre múltiplos data marts. A mesma DIM_CLIENTE usada em Vendas e em Suporte.</p>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align:right; margin-top:8px">
+            <button class="nav-btn nav-btn-primary" onclick="completePhase(0)">Concluir Fase 1 e ganhar XP →</button>
+        </div>
+    </div>
+
+    <!-- ======== FASE 2: IDENTIFICAR (Drag-and-Drop) ======== -->
+    <div class="phase-section" id="phase-1">
+        <div class="section-header">
+            <div class="section-icon icon-purple">🧩</div>
+            <div>
+                <h2>Identificar Fatos e Dimensões</h2>
+                <p>Arraste cada item para a categoria correta. Erro aqui é parte do aprendizado!</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🛒 Cenário: Sistema de E-commerce</h3>
+            <p>Uma loja online precisa analisar suas vendas. Classifique cada elemento abaixo como parte da <strong style="color:var(--accent)">Tabela FATO</strong> ou como uma <strong style="color:var(--accent2)">Tabela DIMENSÃO</strong>.</p>
+
+            <div class="dnd-area">
+                <div class="dnd-chips" id="chips-pool">
+                    <div class="chip" draggable="true" data-id="valor_venda" data-correct="fato">💰 Valor da Venda</div>
+                    <div class="chip" draggable="true" data-id="cliente" data-correct="dim">👤 Cliente</div>
+                    <div class="chip" draggable="true" data-id="quantidade" data-correct="fato">📦 Quantidade</div>
+                    <div class="chip" draggable="true" data-id="produto" data-correct="dim">🛍️ Produto</div>
+                    <div class="chip" draggable="true" data-id="desconto" data-correct="fato">🏷️ Desconto (R$)</div>
+                    <div class="chip" draggable="true" data-id="categoria" data-correct="dim">🗂️ Categoria</div>
+                    <div class="chip" draggable="true" data-id="data" data-correct="dim">📅 Data</div>
+                    <div class="chip" draggable="true" data-id="lucro" data-correct="fato">📈 Lucro</div>
+                    <div class="chip" draggable="true" data-id="cidade" data-correct="dim">🏙️ Cidade do Cliente</div>
+                    <div class="chip" draggable="true" data-id="frete" data-correct="fato">🚚 Custo do Frete</div>
+                </div>
+
+                <div class="dnd-zones">
+                    <div class="dnd-zone fact" id="zone-fato" ondragover="onDragOver(event)" ondrop="onDrop(event,'fato')" ondragleave="onDragLeave(event)">
+                        <h4>📈 Tabela FATO (métricas)</h4>
+                        <div class="dropped-chips" id="dropped-fato"></div>
+                    </div>
+                    <div class="dnd-zone dim" id="zone-dim" ondragover="onDragOver(event)" ondrop="onDrop(event,'dim')" ondragleave="onDragLeave(event)">
+                        <h4>🗂️ Tabelas DIMENSÃO (contexto)</h4>
+                        <div class="dropped-chips" id="dropped-dim"></div>
+                    </div>
+                </div>
+
+                <button class="dnd-check-btn" onclick="checkDnD()">✅ Verificar Classificação</button>
+                <div class="dnd-result" id="dnd-result"></div>
+            </div>
+        </div>
+
+        <!-- SEGUNDO DND: GRANULARIDADE -->
+        <div class="card">
+            <h3>🔍 Cenário 2: Identifique o Tipo de Fato</h3>
+            <p>Leia cada descrição e clique no tipo de fato correto para cada situação.</p>
+
+            <div id="fact-type-quiz">
+                <div class="fact-tq" data-idx="0">
+                    <div style="background:var(--surface2);border-radius:10px;padding:16px;margin-bottom:12px">
+                        <p style="margin-bottom:12px"><strong>Situação 1:</strong> Um banco registra a movimentação de <em>cada transferência realizada</em> pelo cliente, guardando valor, hora exata, conta origem e conta destino.</p>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap">
+                            <button class="ftq-btn" data-q="0" data-ans="transacional">⚡ Transacional</button>
+                            <button class="ftq-btn" data-q="0" data-ans="snapshot">📸 Snapshot Periódico</button>
+                            <button class="ftq-btn" data-q="0" data-ans="acumulado">📋 Snapshot Acumulado</button>
+                        </div>
+                        <div class="ftq-feedback" id="ftq-0"></div>
+                    </div>
+                </div>
+                <div class="fact-tq" data-idx="1">
+                    <div style="background:var(--surface2);border-radius:10px;padding:16px;margin-bottom:12px">
+                        <p style="margin-bottom:12px"><strong>Situação 2:</strong> Um e-commerce acompanha o ciclo de vida de cada pedido: data do pedido, data de aprovação de pagamento, data de separação no estoque, data de envio e data de entrega.</p>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap">
+                            <button class="ftq-btn" data-q="1" data-ans="transacional">⚡ Transacional</button>
+                            <button class="ftq-btn" data-q="1" data-ans="snapshot">📸 Snapshot Periódico</button>
+                            <button class="ftq-btn" data-q="1" data-ans="acumulado">📋 Snapshot Acumulado</button>
+                        </div>
+                        <div class="ftq-feedback" id="ftq-1"></div>
+                    </div>
+                </div>
+                <div class="fact-tq" data-idx="2">
+                    <div style="background:var(--surface2);border-radius:10px;padding:16px;margin-bottom:12px">
+                        <p style="margin-bottom:12px"><strong>Situação 3:</strong> Uma loja registra <em>diariamente ao fechar</em> a quantidade de cada produto em estoque.</p>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap">
+                            <button class="ftq-btn" data-q="2" data-ans="transacional">⚡ Transacional</button>
+                            <button class="ftq-btn" data-q="2" data-ans="snapshot">📸 Snapshot Periódico</button>
+                            <button class="ftq-btn" data-q="2" data-ans="acumulado">📋 Snapshot Acumulado</button>
+                        </div>
+                        <div class="ftq-feedback" id="ftq-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align:right; margin-top:8px">
+            <button class="nav-btn nav-btn-primary" onclick="completePhase(1)">Avançar para o Quiz →</button>
+        </div>
+    </div>
+
+    <!-- ======== FASE 3: QUIZ ======== -->
+    <div class="phase-section" id="phase-2">
+        <div class="section-header">
+            <div class="section-icon icon-green">❓</div>
+            <div>
+                <h2>Quiz de Conhecimento</h2>
+                <p>10 perguntas progressivas — cada acerto ganha XP. Você pode errar, reler e tentar de novo!</p>
+            </div>
+        </div>
+
+        <div class="quiz-container">
+            <div class="quiz-progress" id="quiz-progress"></div>
+
+            <!-- Q1 -->
+            <div class="quiz-card active" id="qcard-0">
+                <div class="quiz-meta">
+                    <span class="quiz-number">Pergunta 1 de 10</span>
+                    <span class="quiz-xp">+15 XP</span>
+                </div>
+                <div class="quiz-question">O que diferencia uma Tabela Fato de uma Tabela Dimensão em um modelo dimensional?</div>
+                <div class="quiz-options">
+                    <button class="quiz-option" onclick="answerQuiz(0,0,3)">A tabela fato tem mais colunas que a dimensão</button>
+                    <button class="quiz-option" onclick="answerQuiz(0,1,3)">A tabela fato armazena métricas numéricas; a dimensão armazena contexto descritivo</button>
+                    <button class="quiz-option" onclick="answerQuiz(0,2,3)">A tabela fato é normalizada; a dimensão é desnormalizada</button>
+                    <button class="quiz-option" onclick="answerQuiz(0,3,3)">A tabela fato é pequena; a dimensão é grande</button>
+                </div>
+                <div class="quiz-feedback" id="qfb-0"></div>
+                <button class="quiz-next" id="qnext-0" onclick="nextQuestion(1)">Próxima →</button>
+            </div>
+
+            <!-- Q2 -->
+            <div class="quiz-card" id="qcard-1">
+                <div class="quiz-meta"><span class="quiz-number">Pergunta 2 de 10</span><span class="quiz-xp">+15 XP</span></div>
+                <div class="quiz-question">Em um Star Schema para vendas, qual destas opções representa corretamente a estrutura central?</div>
+                <div class="quiz-options">
+                    <button class="quiz-option" onclick="answerQuiz(1,0,0)">DIM_PRODUTO no centro, FATO_VENDAS nas pontas</button>
+                    <button class="quiz-option" onclick="answerQuiz(1,1,0)">FATO_VENDAS no centro, dimensões (Cliente, Produto, Tempo, Loja) nas pontas</button>
+                    <button class="quiz-option" onclick="answerQuiz(1,2,0)">Todas as tabelas num círculo sem hierarquia</button>
+                    <button class="quiz-option" onclick="answerQuiz(1,3,0)">DIM_TEMPO no centro por ser a dimensão mais importante</button>
+                </div>
+                <div class="quiz-feedback" id="qfb-1"></div>
+                <button class="quiz-next" id="qnext-1" onclick="nextQuestion(2)">Próxima →</button>
+            </div>
+
+            <!-- Q3 -->
+            <div class="quiz-card" id="qcard-2">
+                <div class="quiz-meta"><span class="quiz-number">Pergunta 3 de 10</span><span class="quiz-xp">+15 XP</span></div>
+                <div class="quiz-question">Qual a principal vantagem do Star Schema sobre o Snowflake Schema para um Data Warehouse?</div>
+                <div class="quiz-options">
+                    <button class="quiz-option" onclick="answerQuiz(2,0,2)">Ocupa menos espaço em disco por não repetir dados</button>
+                    <button class="quiz-option" onclick="answerQuiz(2,1,2)">É mais difícil de entender, garantindo segurança dos dados</button>
+                    <button class="quiz-option" onclick="answerQuiz(2,2,2)">Menos JOINs = queries mais rápidas e SQL mais simples</button>
+                    <button class="quiz-option" onclick="answerQuiz(2,3,2)">Suporta mais usuários simultâneos</button>
+                </div>
+                <div class="quiz-feedback" id="qfb-2"></div>
+                <button class="quiz-next" id="qnext-2" onclick="nextQuestion(3)">Próxima →</button>
+            </div>
+
+            <!-- Q4 -->
+            <div class="quiz-card" id="qcard-3">
+                <div class="quiz-meta"><span class="quiz-number">Pergunta 4 de 10</span><span class="quiz-xp">+20 XP</span></div>
+                <div class="quiz-question">Uma empresa analisa o saldo médio mensal das contas dos clientes. Por que a métrica "saldo" é semi-aditiva e não aditiva?</div>
+                <div class="quiz-options">
+                    <button class="quiz-option" onclick="answerQuiz(3,0,1)">Porque saldo é sempre negativo</button>
+                    <button class="quiz-option" onclick="answerQuiz(3,1,1)">Porque somar saldos no tempo não faz sentido — não acumulam como vendas</button>
+                    <button class="quiz-option" onclick="answerQuiz(3,2,1)">Porque o banco não permite consultas de saldo</button>
+                    <button class="quiz-option" onclick="answerQuiz(3,3,1)">Porque saldo não pode ser somado por nenhuma dimensão</button>
+                </div>
+                <div class="quiz-feedback" id="qfb-3"></div>
+                <button class="quiz-next" id="qnext-3" onclick="nextQuestion(4)">Próxima →</button>
+            </div>
+
+            <!-- Q5 -->
+            <div class="quiz-card" id="qcard-4">
+                <div class="quiz-meta"><span class="quiz-number">Pergunta 5 de 10</span><span class="quiz-xp">+20 XP</span></div>
+                <div class="quiz-question">O que é uma Surrogate Key (chave substituta) e por que ela é usada em Data Warehouses?</div>
+                <div class="quiz-options">
+                    <button class="quiz-option" onclick="answerQuiz(4,0,2)">É a chave natural vinda do sistema OLTP, usada para rastreabilidade</button>
+                    <button class="quiz-option" onclick="answerQuiz(4,1,2)">É um UUID gerado pelo usuário para identificar registros únicos</button>
+                    <button class="quiz-option" onclick="answerQuiz(4,2,2)">É um inteiro sequencial gerado pelo DW, que isola o modelo das fontes e facilita gestão de mudanças históricas</button>
+                    <button class="quiz-option" onclick="answerQuiz(4,3,2)">É uma chave composta criada para reduzir o tamanho das tabelas</button>
+                </div>
+                <div class="quiz-feedback" id="qfb-4"></div>
+                <button class="quiz-next" id="qnext-4" onclick="nextQuestion(5)">Próxima →</button>
+            </div>
+
+            <!-- Q6 -->
+            <div class="quiz-card" id="qcard-5">
+                <div class="quiz-meta"><span class="quiz-number">Pergunta 6 de 10</span><span class="quiz-xp">+20 XP</span></div>
+                <div class="quiz-question">O que é uma "Dimensão Degenerada"?</div>
+                <div class="quiz-options">
+                    <button class="quiz-option" onclick="answerQuiz(5,0,3)">Uma dimensão que foi removida do modelo por ser desnecessária</button>
+                    <button class="quiz-option" onclick="answerQuiz(5,1,3)">Uma dimensão com dados corrompidos ou incompletos</button>
+                    <button class="quiz-option" onclick="answerQuiz(5,2,3)">Uma dimensão que agrupa flags booleanas diversas</button>
+                    <button class="quiz-option" onclick="answerQuiz(5,3,3)">Um atributo dimensional armazenado diretamente na tabela fato, sem tabela dimensão própria</button>
+                </div>
+                <div class="quiz-feedback" id="qfb-5"></div>
+                <button class="quiz-next" id="qnext-5" onclick="nextQuestion(6)">Próxima →</button>
+            </div>
+
+            <!-- Q7 -->
+            <div class="quiz-card" id="qcard-6">
+                <div class="quiz-meta"><span class="quiz-number">Pergunta 7 de 10</span><span class="quiz-xp">+20 XP</span></div>
+                <div class="quiz-question">Um analista precisa criar um relatório que mostra vendas por DIA, por MÊS e por ANO, com drill-down entre eles. Qual conceito da DIM_TEMPO isso representa?</div>
+                <div class="quiz-options">
+                    <button class="quiz-option" onclick="answerQuiz(6,0,1)">Dimensão Conformada</button>
+                    <button class="quiz-option" onclick="answerQuiz(6,1,1)">Hierarquia (Ano → Trimestre → Mês → Dia)</button>
+                    <button class="quiz-option" onclick="answerQuiz(6,2,1)">Fato Snapshot Periódico</button>
+                    <button class="quiz-option" onclick="answerQuiz(6,3,1)">Surrogate Key temporal</button>
+                </div>
+                <div class="quiz-feedback" id="qfb-6"></div>
+                <button class="quiz-next" id="qnext-6" onclick="nextQuestion(7)">Próxima →</button>
+            </div>
+
+            <!-- Q8 -->
+            <div class="quiz-card" id="qcard-7">
+                <div class="quiz-meta"><span class="quiz-number">Pergunta 8 de 10</span><span class="quiz-xp">+25 XP</span></div>
+                <div class="quiz-question">Em um modelo de e-commerce, a coluna "numero_pedido" (ex: PED-2024-001234) precisa estar acessível para filtros, mas não tem outros atributos associados. Qual a melhor prática?</div>
+                <div class="quiz-options">
+                    <button class="quiz-option" onclick="answerQuiz(7,0,2)">Criar uma DIM_PEDIDO com apenas essa coluna</button>
+                    <button class="quiz-option" onclick="answerQuiz(7,1,2)">Remover o campo, pois pedidos são rastreados apenas pelo ID</button>
+                    <button class="quiz-option" onclick="answerQuiz(7,2,2)">Armazenar como Dimensão Degenerada diretamente na FATO_VENDAS</button>
+                    <button class="quiz-option" onclick="answerQuiz(7,3,2)">Criar uma tabela separada linkada à DIM_TEMPO</button>
+                </div>
+                <div class="quiz-feedback" id="qfb-7"></div>
+                <button class="quiz-next" id="qnext-7" onclick="nextQuestion(8)">Próxima →</button>
+            </div>
+
+            <!-- Q9 -->
+            <div class="quiz-card" id="qcard-8">
+                <div class="quiz-meta"><span class="quiz-number">Pergunta 9 de 10</span><span class="quiz-xp">+25 XP</span></div>
+                <div class="quiz-question">Qual a "Regra de Ouro" da granularidade em modelagem dimensional segundo Ralph Kimball?</div>
+                <div class="quiz-options">
+                    <button class="quiz-option" onclick="answerQuiz(8,0,0)">Sempre capturar no nível mais atômico/baixo possível — você pode agregar depois, mas não pode detalhar o que não foi capturado</button>
+                    <button class="quiz-option" onclick="answerQuiz(8,1,0)">Usar sempre granularidade mensal para economizar espaço</button>
+                    <button class="quiz-option" onclick="answerQuiz(8,2,0)">Definir granularidade conforme o volume máximo de linhas suportado</button>
+                    <button class="quiz-option" onclick="answerQuiz(8,3,0)">Granularidade anual é sempre suficiente para análises de negócio</button>
+                </div>
+                <div class="quiz-feedback" id="qfb-8"></div>
+                <button class="quiz-next" id="qnext-8" onclick="nextQuestion(9)">Próxima →</button>
+            </div>
+
+            <!-- Q10 -->
+            <div class="quiz-card" id="qcard-9">
+                <div class="quiz-meta"><span class="quiz-number">Pergunta 10 de 10</span><span class="quiz-xp">+25 XP</span></div>
+                <div class="quiz-question">A empresa tem dois data marts: Vendas e Suporte. Ambos usam a mesma DIM_CLIENTE com a mesma estrutura e definições. Como chamamos essa dimensão?</div>
+                <div class="quiz-options">
+                    <button class="quiz-option" onclick="answerQuiz(9,0,1)">Dimensão Junk</button>
+                    <button class="quiz-option" onclick="answerQuiz(9,1,1)">Dimensão Conformada</button>
+                    <button class="quiz-option" onclick="answerQuiz(9,2,1)">Dimensão Degenerada</button>
+                    <button class="quiz-option" onclick="answerQuiz(9,3,1)">Dimensão Snapshot</button>
+                </div>
+                <div class="quiz-feedback" id="qfb-9"></div>
+                <button class="quiz-next" id="qnext-9" onclick="showQuizResult()">Ver Resultado →</button>
+            </div>
+
+            <!-- RESULTADO -->
+            <div class="quiz-result" id="quiz-result">
+                <div class="result-score" id="result-score">0/10</div>
+                <div class="result-msg" id="result-msg"></div>
+                <div style="margin-bottom:24px">
+                    <span id="result-xp" style="font-size:1.3em;color:var(--xp-color);font-weight:700"></span>
+                </div>
+                <button class="restart-btn" onclick="restartQuiz()">🔄 Tentar novamente</button>
+                <button class="nav-btn nav-btn-primary" style="margin-left:12px" onclick="completePhase(2)">Avançar para Codificação →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======== FASE 4: IMPLEMENTAÇÃO ======== -->
+    <div class="phase-section" id="phase-3">
+        <div class="section-header">
+            <div class="section-icon icon-orange">💻</div>
+            <div>
+                <h2>Implementação em Python</h2>
+                <p>Construa o modelo dimensional do zero — do CREATE TABLE à query analítica</p>
+            </div>
+        </div>
+
+        <div class="card" style="border-color:rgba(245,158,11,0.3);background:rgba(245,158,11,0.05)">
+            <h3>🎓 Por que Python + SQLite?</h3>
+            <p>SQLite é uma biblioteca SQL embutida — sem servidor, sem instalação. Perfeito para aprender. O Python a acessa com o módulo <strong style="color:var(--accent)">sqlite3</strong> que já vem instalado. Você vai escrever o mesmo SQL que usaria em PostgreSQL ou SQL Server!</p>
+            <div class="pill-list">
+                <span class="pill green">✅ Zero configuração</span>
+                <span class="pill green">✅ SQL padrão</span>
+                <span class="pill green">✅ Ideal para prototipar DW</span>
+                <span class="pill blue">import sqlite3</span>
+            </div>
+        </div>
+
+        <!-- DESAFIO 1 -->
+        <div class="challenge-card">
+            <div class="challenge-header">
+                <h3>🏗️ Desafio 1: Criar as Tabelas do Star Schema</h3>
+                <span class="difficulty diff-easy">Fácil · +30 XP</span>
+            </div>
+            <p class="challenge-desc">Implemente o Star Schema de Vendas. Crie as tabelas dimensão (Tempo, Produto, Cliente, Loja) e a tabela fato (Vendas) com as chaves corretas.</p>
+            <div class="challenge-context">
+                <p><strong>Estrutura esperada:</strong></p>
+                <p>• DIM_TEMPO: data_id, data_completa, dia, mes, ano, trimestre, dia_semana, feriado</p>
+                <p>• DIM_PRODUTO: produto_id, nome_produto, categoria, subcategoria, preco_custo</p>
+                <p>• DIM_CLIENTE: cliente_id, nome, cidade, estado, segmento</p>
+                <p>• DIM_LOJA: loja_id, nome_loja, cidade, regiao</p>
+                <p>• FATO_VENDAS: venda_id, data_id(FK), produto_id(FK), cliente_id(FK), loja_id(FK), quantidade, valor_venda, custo, lucro</p>
+            </div>
+            <textarea class="code-editor" id="editor-1" placeholder="# Escreva seu código Python aqui...
+import sqlite3
+
+conn = sqlite3.connect(':memory:')  # banco em memória
+cursor = conn.cursor()
+
+# Crie a DIM_TEMPO
+cursor.execute('''
+    CREATE TABLE DIM_TEMPO (
+        ...
+    )
+''')
+
+# Continue com as outras tabelas...
+"></textarea>
+            <div class="editor-actions">
+                <button class="run-btn" onclick="validateChallenge(1)">▶ Verificar Código</button>
+                <button class="hint-btn" onclick="toggleHint(1)">💡 Dica</button>
+                <button class="show-solution-btn" onclick="toggleSolution(1)">👁️ Ver Solução</button>
+            </div>
+            <div class="hint-box" id="hint-1">
+                💡 <strong>Dica:</strong> Use <code>INTEGER PRIMARY KEY AUTOINCREMENT</code> para surrogate keys. As foreign keys na FATO_VENDAS referenciam as PKs de cada dimensão com <code>FOREIGN KEY (coluna) REFERENCES tabela(pk)</code>.
+            </div>
+            <div class="solution-box" id="solution-1"><span class="comment"># ✅ SOLUÇÃO — Desafio 1: Star Schema Completo
+</span>
+<span class="kw">import</span> sqlite3
+
+conn = sqlite3.connect(<span class="str">':memory:'</span>)
+cursor = conn.cursor()
+
+<span class="comment"># Ativar suporte a chaves estrangeiras no SQLite</span>
+cursor.execute(<span class="str">"PRAGMA foreign_keys = ON"</span>)
+
+<span class="comment"># --- DIMENSÃO TEMPO ---</span>
+cursor.execute(<span class="str">'''
+    CREATE TABLE DIM_TEMPO (
+        data_id       INTEGER PRIMARY KEY AUTOINCREMENT,
+        data_completa DATE    NOT NULL,
+        dia           INTEGER NOT NULL,
+        mes           INTEGER NOT NULL,
+        ano           INTEGER NOT NULL,
+        trimestre     INTEGER NOT NULL,
+        dia_semana    TEXT    NOT NULL,
+        feriado       TEXT    DEFAULT 'N' CHECK(feriado IN ('S','N'))
+    )
+'''</span>)
+
+<span class="comment"># --- DIMENSÃO PRODUTO ---</span>
+cursor.execute(<span class="str">'''
+    CREATE TABLE DIM_PRODUTO (
+        produto_id    INTEGER PRIMARY KEY AUTOINCREMENT,
+        nome_produto  TEXT    NOT NULL,
+        categoria     TEXT    NOT NULL,
+        subcategoria  TEXT,
+        preco_custo   DECIMAL(10,2) NOT NULL
+    )
+'''</span>)
+
+<span class="comment"># --- DIMENSÃO CLIENTE ---</span>
+cursor.execute(<span class="str">'''
+    CREATE TABLE DIM_CLIENTE (
+        cliente_id    INTEGER PRIMARY KEY AUTOINCREMENT,
+        nome          TEXT    NOT NULL,
+        cidade        TEXT,
+        estado        TEXT,
+        segmento      TEXT    DEFAULT 'Pessoa Física'
+    )
+'''</span>)
+
+<span class="comment"># --- DIMENSÃO LOJA ---</span>
+cursor.execute(<span class="str">'''
+    CREATE TABLE DIM_LOJA (
+        loja_id       INTEGER PRIMARY KEY AUTOINCREMENT,
+        nome_loja     TEXT    NOT NULL,
+        cidade        TEXT    NOT NULL,
+        regiao        TEXT    NOT NULL
+    )
+'''</span>)
+
+<span class="comment"># --- TABELA FATO ---</span>
+cursor.execute(<span class="str">'''
+    CREATE TABLE FATO_VENDAS (
+        venda_id    INTEGER PRIMARY KEY AUTOINCREMENT,
+        data_id     INTEGER NOT NULL,
+        produto_id  INTEGER NOT NULL,
+        cliente_id  INTEGER NOT NULL,
+        loja_id     INTEGER NOT NULL,
+        quantidade  INTEGER NOT NULL,
+        valor_venda DECIMAL(10,2) NOT NULL,
+        custo       DECIMAL(10,2) NOT NULL,
+        lucro       DECIMAL(10,2) GENERATED ALWAYS AS (valor_venda - custo) STORED,
+        FOREIGN KEY (data_id)    REFERENCES DIM_TEMPO(data_id),
+        FOREIGN KEY (produto_id) REFERENCES DIM_PRODUTO(produto_id),
+        FOREIGN KEY (cliente_id) REFERENCES DIM_CLIENTE(cliente_id),
+        FOREIGN KEY (loja_id)    REFERENCES DIM_LOJA(loja_id)
+    )
+'''</span>)
+
+conn.commit()
+<span class="fn">print</span>(<span class="str">"✅ Star Schema criado com sucesso!"</span>)
+
+<span class="comment"># Verificar tabelas criadas</span>
+cursor.execute(<span class="str">"SELECT name FROM sqlite_master WHERE type='table'"</span>)
+tabelas = cursor.fetchall()
+<span class="kw">for</span> t <span class="kw">in</span> tabelas:
+    <span class="fn">print</span>(<span class="str">f"  📊 {t[0]}"</span>)
+
+conn.close()</div>
+        </div>
+
+        <!-- DESAFIO 2 -->
+        <div class="challenge-card">
+            <div class="challenge-header">
+                <h3>📥 Desafio 2: Popular as Tabelas com Dados Realistas</h3>
+                <span class="difficulty diff-medium">Médio · +40 XP</span>
+            </div>
+            <p class="challenge-desc">Insira dados nas dimensões e na tabela fato. Use a biblioteca <strong>Faker</strong> para gerar dados ou insira manualmente. O objetivo é ter pelo menos 20 vendas registradas para poder analisar.</p>
+            <div class="challenge-context">
+                <p><strong>Dica de estratégia:</strong></p>
+                <p>1. Insira dimensões primeiro (Tempo, Produto, Cliente, Loja)</p>
+                <p>2. Use os IDs gerados para inserir os registros na FATO_VENDAS</p>
+                <p>3. Lembre: a FATO guarda apenas IDs (FKs) + métricas numéricas</p>
+            </div>
+            <textarea class="code-editor" id="editor-2" placeholder="# Continuando do Desafio 1...
+# Insira dados nas dimensões primeiro
+
+# INSERT na DIM_TEMPO:
+cursor.execute('''INSERT INTO DIM_TEMPO
+    (data_completa, dia, mes, ano, trimestre, dia_semana, feriado)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+''', ('2024-01-15', 15, 1, 2024, 1, 'Segunda', 'N'))
+
+# Agora insira DIM_PRODUTO, DIM_CLIENTE, DIM_LOJA e FATO_VENDAS...
+"></textarea>
+            <div class="editor-actions">
+                <button class="run-btn" onclick="validateChallenge(2)">▶ Verificar Código</button>
+                <button class="hint-btn" onclick="toggleHint(2)">💡 Dica</button>
+                <button class="show-solution-btn" onclick="toggleSolution(2)">👁️ Ver Solução</button>
+            </div>
+            <div class="hint-box" id="hint-2">
+                💡 Use <code>cursor.lastrowid</code> para obter o ID gerado após um INSERT. Assim você não precisa saber o ID da dimensão — o banco gera e você recupera automaticamente!
+            </div>
+            <div class="solution-box" id="solution-2"><span class="comment"># ✅ SOLUÇÃO — Desafio 2: Inserindo Dados
+</span>
+<span class="comment"># (assuma que o código do Desafio 1 já rodou e conn/cursor existem)
+
+# Inserir datas na DIM_TEMPO</span>
+datas = [
+    (<span class="str">'2024-01-15'</span>, 15, 1, 2024, 1, <span class="str">'Segunda'</span>,  <span class="str">'N'</span>),
+    (<span class="str">'2024-02-10'</span>, 10, 2, 2024, 1, <span class="str">'Sábado'</span>,   <span class="str">'N'</span>),
+    (<span class="str">'2024-03-20'</span>, 20, 3, 2024, 1, <span class="str">'Quarta'</span>,    <span class="str">'N'</span>),
+    (<span class="str">'2024-04-05'</span>,  5, 4, 2024, 2, <span class="str">'Sexta'</span>,     <span class="str">'S'</span>),  <span class="comment"># Feriado</span>
+]
+cursor.executemany(
+    <span class="str">"INSERT INTO DIM_TEMPO (data_completa,dia,mes,ano,trimestre,dia_semana,feriado) VALUES (?,?,?,?,?,?,?)"</span>,
+    datas
+)
+
+<span class="comment"># Inserir produtos na DIM_PRODUTO</span>
+produtos = [
+    (<span class="str">'Notebook Pro'</span>, <span class="str">'Eletrônicos'</span>, <span class="str">'Computadores'</span>, 2800.00),
+    (<span class="str">'Mouse Gamer'</span>,  <span class="str">'Eletrônicos'</span>, <span class="str">'Periféricos'</span>,  80.00),
+    (<span class="str">'Cadeira Flex'</span>, <span class="str">'Móveis'</span>,       <span class="str">'Escritório'</span>,   450.00),
+    (<span class="str">'Monitor 4K'</span>,   <span class="str">'Eletrônicos'</span>, <span class="str">'Monitores'</span>,    950.00),
+]
+cursor.executemany(
+    <span class="str">"INSERT INTO DIM_PRODUTO (nome_produto,categoria,subcategoria,preco_custo) VALUES (?,?,?,?)"</span>,
+    produtos
+)
+
+<span class="comment"># Inserir clientes</span>
+clientes = [
+    (<span class="str">'Ana Lima'</span>,     <span class="str">'São Paulo'</span>,    <span class="str">'SP'</span>, <span class="str">'Pessoa Física'</span>),
+    (<span class="str">'João Santos'</span>,  <span class="str">'Campinas'</span>,     <span class="str">'SP'</span>, <span class="str">'Pessoa Física'</span>),
+    (<span class="str">'TechCorp'</span>,     <span class="str">'São Paulo'</span>,    <span class="str">'SP'</span>, <span class="str">'Empresa'</span>),
+    (<span class="str">'Maria Souza'</span>,  <span class="str">'Curitiba'</span>,     <span class="str">'PR'</span>, <span class="str">'Pessoa Física'</span>),
+]
+cursor.executemany(
+    <span class="str">"INSERT INTO DIM_CLIENTE (nome,cidade,estado,segmento) VALUES (?,?,?,?)"</span>,
+    clientes
+)
+
+<span class="comment"># Inserir lojas</span>
+lojas = [
+    (<span class="str">'Loja SP Centro'</span>,  <span class="str">'São Paulo'</span>, <span class="str">'Sudeste'</span>),
+    (<span class="str">'Loja SP Norte'</span>,   <span class="str">'São Paulo'</span>, <span class="str">'Sudeste'</span>),
+    (<span class="str">'Loja Curitiba'</span>,   <span class="str">'Curitiba'</span>,  <span class="str">'Sul'</span>),
+]
+cursor.executemany(
+    <span class="str">"INSERT INTO DIM_LOJA (nome_loja,cidade,regiao) VALUES (?,?,?)"</span>,
+    lojas
+)
+
+<span class="comment"># Inserir vendas na FATO (data_id, produto_id, cliente_id, loja_id, qtd, valor, custo)</span>
+vendas = [
+    (1, 1, 3, 1,  2, 7200.00, 5600.00),  <span class="comment"># TechCorp comprou 2 Notebooks</span>
+    (1, 2, 1, 1,  1,  150.00,   80.00),  <span class="comment"># Ana comprou Mouse</span>
+    (2, 3, 4, 3,  1,  800.00,  450.00),  <span class="comment"># Maria comprou Cadeira</span>
+    (2, 4, 2, 2,  1, 1500.00,  950.00),  <span class="comment"># João comprou Monitor</span>
+    (3, 1, 1, 1,  1, 3800.00, 2800.00),  <span class="comment"># Ana comprou Notebook</span>
+    (4, 2, 3, 2, 10,  120.00,   80.00),  <span class="comment"># TechCorp 10 mouses</span>
+]
+cursor.executemany(
+    <span class="str">"INSERT INTO FATO_VENDAS (data_id,produto_id,cliente_id,loja_id,quantidade,valor_venda,custo) VALUES (?,?,?,?,?,?,?)"</span>,
+    vendas
+)
+conn.commit()
+<span class="fn">print</span>(<span class="str">"✅ 6 vendas inseridas com sucesso!"</span>)
+
+<span class="comment"># Verificar</span>
+cursor.execute(<span class="str">"SELECT COUNT(*) FROM FATO_VENDAS"</span>)
+<span class="fn">print</span>(<span class="str">f"Total de vendas: {cursor.fetchone()[0]}"</span>)</div>
+        </div>
+
+        <!-- DESAFIO 3 -->
+        <div class="challenge-card">
+            <div class="challenge-header">
+                <h3>🔎 Desafio 3: Queries Analíticas (O Poder do DW)</h3>
+                <span class="difficulty diff-hard">Difícil · +50 XP</span>
+            </div>
+            <p class="challenge-desc">Agora é hora de ver o modelo dimensional em ação! Escreva queries SQL que cruzam a tabela fato com as dimensões para responder perguntas de negócio. Aqui você entende <em>por que</em> esse modelo existe.</p>
+            <div class="challenge-context">
+                <p><strong>Escreva queries para responder:</strong></p>
+                <p>1. 💰 Qual a receita total e lucro total por categoria de produto?</p>
+                <p>2. 📅 Qual o total de vendas por mês e trimestre?</p>
+                <p>3. 🏙️ Qual a receita por cidade do cliente e segmento?</p>
+                <p>4. 🏆 Quais os 3 produtos mais vendidos (em valor)?</p>
+            </div>
+            <textarea class="code-editor" id="editor-3" style="min-height:280px" placeholder="# Query 1: Receita por categoria
+cursor.execute('''
+    SELECT 
+        p.categoria,
+        SUM(f.valor_venda) AS receita_total,
+        SUM(f.lucro)       AS lucro_total
+    FROM FATO_VENDAS f
+    JOIN DIM_PRODUTO p ON f.produto_id = p.produto_id
+    GROUP BY p.categoria
+    ORDER BY receita_total DESC
+''')
+
+for row in cursor.fetchall():
+    print(row)
+
+# Escreva as outras 3 queries...
+"></textarea>
+            <div class="editor-actions">
+                <button class="run-btn" onclick="validateChallenge(3)">▶ Verificar Código</button>
+                <button class="hint-btn" onclick="toggleHint(3)">💡 Dica</button>
+                <button class="show-solution-btn" onclick="toggleSolution(3)">👁️ Ver Solução</button>
+            </div>
+            <div class="hint-box" id="hint-3">
+                💡 O padrão de query dimensional é sempre: <code>SELECT dimensão.atributo, SUM(fato.métrica) FROM FATO JOIN DIM ON fato.fk = dim.pk GROUP BY dimensão.atributo</code>. Adicione múltiplos JOINs para cruzar várias dimensões ao mesmo tempo!
+            </div>
+            <div class="solution-box" id="solution-3"><span class="comment"># ✅ SOLUÇÃO — Desafio 3: Queries Analíticas
+</span>
+<span class="fn">print</span>(<span class="str">"="*50</span>)
+<span class="fn">print</span>(<span class="str">"📊 QUERY 1: Receita e Lucro por Categoria"</span>)
+<span class="fn">print</span>(<span class="str">"="*50</span>)
+cursor.execute(<span class="str">'''
+    SELECT 
+        p.categoria,
+        SUM(f.valor_venda)              AS receita_total,
+        SUM(f.lucro)                    AS lucro_total,
+        ROUND(SUM(f.lucro) * 100.0 
+              / SUM(f.valor_venda), 1)  AS margem_pct
+    FROM FATO_VENDAS f
+    JOIN DIM_PRODUTO p ON f.produto_id = p.produto_id
+    GROUP BY p.categoria
+    ORDER BY receita_total DESC
+'''</span>)
+<span class="kw">for</span> row <span class="kw">in</span> cursor.fetchall():
+    <span class="fn">print</span>(<span class="str">f"  {row[0]:15} | R$ {row[1]:8.2f} | Lucro: R$ {row[2]:7.2f} | Margem: {row[3]}%"</span>)
+
+<span class="fn">print</span>(<span class="str">"\n" + "="*50</span>)
+<span class="fn">print</span>(<span class="str">"📅 QUERY 2: Vendas por Mês"</span>)
+<span class="fn">print</span>(<span class="str">"="*50</span>)
+cursor.execute(<span class="str">'''
+    SELECT 
+        t.ano,
+        t.mes,
+        t.trimestre,
+        COUNT(f.venda_id)    AS num_vendas,
+        SUM(f.valor_venda)   AS receita
+    FROM FATO_VENDAS f
+    JOIN DIM_TEMPO t ON f.data_id = t.data_id
+    GROUP BY t.ano, t.trimestre, t.mes
+    ORDER BY t.ano, t.mes
+'''</span>)
+<span class="kw">for</span> row <span class="kw">in</span> cursor.fetchall():
+    <span class="fn">print</span>(<span class="str">f"  {row[0]}/{row[1]:02d} (Q{row[2]}) | {row[3]} vendas | R$ {row[4]:.2f}"</span>)
+
+<span class="fn">print</span>(<span class="str">"\n" + "="*50</span>)
+<span class="fn">print</span>(<span class="str">"🏙️ QUERY 3: Receita por Cidade e Segmento"</span>)
+<span class="fn">print</span>(<span class="str">"="*50</span>)
+cursor.execute(<span class="str">'''
+    SELECT 
+        c.cidade,
+        c.segmento,
+        SUM(f.valor_venda) AS receita
+    FROM FATO_VENDAS f
+    JOIN DIM_CLIENTE c ON f.cliente_id = c.cliente_id
+    GROUP BY c.cidade, c.segmento
+    ORDER BY receita DESC
+'''</span>)
+<span class="kw">for</span> row <span class="kw">in</span> cursor.fetchall():
+    <span class="fn">print</span>(<span class="str">f"  {row[0]:12} | {row[1]:15} | R$ {row[2]:.2f}"</span>)
+
+<span class="fn">print</span>(<span class="str">"\n" + "="*50</span>)
+<span class="fn">print</span>(<span class="str">"🏆 QUERY 4: Top 3 Produtos por Receita"</span>)
+<span class="fn">print</span>(<span class="str">"="*50</span>)
+cursor.execute(<span class="str">'''
+    SELECT 
+        p.nome_produto,
+        p.categoria,
+        SUM(f.quantidade)  AS unidades,
+        SUM(f.valor_venda) AS receita
+    FROM FATO_VENDAS f
+    JOIN DIM_PRODUTO p ON f.produto_id = p.produto_id
+    GROUP BY p.produto_id, p.nome_produto, p.categoria
+    ORDER BY receita DESC
+    LIMIT 3
+'''</span>)
+<span class="kw">for</span> i, row <span class="kw">in</span> <span class="fn">enumerate</span>(cursor.fetchall(), 1):
+    <span class="fn">print</span>(<span class="str">f"  #{i} {row[0]:15} | {row[1]:12} | {row[2]} un. | R$ {row[3]:.2f}"</span>)
+
+conn.close()</div>
+        </div>
+
+        <div style="text-align:right; margin-top:8px">
+            <button class="nav-btn nav-btn-primary" onclick="completePhase(3)">Finalizar e ver Conquistas 🏆</button>
+        </div>
+    </div>
+
+    <!-- ======== FASE 5: CONQUISTAS ======== -->
+    <div class="phase-section" id="phase-4">
+        <div class="section-header">
+            <div class="section-icon icon-orange">🏆</div>
+            <div>
+                <h2>Suas Conquistas</h2>
+                <p>Complete atividades para desbloquear troféus. Conquistas desbloqueadas ficam douradas.</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🎖️ Coleção de Conquistas — Semana 03</h3>
+            <div class="achievements" id="achievements-grid">
+                <div class="ach" id="ach-reader">
+                    <div class="ach-icon">📖</div>
+                    <div class="ach-name">Leitor Atento</div>
+                    <div class="ach-desc">Concluiu a Fase 1</div>
+                </div>
+                <div class="ach" id="ach-classifier">
+                    <div class="ach-icon">🧩</div>
+                    <div class="ach-name">Classificador</div>
+                    <div class="ach-desc">Acertou o Drag & Drop</div>
+                </div>
+                <div class="ach" id="ach-quizmaster">
+                    <div class="ach-icon">🎯</div>
+                    <div class="ach-name">Quiz Master</div>
+                    <div class="ach-desc">7+ acertos no Quiz</div>
+                </div>
+                <div class="ach" id="ach-perfect">
+                    <div class="ach-icon">💎</div>
+                    <div class="ach-name">Perfeição</div>
+                    <div class="ach-desc">10/10 no Quiz</div>
+                </div>
+                <div class="ach" id="ach-coder">
+                    <div class="ach-icon">💻</div>
+                    <div class="ach-name">Codificador</div>
+                    <div class="ach-desc">Completou Desafio 1</div>
+                </div>
+                <div class="ach" id="ach-architect">
+                    <div class="ach-icon">🏗️</div>
+                    <div class="ach-name">Arquiteto</div>
+                    <div class="ach-desc">Completou todos os desafios</div>
+                </div>
+                <div class="ach" id="ach-streak">
+                    <div class="ach-icon">🔥</div>
+                    <div class="ach-name">Em Chamas</div>
+                    <div class="ach-desc">3 acertos seguidos</div>
+                </div>
+                <div class="ach" id="ach-graduate">
+                    <div class="ach-icon">🎓</div>
+                    <div class="ach-name">Graduado S03</div>
+                    <div class="ach-desc">Completou todas as fases</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SUMÁRIO -->
+        <div class="card">
+            <h3>📊 Seu Desempenho na Semana 03</h3>
+            <div class="concept-grid">
+                <div class="concept-card green-top">
+                    <h4>✅ O que você aprendeu</h4>
+                    <p>Star Schema, Snowflake, Tabelas Fato e Dimensão, Tipos de Métricas, Surrogate Keys, Granularidade, Dimensões Especiais</p>
+                </div>
+                <div class="concept-card orange-top">
+                    <h4>🛠️ Habilidades praticadas</h4>
+                    <p>Classificação de atributos, interpretação de cenários, SQL DDL, INSERT, JOINs analíticos em Python + SQLite</p>
+                </div>
+            </div>
+            <div style="margin-top:24px;padding:24px;background:var(--surface2);border-radius:12px;text-align:center">
+                <div style="font-size:3em;font-weight:700;color:var(--xp-color)" id="final-xp">0 XP</div>
+                <div style="color:var(--muted);margin-top:4px">Total conquistado nesta semana</div>
+            </div>
+        </div>
+
+        <div class="bottom-nav">
+            <a href="semana02.html" class="nav-btn nav-btn-ghost">← Semana 02</a>
+            <a href="index.html" class="nav-btn nav-btn-ghost">🏠 Início</a>
+            <a href="semana04.html" class="nav-btn nav-btn-primary">Semana 04: OLAP e Cubos →</a>
+        </div>
+    </div>
+
+</div>
+
+<script>
+// === STATE ===
+let xpTotal = 0;
+let streak = 0;
+let achCount = 0;
+let phaseDone = [false,false,false,false,false];
+let quizAnswers = {};
+let quizCorrect = 0;
+let currentQ = 0;
+let dndDone = false;
+let challengesDone = [false,false,false];
+
+const QUIZ_FEEDBACKS = [
+    { correct: 1, exp: "✅ Exato! Fatos = números que medimos (valor, quantidade, lucro). Dimensões = contexto (quem comprou, o quê, onde, quando)." },
+    { correct: 1, exp: "✅ Correto! A tabela fato fica no centro da estrela, com as dimensões ao redor. Por isso se chama 'Star Schema'." },
+    { correct: 2, exp: "✅ Isso mesmo! Menos JOINs = queries mais simples e rápidas. O trade-off é redundância de dados nas dimensões." },
+    { correct: 1, exp: "✅ Perfeito! Se você somar saldo bancário de Janeiro + Fevereiro + Março, o resultado não tem significado. Use AVG ou MAX para análises temporais." },
+    { correct: 2, exp: "✅ Correto! A surrogate key isola o DW das chaves do sistema fonte. Se a chave natural mudar no OLTP, seu DW continua íntegro." },
+    { correct: 3, exp: "✅ Certo! O número do pedido identifica a transação mas não tem sub-atributos. Criar uma tabela DIM_PEDIDO seria desperdício — vai direto na fato." },
+    { correct: 1, exp: "✅ Sim! Hierarquias permitem navegação drill-down (Ano → Mês → Dia) e roll-up (Dia → Mês → Ano). Fundamental para OLAP." },
+    { correct: 2, exp: "✅ Dimensão Degenerada! O número do pedido existe para filtros mas não merece tabela própria. Solução elegante que economiza JOINs." },
+    { correct: 0, exp: "✅ A Regra de Ouro de Kimball! Capture granularidade máxima — você pode sempre agregar (SUM), mas nunca pode desagregar o que não foi capturado." },
+    { correct: 1, exp: "✅ Dimensão Conformada! Quando a mesma dimensão é usada em múltiplos data marts com a mesma definição, possibilita análises cross-subject." },
+];
+
+// === XP ===
+function addXP(amount, reason) {
+    xpTotal += amount;
+    updateXPBar();
+    showToast(`+${amount} XP`, reason);
+    document.getElementById('final-xp').textContent = xpTotal + ' XP';
+}
+
+function updateXPBar() {
+    const maxXP = 300;
+    const pct = Math.min((xpTotal / maxXP) * 100, 100);
+    document.getElementById('xp-fill').style.width = pct + '%';
+    document.getElementById('xp-points').textContent = `${xpTotal} / ${maxXP} XP`;
+    document.getElementById('stat-xp').textContent = xpTotal;
+    let level = 'Iniciante';
+    if (xpTotal >= 100) level = 'Aprendiz';
+    if (xpTotal >= 200) level = 'Praticante';
+    if (xpTotal >= 300) level = 'Modelador BI';
+    document.getElementById('xp-level').textContent = `Nível — ${level}`;
+    document.getElementById('stat-streak').textContent = streak;
+    document.getElementById('stat-ach').textContent = achCount;
+}
+
+// === TOAST ===
+function showToast(title, msg) {
+    const t = document.getElementById('toast');
+    document.getElementById('toast-title').textContent = title;
+    document.getElementById('toast-msg').textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// === ACHIEVEMENTS ===
+function unlockAch(id, name) {
+    const el = document.getElementById('ach-' + id);
+    if (el && !el.classList.contains('unlocked')) {
+        el.classList.add('unlocked');
+        achCount++;
+        document.getElementById('stat-ach').textContent = achCount;
+        showToast('🏆 Conquista desbloqueada!', name);
+    }
+}
+
+// === PHASES ===
+function goPhase(idx) {
+    if (idx > 0 && !phaseDone[idx-1] && idx !== 4) {
+        showToast('🔒 Bloqueado', 'Complete a fase anterior primeiro!');
+        return;
+    }
+    document.querySelectorAll('.phase-section').forEach(s => s.classList.remove('visible'));
+    document.querySelectorAll('.phase-btn').forEach((b,i) => {
+        b.classList.remove('active');
+        if (phaseDone[i]) b.classList.add('done');
+    });
+    document.getElementById('phase-' + idx).classList.add('visible');
+    document.getElementById('pbtn-' + idx).classList.add('active');
+}
+
+function completePhase(idx) {
+    phaseDone[idx] = true;
+    const btn = document.getElementById('pbtn-' + (idx+1));
+    if (btn) {
+        btn.classList.remove('locked');
+        btn.classList.add('done');
+    }
+    document.getElementById('pbtn-' + idx).classList.add('done');
+
+    if (idx === 0) {
+        addXP(30, 'Fase de Conceitos concluída!');
+        unlockAch('reader', 'Leitor Atento');
+        goPhase(1);
+    } else if (idx === 1) {
+        addXP(20, 'Fase de Identificação concluída!');
+        goPhase(2);
+        initQuizProgress();
+    } else if (idx === 2) {
+        goPhase(3);
+    } else if (idx === 3) {
+        addXP(40, 'Fase de Codificação concluída!');
+        unlockAch('architect', 'Arquiteto DW');
+        unlockAch('graduate', 'Graduado Semana 03');
+        goPhase(4);
+    }
+}
+
+// === DND ===
+let draggedChip = null;
+
+document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('dragstart', e => {
+        draggedChip = chip;
+        chip.classList.add('dragging');
+    });
+    chip.addEventListener('dragend', () => chip.classList.remove('dragging'));
+});
+
+function onDragOver(e) {
+    e.preventDefault();
+    e.currentTarget.classList.add('over');
+}
+function onDragLeave(e) { e.currentTarget.classList.remove('over'); }
+function onDrop(e, zone) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('over');
+    if (!draggedChip) return;
+    const dropped = document.getElementById('dropped-' + zone);
+    const chipClone = draggedChip.cloneNode(true);
+    chipClone.draggable = false;
+    chipClone.style.cursor = 'default';
+    dropped.appendChild(chipClone);
+    draggedChip.remove();
+    draggedChip = null;
+}
+
+function checkDnD() {
+    const fatoChips = document.getElementById('dropped-fato').querySelectorAll('.chip');
+    const dimChips = document.getElementById('dropped-dim').querySelectorAll('.chip');
+    let correct = 0, total = 0;
+    fatoChips.forEach(c => { total++; if (c.dataset.correct === 'fato') correct++; });
+    dimChips.forEach(c => { total++; if (c.dataset.correct === 'dim') correct++; });
+    const res = document.getElementById('dnd-result');
+    if (total < 8) {
+        res.className = 'dnd-result fail';
+        res.textContent = `⚠️ Classifique todos os itens antes de verificar. (${total}/10 classificados)`;
+        return;
+    }
+    if (correct === total) {
+        res.className = 'dnd-result ok';
+        res.textContent = `🎉 Perfeito! ${correct}/${total} corretos. Você dominou a diferença entre Fato e Dimensão!`;
+        unlockAch('classifier', 'Classificador DW');
+        addXP(25, 'Drag & Drop perfeito!');
+        dndDone = true;
+    } else {
+        res.className = 'dnd-result fail';
+        res.textContent = `❌ ${correct}/${total} corretos. Dica: métricas numéricas (valor, quantidade, lucro) são FATOS. Atributos descritivos (quem, o quê, onde) são DIMENSÕES.`;
+    }
+}
+
+// === FACT TYPE QUIZ ===
+const ftqAnswers = { 0: 'transacional', 1: 'acumulado', 2: 'snapshot' };
+const ftqExp = {
+    0: 'Transacional — cada transferência é um evento individual registrado.',
+    1: 'Snapshot Acumulado — a linha do pedido é atualizada a cada etapa (aprovação, envio, entrega).',
+    2: 'Snapshot Periódico — estoque capturado diariamente em intervalos regulares.',
+};
+document.querySelectorAll('.ftq-btn').forEach(btn => {
+    btn.style.cssText = 'padding:8px 16px;border-radius:8px;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:Space Grotesk,sans-serif;font-size:0.88em;cursor:pointer;transition:all 0.2s;';
+    btn.addEventListener('click', function() {
+        const q = parseInt(this.dataset.q);
+        const ans = this.dataset.ans;
+        const fb = document.getElementById('ftq-' + q);
+        document.querySelectorAll(`.ftq-btn[data-q="${q}"]`).forEach(b => b.disabled = true);
+        if (ans === ftqAnswers[q]) {
+            this.style.background = 'rgba(16,185,129,0.2)';
+            this.style.borderColor = '#10b981';
+            this.style.color = '#6ee7b7';
+            fb.innerHTML = `<span style="color:#6ee7b7">✅ Correto! ${ftqExp[q]}</span>`;
+            addXP(10, 'Tipo de fato identificado!');
+            streak++;
+            if (streak >= 3) unlockAch('streak', 'Em Chamas 🔥');
+        } else {
+            this.style.background = 'rgba(239,68,68,0.1)';
+            this.style.borderColor = '#ef4444';
+            this.style.color = '#fca5a5';
+            fb.innerHTML = `<span style="color:#fca5a5">❌ Não exatamente. Resposta correta: ${ftqAnswers[q]}. ${ftqExp[q]}</span>`;
+            streak = 0;
+        }
+        fb.style.marginTop = '10px';
+        document.getElementById('stat-streak').textContent = streak;
+    });
+});
+
+// === QUIZ ===
+function initQuizProgress() {
+    const container = document.getElementById('quiz-progress');
+    container.innerHTML = '';
+    for (let i = 0; i < 10; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'qp-dot' + (i === 0 ? ' active' : '');
+        dot.id = 'qdot-' + i;
+        container.appendChild(dot);
+    }
+}
+
+function answerQuiz(qIdx, optIdx, correctIdx) {
+    const opts = document.querySelectorAll(`#qcard-${qIdx} .quiz-option`);
+    opts.forEach(o => o.disabled = true);
+    const fb = document.getElementById(`qfb-${qIdx}`);
+    const nxt = document.getElementById(`qnext-${qIdx}`);
+    const xpMap = [15,15,15,20,20,20,20,25,25,25];
+    const isCorrect = optIdx === correctIdx;
+    opts[optIdx].classList.add(isCorrect ? 'correct' : 'wrong');
+    if (!isCorrect) opts[correctIdx].classList.add('correct');
+    fb.textContent = isCorrect
+        ? QUIZ_FEEDBACKS[qIdx].exp
+        : `❌ Resposta errada. ${QUIZ_FEEDBACKS[qIdx].exp}`;
+    fb.className = 'quiz-feedback show ' + (isCorrect ? 'success' : 'error');
+    nxt.classList.add('show');
+    if (isCorrect) {
+        quizCorrect++;
+        addXP(xpMap[qIdx], 'Resposta correta!');
+        streak++;
+        if (streak >= 3) unlockAch('streak', 'Em Chamas 🔥');
+        const dot = document.getElementById('qdot-' + qIdx);
+        if (dot) dot.style.background = 'var(--accent3)';
+    } else {
+        streak = 0;
+        const dot = document.getElementById('qdot-' + qIdx);
+        if (dot) dot.style.background = 'var(--danger)';
+    }
+    document.getElementById('stat-streak').textContent = streak;
+    quizAnswers[qIdx] = isCorrect;
+}
+
+function nextQuestion(nextIdx) {
+    document.getElementById('qcard-' + (nextIdx - 1)).classList.remove('active');
+    document.getElementById('qcard-' + nextIdx).classList.add('active');
+    const dot = document.getElementById('qdot-' + nextIdx);
+    if (dot) dot.classList.add('active');
+}
+
+function showQuizResult() {
+    document.getElementById('qcard-9').classList.remove('active');
+    const res = document.getElementById('quiz-result');
+    res.classList.add('show');
+    document.getElementById('result-score').textContent = quizCorrect + '/10';
+    const msgs = ['Não desanime, releia os conceitos e tente novamente!', 'Está progredindo! Revise os pontos errados.', 'Bom trabalho! Mais alguns acertos e você estará ótimo.', '🎉 Excelente! Você dominou a Modelagem Dimensional!', '💎 Perfeito! 10/10! Você é um Arquiteto Dimensional!'];
+    const msgIdx = quizCorrect >= 10 ? 4 : quizCorrect >= 8 ? 3 : quizCorrect >= 6 ? 2 : quizCorrect >= 4 ? 1 : 0;
+    document.getElementById('result-msg').textContent = msgs[msgIdx];
+    if (quizCorrect >= 7) unlockAch('quizmaster', 'Quiz Master 🎯');
+    if (quizCorrect === 10) unlockAch('perfect', 'Perfeição 💎');
+    phaseDone[2] = true;
+}
+
+function restartQuiz() {
+    quizCorrect = 0;
+    quizAnswers = {};
+    currentQ = 0;
+    document.getElementById('quiz-result').classList.remove('show');
+    document.querySelectorAll('.quiz-card').forEach((c, i) => {
+        c.classList.toggle('active', i === 0);
+        c.querySelectorAll('.quiz-option').forEach(o => {
+            o.disabled = false;
+            o.classList.remove('correct','wrong');
+        });
+        const fb = c.querySelector('.quiz-feedback');
+        if (fb) { fb.classList.remove('show','success','error'); fb.textContent = ''; }
+        const nxt = c.querySelector('.quiz-next');
+        if (nxt) nxt.classList.remove('show');
+    });
+    initQuizProgress();
+}
+
+// === CHALLENGES ===
+function toggleHint(n) {
+    const h = document.getElementById('hint-' + n);
+    h.classList.toggle('show');
+}
+function toggleSolution(n) {
+    const s = document.getElementById('solution-' + n);
+    s.classList.toggle('show');
+}
+function validateChallenge(n) {
+    const editor = document.getElementById('editor-' + n);
+    const code = editor.value.trim();
+    const xpMap = {1: 30, 2: 40, 3: 50};
+    if (code.length < 50) {
+        showToast('⚠️ Código muito curto', 'Escreva mais código antes de verificar!');
+        return;
+    }
+    const checks = {
+        1: ['CREATE TABLE', 'DIM_TEMPO', 'DIM_PRODUTO', 'FATO_VENDAS', 'FOREIGN KEY'],
+        2: ['INSERT', 'DIM_PRODUTO', 'FATO_VENDAS', 'executemany'],
+        3: ['SELECT', 'SUM', 'JOIN', 'GROUP BY'],
+    };
+    const passed = checks[n].every(kw => code.toUpperCase().includes(kw.toUpperCase()));
+    if (passed && !challengesDone[n-1]) {
+        challengesDone[n-1] = true;
+        addXP(xpMap[n], `Desafio ${n} aprovado!`);
+        if (n === 1) unlockAch('coder', 'Codificador 💻');
+        showToast(`✅ Desafio ${n} aprovado!`, 'Ótimo código! Avance para o próximo.');
+    } else if (passed) {
+        showToast('✅ Código verificado!', 'Você já ganhou o XP por este desafio.');
+    } else {
+        const missing = checks[n].find(kw => !code.toUpperCase().includes(kw.toUpperCase()));
+        showToast(`❌ Faltando algo`, `Dica: inclua "${missing}" no seu código.`);
+    }
+}
+
+// === INIT ===
+initQuizProgress();
+updateXPBar();
+</script>
+</body>
+</html>
