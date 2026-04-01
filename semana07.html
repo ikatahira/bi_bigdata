@@ -3,90 +3,1357 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Semana 07 - Schema Star e Snowflake | BDN007</title>
+    <title>Semana 07 — Schema Star e Snowflake | BDN007</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg: #0a0e1a;
+            --surface: #111827;
+            --surface2: #1a2235;
+            --border: #1e2d45;
+            --accent: #00d4ff;
+            --accent2: #7c3aed;
+            --accent3: #10b981;
+            --accent4: #f59e0b;
+            --danger: #ef4444;
+            --text: #e2e8f0;
+            --muted: #64748b;
+            --gold: #fbbf24;
+            --xp-color: #a78bfa;
+            --star-color: #f59e0b;
+            --snow-color: #00d4ff;
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
-        .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); overflow: hidden; }
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; text-align: center; }
-        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
-        .content { padding: 40px; }
-        .section { margin: 40px 0; }
-        .section h2 { color: #667eea; font-size: 2em; margin-bottom: 20px; border-bottom: 3px solid #667eea; padding-bottom: 10px; }
-        .objetivos { background: #f8f9fa; padding: 30px; border-radius: 10px; margin-bottom: 40px; border-left: 5px solid #667eea; }
-        .activity-card { background: white; border-radius: 10px; padding: 30px; margin-bottom: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-left: 5px solid #764ba2; }
-        .navigation { display: flex; justify-content: space-between; padding: 30px 40px; background: #f8f9fa; }
-        .nav-button { padding: 15px 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 8px; font-weight: bold; transition: transform 0.3s; }
-        .nav-button:hover { transform: scale(1.05); }
+        body { font-family: 'Space Grotesk', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+
+        /* ── HERO ── */
+        .hero {
+            position: relative;
+            background: linear-gradient(135deg, #0a0e1a 0%, #0d1a2e 50%, #0a1628 100%);
+            padding: 50px 20px 70px;
+            text-align: center;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: radial-gradient(ellipse at 20% 50%, rgba(245,158,11,0.08) 0%, transparent 60%),
+                        radial-gradient(ellipse at 80% 20%, rgba(0,212,255,0.10) 0%, transparent 50%);
+        }
+        .hero-grid {
+            position: absolute; inset: 0;
+            background-image: linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+        .hero-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #7c3aed, #f59e0b);
+            color: white;
+            padding: 6px 18px;
+            border-radius: 100px;
+            font-size: 0.78em;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .hero h1 {
+            font-size: clamp(1.8em, 5vw, 3.5em);
+            font-weight: 700;
+            line-height: 1.1;
+            position: relative;
+            background: linear-gradient(135deg, #fff 0%, var(--star-color) 50%, var(--snow-color) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 14px;
+        }
+        .hero p { font-size: 1.1em; color: var(--muted); position: relative; margin-bottom: 36px; }
+        .hero-tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; position: relative; margin-bottom: 32px; }
+        .hero-tag {
+            background: var(--surface2); border: 1px solid var(--border);
+            border-radius: 100px; padding: 6px 14px;
+            font-size: 0.8em; color: var(--muted);
+        }
+
+        /* XP BAR */
+        .xp-bar-container { max-width: 560px; margin: 0 auto; position: relative; }
+        .xp-bar-label { display: flex; justify-content: space-between; font-size: 0.82em; color: var(--muted); margin-bottom: 8px; }
+        .xp-bar { background: var(--surface2); height: 12px; border-radius: 100px; overflow: hidden; border: 1px solid var(--border); }
+        .xp-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #7c3aed, #f59e0b, #00d4ff); border-radius: 100px; transition: width 1.5s ease; box-shadow: 0 0 10px rgba(245,158,11,0.4); }
+        .xp-status { display: flex; justify-content: center; gap: 28px; margin-top: 20px; flex-wrap: wrap; }
+        .xp-stat { text-align: center; }
+        .xp-stat .val { font-size: 1.7em; font-weight: 700; color: var(--xp-color); }
+        .xp-stat .lbl { font-size: 0.73em; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+
+        /* MAIN */
+        .main { max-width: 1100px; margin: 0 auto; padding: 40px 16px 80px; }
+
+        /* TABS */
+        .phase-nav {
+            display: flex; gap: 8px; margin-bottom: 36px;
+            overflow-x: auto; padding-bottom: 4px;
+            -webkit-overflow-scrolling: touch;
+        }
+        .phase-btn {
+            flex-shrink: 0; padding: 10px 18px; border-radius: 8px;
+            background: var(--surface); border: 1px solid var(--border);
+            color: var(--muted); font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.88em; font-weight: 500; cursor: pointer; transition: all 0.2s;
+        }
+        .phase-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .phase-btn.active { background: linear-gradient(135deg, #7c3aed, #f59e0b); border-color: transparent; color: white; box-shadow: 0 0 20px rgba(245,158,11,0.25); }
+        .phase-btn.done { border-color: var(--accent3); color: var(--accent3); }
+
+        .phase-section { display: none; animation: fadeIn 0.35s ease; }
+        .phase-section.visible { display: block; }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+        /* SECTION HEADER */
+        .section-header { display: flex; align-items: center; gap: 14px; margin-bottom: 28px; }
+        .section-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.5em; flex-shrink: 0; }
+        .icon-yellow { background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.35); }
+        .icon-blue  { background: rgba(0,212,255,0.12); border: 1px solid rgba(0,212,255,0.3); }
+        .icon-purple{ background: rgba(124,58,237,0.15); border: 1px solid rgba(124,58,237,0.3); }
+        .icon-green { background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); }
+        .section-header h2 { font-size: 1.7em; font-weight: 700; }
+        .section-header p { color: var(--muted); font-size: 0.92em; margin-top: 4px; }
+
+        /* CARDS */
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 26px; margin-bottom: 22px; transition: border-color 0.2s; }
+        .card:hover { border-color: var(--accent4); }
+        .card h3 { font-size: 1.15em; font-weight: 600; margin-bottom: 10px; color: var(--accent4); }
+        .card p { color: #94a3b8; line-height: 1.75; margin-bottom: 10px; }
+
+        /* CONCEPT GRID */
+        .concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin: 20px 0; }
+        .concept-card {
+            background: var(--surface2); border: 1px solid var(--border);
+            border-radius: 12px; padding: 18px;
+            border-top: 3px solid var(--accent4);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .concept-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .concept-card.blue-top { border-top-color: var(--accent); }
+        .concept-card.purple-top { border-top-color: var(--accent2); }
+        .concept-card.green-top { border-top-color: var(--accent3); }
+        .concept-card h4 { font-size: 0.95em; font-weight: 600; margin-bottom: 8px; }
+        .concept-card p { font-size: 0.88em; color: #94a3b8; margin: 0; line-height: 1.6; }
+
+        /* SCHEMA SVG DIAGRAMS */
+        .schema-wrap {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 24px 0;
+        }
+        @media(max-width:640px){ .schema-wrap { grid-template-columns: 1fr; } }
+        .schema-box {
+            background: var(--surface2); border: 1px solid var(--border);
+            border-radius: 14px; padding: 20px; text-align: center;
+        }
+        .schema-box h4 { font-size: 1em; font-weight: 600; margin-bottom: 16px; }
+        .schema-box.star h4 { color: var(--star-color); }
+        .schema-box.snow h4 { color: var(--snow-color); }
+        .schema-svg { width: 100%; max-width: 300px; }
+
+        /* CODE BLOCK */
+        .code-block {
+            background: #0d1117; border: 1px solid var(--border);
+            border-radius: 12px; padding: 20px; margin: 18px 0;
+            overflow-x: auto; -webkit-overflow-scrolling: touch;
+        }
+        .code-block pre { font-family: 'JetBrains Mono', monospace; font-size: 0.82em; line-height: 1.65; color: #a5f3fc; }
+        .kw  { color: #c084fc; }
+        .tbl { color: #60a5fa; font-weight: 600; }
+        .col { color: #a5f3fc; }
+        .typ { color: #86efac; }
+        .cmt { color: var(--muted); }
+        .pk  { color: var(--gold); }
+        .fk  { color: #fb923c; }
+
+        /* COMPARE TABLE */
+        .compare-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 20px 0; }
+        .compare-table { width: 100%; border-collapse: collapse; min-width: 480px; font-size: 0.92em; }
+        .compare-table th { background: var(--surface2); padding: 12px 14px; text-align: left; font-weight: 600; border-bottom: 2px solid var(--accent4); color: var(--accent4); }
+        .compare-table th:first-child { color: var(--text); }
+        .compare-table td { padding: 11px 14px; border-bottom: 1px solid var(--border); color: #94a3b8; }
+        .compare-table td:first-child { font-weight: 500; color: var(--text); }
+        .compare-table tr:hover td { background: var(--surface2); }
+        .tag-good { color: var(--accent3); font-weight: 600; }
+        .tag-bad  { color: var(--danger); font-weight: 600; }
+
+        /* INFO BOX */
+        .info-box {
+            border-radius: 10px; padding: 16px 18px; margin: 16px 0;
+            display: flex; align-items: flex-start; gap: 12px; font-size: 0.92em; line-height: 1.7;
+        }
+        .info-box .icon { font-size: 1.3em; flex-shrink: 0; margin-top: 1px; }
+        .info-box.tip   { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.25); color: #fde68a; }
+        .info-box.warn  { background: rgba(239,68,68,0.08);  border: 1px solid rgba(239,68,68,0.25);  color: #fca5a5; }
+        .info-box.note  { background: rgba(0,212,255,0.07);  border: 1px solid rgba(0,212,255,0.2);   color: #a5f3fc; }
+        .info-box.success{ background: rgba(16,185,129,0.08);border: 1px solid rgba(16,185,129,0.25); color: #6ee7b7; }
+
+        /* ACCORDION */
+        .accordion { margin: 16px 0; }
+        .acc-item { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 10px; overflow: hidden; }
+        .acc-head {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 16px 20px; cursor: pointer; font-weight: 500;
+            transition: background 0.2s;
+        }
+        .acc-head:hover { background: var(--surface2); }
+        .acc-head .arrow { color: var(--muted); transition: transform 0.3s; font-size: 0.85em; }
+        .acc-item.open .acc-head .arrow { transform: rotate(180deg); }
+        .acc-body { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+        .acc-body-inner { padding: 0 20px 20px; color: #94a3b8; line-height: 1.75; font-size: 0.93em; }
+        .acc-body-inner ul { margin: 10px 0 0 16px; }
+        .acc-body-inner li { margin-bottom: 6px; }
+
+        /* VIDEOS */
+        .video-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 14px; padding: 22px; margin-bottom: 18px;
+            display: flex; gap: 18px; align-items: flex-start;
+            transition: border-color 0.2s;
+        }
+        .video-card:hover { border-color: var(--accent); }
+        .video-thumb {
+            width: 72px; height: 72px; border-radius: 10px; flex-shrink: 0;
+            background: linear-gradient(135deg, var(--surface2), #1a2a3a);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.8em;
+        }
+        .video-info h4 { font-size: 1em; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+        .video-info .meta { font-size: 0.82em; color: var(--muted); margin-bottom: 10px; }
+        .video-info p { font-size: 0.88em; color: #94a3b8; line-height: 1.6; margin-bottom: 12px; }
+        .btn-sm {
+            display: inline-block; padding: 8px 20px;
+            background: linear-gradient(135deg, var(--accent2), var(--accent));
+            color: white; text-decoration: none; border-radius: 8px;
+            font-size: 0.85em; font-weight: 600; transition: opacity 0.2s;
+        }
+        .btn-sm:hover { opacity: 0.88; }
+
+        /* ATIVIDADES */
+        .ativ-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 16px; padding: 26px; margin-bottom: 20px;
+        }
+        .ativ-header { display: flex; align-items: center; gap: 16px; margin-bottom: 18px; }
+        .ativ-num {
+            width: 46px; height: 46px; border-radius: 12px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4em; font-weight: 700;
+            background: linear-gradient(135deg, var(--accent2), var(--accent4));
+            color: white;
+        }
+        .ativ-header h3 { font-size: 1.05em; font-weight: 600; }
+        .ativ-header .pts { font-size: 0.82em; color: var(--xp-color); }
+        .ativ-card p { color: #94a3b8; line-height: 1.75; margin-bottom: 10px; font-size: 0.93em; }
+        .ativ-card ol, .ativ-card ul { margin: 10px 0 0 18px; }
+        .ativ-card li { color: #94a3b8; font-size: 0.92em; line-height: 1.7; margin-bottom: 4px; }
+        .tag-entregavel {
+            display: inline-block; background: rgba(245,158,11,0.12);
+            border: 1px solid rgba(245,158,11,0.3); color: var(--gold);
+            border-radius: 6px; padding: 4px 12px; font-size: 0.82em; font-weight: 600; margin-top: 8px;
+        }
+
+        /* QUIZ */
+        .quiz-wrap { margin: 28px 0; }
+        .quiz-progress { display: flex; gap: 6px; margin-bottom: 22px; }
+        .qp-dot { width: 30px; height: 6px; border-radius: 100px; background: var(--border); transition: background 0.3s; }
+        .qp-dot.done { background: var(--accent3); }
+        .qp-dot.active { background: var(--accent4); }
+        .qp-dot.wrong-d { background: var(--danger); }
+
+        .quiz-card-q {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 16px; padding: 26px; display: none;
+        }
+        .quiz-card-q.active { display: block; animation: fadeIn .3s; }
+        .quiz-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+        .quiz-num { font-size: 0.83em; color: var(--muted); }
+        .quiz-xp { background: rgba(167,139,250,0.2); color: var(--xp-color); padding: 4px 12px; border-radius: 100px; font-size: 0.78em; font-weight: 600; }
+        .quiz-q { font-size: 1.1em; font-weight: 500; line-height: 1.55; margin-bottom: 18px; }
+        .quiz-opts { display: grid; gap: 10px; }
+        .quiz-opt {
+            background: var(--surface2); border: 1px solid var(--border);
+            border-radius: 10px; padding: 13px 16px; cursor: pointer;
+            font-family: 'Space Grotesk', sans-serif; font-size: 0.93em;
+            color: var(--text); text-align: left; transition: all 0.2s;
+        }
+        .quiz-opt:hover:not(:disabled) { border-color: var(--accent4); background: rgba(245,158,11,0.06); }
+        .quiz-opt.correct { border-color: var(--accent3) !important; background: rgba(16,185,129,0.1) !important; color: #6ee7b7 !important; }
+        .quiz-opt.wrong   { border-color: var(--danger) !important;  background: rgba(239,68,68,0.1) !important;  color: #fca5a5 !important; }
+        .quiz-fb { margin-top: 14px; padding: 13px; border-radius: 8px; font-size: 0.88em; display: none; line-height: 1.6; }
+        .quiz-fb.show { display: block; }
+        .quiz-fb.ok  { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: #6ee7b7; }
+        .quiz-fb.err { background: rgba(239,68,68,0.1);  border: 1px solid rgba(239,68,68,0.3);  color: #fca5a5; }
+        .quiz-next {
+            margin-top: 14px; padding: 9px 22px;
+            background: linear-gradient(135deg, var(--accent2), var(--accent4));
+            border: none; border-radius: 8px; color: white;
+            font-family: 'Space Grotesk', sans-serif; font-size: 0.93em; font-weight: 600;
+            cursor: pointer; display: none;
+        }
+        .quiz-next.show { display: inline-block; }
+        .quiz-result { text-align: center; padding: 36px 24px; display: none; }
+        .quiz-result.show { display: block; }
+        .result-score { font-size: 3.8em; font-weight: 700; color: var(--accent4); }
+        .result-msg { font-size: 1.15em; color: var(--muted); margin: 10px 0 22px; }
+        .restart-btn {
+            padding: 11px 30px; background: var(--surface2);
+            border: 1px solid var(--border); border-radius: 8px;
+            color: var(--text); font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.92em; cursor: pointer; transition: border-color 0.2s;
+        }
+        .restart-btn:hover { border-color: var(--accent4); color: var(--accent4); }
+
+        /* DRAG & DROP */
+        .dnd-area { margin: 22px 0; }
+        .dnd-bank {
+            display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;
+            min-height: 56px; padding: 14px;
+            background: var(--surface2); border: 2px dashed var(--border); border-radius: 12px;
+        }
+        .chip {
+            background: var(--surface); border: 1px solid var(--accent2);
+            color: var(--text); padding: 7px 15px; border-radius: 8px;
+            cursor: grab; font-size: 0.88em; font-weight: 500;
+            user-select: none; transition: all 0.2s; touch-action: none;
+        }
+        .chip:hover { background: rgba(124,58,237,0.15); }
+        .chip.dragging { opacity: 0.35; }
+        .dnd-zones { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        @media(max-width:480px){ .dnd-zones { grid-template-columns: 1fr; } }
+        .dnd-zone {
+            background: var(--surface2); border: 2px dashed var(--border);
+            border-radius: 12px; padding: 14px; min-height: 110px;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .dnd-zone.over { border-color: var(--accent4); background: rgba(245,158,11,0.05); }
+        .dnd-zone h4 { font-size: 0.82em; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 10px; }
+        .dnd-zone.star-z h4 { color: var(--star-color); }
+        .dnd-zone.snow-z h4 { color: var(--snow-color); }
+        .dropped-chips { display: flex; flex-wrap: wrap; gap: 8px; min-height: 36px; }
+        .dnd-check { margin-top: 14px; padding: 9px 26px; background: linear-gradient(135deg, var(--accent2), var(--accent4)); border: none; border-radius: 8px; color: white; font-family: 'Space Grotesk', sans-serif; font-size: 0.92em; font-weight: 600; cursor: pointer; }
+        .dnd-result { margin-top: 12px; font-size: 0.92em; padding: 11px; border-radius: 8px; display: none; }
+        .dnd-result.ok   { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: #6ee7b7; display: block; }
+        .dnd-result.fail { background: rgba(239,68,68,0.1);  border: 1px solid rgba(239,68,68,0.3);  color: #fca5a5; display: block; }
+
+        /* MATERIAIS */
+        .material-item {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 14px; padding: 20px; margin-bottom: 16px;
+            display: flex; gap: 16px; align-items: flex-start;
+            transition: border-color 0.2s;
+        }
+        .material-item:hover { border-color: var(--accent4); }
+        .mat-icon { font-size: 1.8em; flex-shrink: 0; }
+        .mat-info h4 { font-size: 0.98em; font-weight: 600; margin-bottom: 4px; }
+        .mat-info .meta { font-size: 0.82em; color: var(--muted); margin-bottom: 8px; }
+        .mat-info p { font-size: 0.88em; color: #94a3b8; line-height: 1.6; margin-bottom: 10px; }
+
+        /* NAV */
+        .nav-bar {
+            background: var(--surface); border-top: 1px solid var(--border);
+            padding: 20px 16px; display: flex; justify-content: space-between;
+            gap: 12px; flex-wrap: wrap;
+        }
+        .nav-btn {
+            padding: 12px 24px; border-radius: 10px;
+            background: var(--surface2); border: 1px solid var(--border);
+            color: var(--text); text-decoration: none; font-weight: 600;
+            font-size: 0.92em; transition: all 0.2s;
+        }
+        .nav-btn:hover { border-color: var(--accent4); color: var(--accent4); }
+        .nav-btn.primary { background: linear-gradient(135deg, var(--accent2), var(--accent4)); border-color: transparent; color: white; }
+        .nav-btn.primary:hover { opacity: 0.9; }
+
+        /* FOOTER */
+        footer { border-top: 1px solid var(--border); padding: 28px 20px; text-align: center; }
+        footer p { color: var(--muted); font-size: 0.85em; line-height: 1.9; }
+        footer a { color: var(--accent4); text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+
+        /* SCROLL TOP */
+        #scroll-top {
+            position: fixed; bottom: 20px; right: 16px; width: 44px; height: 44px;
+            background: linear-gradient(135deg, var(--accent2), var(--accent4));
+            border: none; border-radius: 50%; color: white; font-size: 1.2em;
+            cursor: pointer; opacity: 0; transition: opacity 0.3s; z-index: 50;
+            display: flex; align-items: center; justify-content: center;
+        }
+        #scroll-top.show { opacity: 1; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="module">MÓDULO 2: Data Warehousing</div>
-            <h1>Semana 07</h1>
-            <h2>Schema Star e Snowflake</h2>
-        </div>
-        
-        <div class="content">
-            <div class="objetivos">
-                <h2>🎯 Objetivos de Aprendizagem</h2>
-                <ul>
-                    <li>Compreender os conceitos fundamentais de schema star e snowflake</li>
-                    <li>Aplicar técnicas práticas em cenários reais</li>
-                    <li>Desenvolver habilidades hands-on com ferramentas</li>
-                    <li>Analisar cases e melhores práticas do mercado</li>
-                </ul>
-            </div>
-            
-            <div class="section">
-                <h2>📚 Conteúdo Teórico</h2>
-                <p>Nesta semana, você aprenderá sobre <strong>Schema Star e Snowflake</strong>, um tópico fundamental para módulo 2: data warehousing.</p>
-                <p>O conteúdo completo inclui teoria detalhada, exemplos práticos, cases reais e tutoriais passo-a-passo.</p>
-                <p><em>Nota: O conteúdo teórico completo e detalhado será disponibilizado pelo professor em sala de aula e no Moodle.</em></p>
-            </div>
-            
-            <div class="section">
-                <h2>🎬 Vídeos Recomendados</h2>
-                <p>Assista aos vídeos selecionados para complementar seu aprendizado.</p>
-                <p><em>Links para vídeos serão fornecidos pelo professor.</em></p>
-            </div>
-            
-            <div class="section">
-                <h2>✏️ Atividades Práticas</h2>
-                <div class="activity-card">
-                    <h3>Atividade 1: Pesquisa e Análise</h3>
-                    <p>Pesquise e analise cases reais relacionados a schema star e snowflake.</p>
-                    <p><strong>Entregável:</strong> Documento de 3-5 páginas</p>
-                </div>
-                <div class="activity-card">
-                    <h3>Atividade 2: Implementação Prática</h3>
-                    <p>Implemente os conceitos aprendidos em um projeto hands-on.</p>
-                    <p><strong>Entregável:</strong> Código + Documentação</p>
-                </div>
-                <div class="activity-card">
-                    <h3>Atividade 3: Apresentação</h3>
-                    <p>Apresente seus resultados e aprendizados para a turma.</p>
-                    <p><strong>Entregável:</strong> Apresentação em slides</p>
-                </div>
-            </div>
-            
-            <div class="section">
-                <h2>📖 Materiais Complementares</h2>
-                <ul>
-                    <li>📚 Livros e artigos acadêmicos</li>
-                    <li>🎓 Tutoriais online e documentação oficial</li>
-                    <li>🛠️ Ferramentas e datasets para prática</li>
-                    <li>📄 White papers e estudos de caso</li>
-                </ul>
-            </div>
-        </div>
-        
-        <div class="navigation">
-            <a href="semana06.html" class="nav-button">← Semana Anterior</a>
-            <a href="index.html" class="nav-button">🏠 Início</a>
-            <a href="semana08.html" class="nav-button">Próxima Semana →</a>
+
+<!-- ── HERO ── -->
+<div class="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-badge">MÓDULO 2 · DATA WAREHOUSING</div>
+    <h1>Schema Star<br>& Snowflake</h1>
+    <p>Semana 07 — BDN007 · FATEC Ourinhos</p>
+    <div class="hero-tags">
+        <span class="hero-tag">⭐ Star Schema</span>
+        <span class="hero-tag">❄️ Snowflake Schema</span>
+        <span class="hero-tag">📊 Fato & Dimensão</span>
+        <span class="hero-tag">🔑 Chaves Primárias/Estrangeiras</span>
+        <span class="hero-tag">🏗️ Modelagem DW</span>
+    </div>
+    <div class="xp-bar-container">
+        <div class="xp-bar-label"><span>🔬 Semana 07</span><span id="xp-label">0 / 350 XP</span></div>
+        <div class="xp-bar"><div class="xp-fill" id="xp-fill"></div></div>
+        <div class="xp-status">
+            <div class="xp-stat"><div class="val" id="xp-val">0</div><div class="lbl">XP Ganhos</div></div>
+            <div class="xp-stat"><div class="val" id="quiz-val">0/8</div><div class="lbl">Quiz</div></div>
+            <div class="xp-stat"><div class="val" id="ativ-val">0/3</div><div class="lbl">Atividades</div></div>
         </div>
     </div>
+</div>
+
+<div class="main">
+
+    <!-- TABS -->
+    <div class="phase-nav">
+        <button class="phase-btn active" onclick="showPhase(0)">📚 Teoria</button>
+        <button class="phase-btn" onclick="showPhase(1)">🎬 Vídeos</button>
+        <button class="phase-btn" onclick="showPhase(2)">🧩 Exercícios</button>
+        <button class="phase-btn" onclick="showPhase(3)">✏️ Atividades</button>
+        <button class="phase-btn" onclick="showPhase(4)">📖 Materiais</button>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════ -->
+    <!-- FASE 0 — TEORIA                                   -->
+    <!-- ══════════════════════════════════════════════════ -->
+    <div class="phase-section visible" id="phase-0">
+
+        <div class="section-header">
+            <div class="section-icon icon-yellow">⭐</div>
+            <div><h2>Teoria: Schemas de DW</h2><p>Conteúdo para estudar no seu ritmo, onde e quando quiser</p></div>
+        </div>
+
+        <!-- CONTEXTO -->
+        <div class="card">
+            <h3>🏗️ Por que precisamos de Schemas específicos para DW?</h3>
+            <p>Em um banco de dados transacional (OLTP), o objetivo é evitar redundância — por isso normalizamos ao máximo. Mas em um Data Warehouse, o objetivo é <strong>consulta rápida e análise</strong>. Queremos que o analista consiga responder "Quanto vendemos por região, produto e trimestre?" com uma query simples e eficiente.</p>
+            <p>Para isso, Ralph Kimball (o pai da modelagem dimensional) propôs dois schemas que equilibram <strong>desempenho de leitura</strong> com <strong>clareza de estrutura</strong>: o <em>Star Schema</em> e o <em>Snowflake Schema</em>.</p>
+            <div class="info-box tip">
+                <span class="icon">💡</span>
+                <span>Pense assim: no OLTP você otimiza para <strong>escrever</strong> dados. No DW você otimiza para <strong>ler e analisar</strong> dados. Isso muda tudo na forma de modelar.</span>
+            </div>
+        </div>
+
+        <!-- STAR SCHEMA -->
+        <div class="card">
+            <h3>⭐ Star Schema (Esquema Estrela)</h3>
+            <p>O Star Schema é o modelo mais simples e popular de Data Warehouse. Ele tem uma <strong>Tabela Fato central</strong> rodeada por <strong>Tabelas Dimensão</strong> desnormalizadas — formando uma estrela quando desenhado.</p>
+
+            <div class="concept-grid">
+                <div class="concept-card">
+                    <h4>📊 Tabela Fato</h4>
+                    <p>Armazena os <strong>eventos mensuráveis</strong>: vendas, transações, cliques. Contém métricas numéricas (valores, quantidades) e chaves estrangeiras para as dimensões.</p>
+                </div>
+                <div class="concept-card blue-top">
+                    <h4>🏷️ Tabelas Dimensão</h4>
+                    <p>Descrevem <strong>o contexto</strong> do fato. Quem comprou? Quando? Onde? Qual produto? São desnormalizadas — todos os atributos ficam em uma única tabela.</p>
+                </div>
+                <div class="concept-card green-top">
+                    <h4>🔑 Surrogate Key</h4>
+                    <p>Chave substituta gerada artificialmente (id numérico sequencial). Substitui a chave natural do sistema de origem. Garante unicidade e independência.</p>
+                </div>
+                <div class="concept-card purple-top">
+                    <h4>⚡ Performance</h4>
+                    <p>JOINs simples e poucos níveis. O banco de dados faz uma leitura na tabela fato e busca direto nas dimensões. Ideal para ferramentas de BI como Power BI e Tableau.</p>
+                </div>
+            </div>
+
+            <p>Exemplo de Star Schema para um sistema de vendas de uma rede de lojas:</p>
+            <div class="code-block"><pre><span class="cmt">-- ── DIMENSÕES (desnormalizadas) ──────────────────────────</span>
+
+<span class="kw">CREATE TABLE</span> <span class="tbl">dim_produto</span> (
+  <span class="pk">sk_produto</span>       <span class="typ">INT PRIMARY KEY</span>,  <span class="cmt">-- surrogate key</span>
+  <span class="col">cd_produto</span>       <span class="typ">VARCHAR(20)</span>,       <span class="cmt">-- chave natural</span>
+  <span class="col">nm_produto</span>       <span class="typ">VARCHAR(100)</span>,
+  <span class="col">nm_categoria</span>     <span class="typ">VARCHAR(50)</span>,       <span class="cmt">-- desnormalizado</span>
+  <span class="col">nm_subcategoria</span>  <span class="typ">VARCHAR(50)</span>,       <span class="cmt">-- desnormalizado</span>
+  <span class="col">nm_marca</span>         <span class="typ">VARCHAR(60)</span>,
+  <span class="col">vl_custo</span>         <span class="typ">DECIMAL(10,2)</span>
+);
+
+<span class="kw">CREATE TABLE</span> <span class="tbl">dim_cliente</span> (
+  <span class="pk">sk_cliente</span>       <span class="typ">INT PRIMARY KEY</span>,
+  <span class="col">cd_cliente</span>       <span class="typ">VARCHAR(20)</span>,
+  <span class="col">nm_cliente</span>       <span class="typ">VARCHAR(100)</span>,
+  <span class="col">nm_cidade</span>        <span class="typ">VARCHAR(80)</span>,       <span class="cmt">-- desnormalizado</span>
+  <span class="col">nm_estado</span>        <span class="typ">CHAR(2)</span>,            <span class="cmt">-- desnormalizado</span>
+  <span class="col">nm_regiao</span>        <span class="typ">VARCHAR(30)</span>,       <span class="cmt">-- desnormalizado</span>
+  <span class="col">ds_segmento</span>      <span class="typ">VARCHAR(40)</span>
+);
+
+<span class="kw">CREATE TABLE</span> <span class="tbl">dim_tempo</span> (
+  <span class="pk">sk_tempo</span>         <span class="typ">INT PRIMARY KEY</span>,   <span class="cmt">-- ex: 20240315</span>
+  <span class="col">dt_data</span>          <span class="typ">DATE</span>,
+  <span class="col">nr_dia</span>           <span class="typ">INT</span>,
+  <span class="col">nr_mes</span>           <span class="typ">INT</span>,
+  <span class="col">nm_mes</span>           <span class="typ">VARCHAR(15)</span>,
+  <span class="col">nr_trimestre</span>     <span class="typ">INT</span>,
+  <span class="col">nr_ano</span>           <span class="typ">INT</span>,
+  <span class="col">fl_fim_semana</span>    <span class="typ">BOOLEAN</span>,
+  <span class="col">fl_feriado</span>       <span class="typ">BOOLEAN</span>
+);
+
+<span class="cmt">-- ── TABELA FATO ──────────────────────────────────────────</span>
+
+<span class="kw">CREATE TABLE</span> <span class="tbl">fato_vendas</span> (
+  <span class="fk">sk_produto</span>       <span class="typ">INT REFERENCES dim_produto</span>,
+  <span class="fk">sk_cliente</span>       <span class="typ">INT REFERENCES dim_cliente</span>,
+  <span class="fk">sk_tempo</span>         <span class="typ">INT REFERENCES dim_tempo</span>,
+  <span class="col">qt_itens</span>         <span class="typ">INT</span>,
+  <span class="col">vl_venda</span>         <span class="typ">DECIMAL(12,2)</span>,
+  <span class="col">vl_desconto</span>      <span class="typ">DECIMAL(10,2)</span>,
+  <span class="col">vl_lucro</span>         <span class="typ">DECIMAL(12,2)</span>,
+  <span class="kw">PRIMARY KEY</span> (<span class="fk">sk_produto</span>, <span class="fk">sk_cliente</span>, <span class="fk">sk_tempo</span>)
+);</pre></div>
+        </div>
+
+        <!-- SNOWFLAKE -->
+        <div class="card">
+            <h3>❄️ Snowflake Schema (Esquema Floco de Neve)</h3>
+            <p>O Snowflake Schema é uma extensão do Star Schema onde as Tabelas Dimensão são <strong>normalizadas</strong> — divididas em sub-dimensões. O resultado visualmente lembra um floco de neve, com as dimensões se ramificando.</p>
+
+            <div class="concept-grid">
+                <div class="concept-card blue-top">
+                    <h4>📐 Normalização das Dimensões</h4>
+                    <p>Ao invés de repetir "Eletrônicos" em mil linhas de produto, criamos uma tabela <code>dim_categoria</code> separada. Reduz redundância, aumenta integridade.</p>
+                </div>
+                <div class="concept-card purple-top">
+                    <h4>💾 Economia de Espaço</h4>
+                    <p>Com dimensões normalizadas, armazenamos atributos repetitivos somente uma vez. Em dimensões muito grandes (ex: produto com 500k itens), a economia pode ser significativa.</p>
+                </div>
+                <div class="concept-card">
+                    <h4>🔗 Mais JOINs</h4>
+                    <p>A desvantagem: queries precisam de mais JOINs e ficam mais complexas. Ferramentas de BI como Power BI lidam bem, mas SQL manual fica mais trabalhoso.</p>
+                </div>
+                <div class="concept-card green-top">
+                    <h4>🛠️ Quando usar?</h4>
+                    <p>Snowflake é preferível quando dimensões são muito grandes, mudam com frequência (tipo SCD), ou quando a equipe prioriza consistência dos dados sobre performance.</p>
+                </div>
+            </div>
+
+            <p>Veja como a dim_produto do Star vira três tabelas no Snowflake:</p>
+            <div class="code-block"><pre><span class="cmt">-- ── SNOWFLAKE: dimensões normalizadas ────────────────────</span>
+
+<span class="kw">CREATE TABLE</span> <span class="tbl">dim_categoria</span> (
+  <span class="pk">sk_categoria</span>     <span class="typ">INT PRIMARY KEY</span>,
+  <span class="col">nm_categoria</span>     <span class="typ">VARCHAR(50)</span>
+);
+
+<span class="kw">CREATE TABLE</span> <span class="tbl">dim_subcategoria</span> (
+  <span class="pk">sk_subcategoria</span>  <span class="typ">INT PRIMARY KEY</span>,
+  <span class="col">nm_subcategoria</span>  <span class="typ">VARCHAR(50)</span>,
+  <span class="fk">sk_categoria</span>     <span class="typ">INT REFERENCES dim_categoria</span>  <span class="cmt">-- FK</span>
+);
+
+<span class="kw">CREATE TABLE</span> <span class="tbl">dim_produto</span> (
+  <span class="pk">sk_produto</span>       <span class="typ">INT PRIMARY KEY</span>,
+  <span class="col">cd_produto</span>       <span class="typ">VARCHAR(20)</span>,
+  <span class="col">nm_produto</span>       <span class="typ">VARCHAR(100)</span>,
+  <span class="col">nm_marca</span>         <span class="typ">VARCHAR(60)</span>,
+  <span class="col">vl_custo</span>         <span class="typ">DECIMAL(10,2)</span>,
+  <span class="fk">sk_subcategoria</span>  <span class="typ">INT REFERENCES dim_subcategoria</span> <span class="cmt">-- FK</span>
+);
+
+<span class="cmt">-- A fato_vendas permanece idêntica ao Star Schema.</span>
+<span class="cmt">-- A diferença está apenas nas dimensões normalizadas.</span></pre></div>
+        </div>
+
+        <!-- DIAGRAMA SVG -->
+        <div class="card">
+            <h3>🗺️ Visualização dos Dois Schemas</h3>
+            <p>O diagrama abaixo mostra a diferença estrutural entre os dois modelos para um mesmo cenário de vendas:</p>
+            <div class="schema-wrap">
+                <div class="schema-box star">
+                    <h4>⭐ Star Schema</h4>
+                    <svg class="schema-svg" viewBox="0 0 260 240" xmlns="http://www.w3.org/2000/svg">
+                        <!-- FATO center -->
+                        <rect x="85" y="85" width="90" height="70" rx="8" fill="#1a2235" stroke="#f59e0b" stroke-width="2"/>
+                        <text x="130" y="108" text-anchor="middle" fill="#f59e0b" font-size="9" font-weight="bold">FATO_VENDAS</text>
+                        <text x="130" y="122" text-anchor="middle" fill="#94a3b8" font-size="7">sk_produto (FK)</text>
+                        <text x="130" y="133" text-anchor="middle" fill="#94a3b8" font-size="7">sk_cliente (FK)</text>
+                        <text x="130" y="144" text-anchor="middle" fill="#94a3b8" font-size="7">sk_tempo (FK)</text>
+                        <!-- DIM PRODUTO top -->
+                        <rect x="90" y="2" width="80" height="50" rx="6" fill="#1a2235" stroke="#60a5fa" stroke-width="1.5"/>
+                        <text x="130" y="18" text-anchor="middle" fill="#60a5fa" font-size="8" font-weight="bold">DIM_PRODUTO</text>
+                        <text x="130" y="30" text-anchor="middle" fill="#94a3b8" font-size="7">sk_produto (PK)</text>
+                        <text x="130" y="40" text-anchor="middle" fill="#94a3b8" font-size="7">nm_produto</text>
+                        <text x="130" y="50" text-anchor="middle" fill="#94a3b8" font-size="7">nm_categoria ◀desnorm</text>
+                        <line x1="130" y1="52" x2="130" y2="85" stroke="#60a5fa" stroke-width="1.5" stroke-dasharray="4,3"/>
+                        <!-- DIM CLIENTE bottom -->
+                        <rect x="90" y="188" width="80" height="46" rx="6" fill="#1a2235" stroke="#a78bfa" stroke-width="1.5"/>
+                        <text x="130" y="203" text-anchor="middle" fill="#a78bfa" font-size="8" font-weight="bold">DIM_CLIENTE</text>
+                        <text x="130" y="215" text-anchor="middle" fill="#94a3b8" font-size="7">sk_cliente (PK)</text>
+                        <text x="130" y="226" text-anchor="middle" fill="#94a3b8" font-size="7">nm_cidade ◀desnorm</text>
+                        <line x1="130" y1="155" x2="130" y2="188" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="4,3"/>
+                        <!-- DIM TEMPO left -->
+                        <rect x="2" y="98" width="76" height="44" rx="6" fill="#1a2235" stroke="#10b981" stroke-width="1.5"/>
+                        <text x="40" y="113" text-anchor="middle" fill="#10b981" font-size="8" font-weight="bold">DIM_TEMPO</text>
+                        <text x="40" y="125" text-anchor="middle" fill="#94a3b8" font-size="7">sk_tempo (PK)</text>
+                        <text x="40" y="136" text-anchor="middle" fill="#94a3b8" font-size="7">nm_mes, nr_ano…</text>
+                        <line x1="78" y1="120" x2="85" y2="120" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4,3"/>
+                    </svg>
+                    <p style="font-size:0.78em;color:var(--muted);margin-top:10px;">Dimensões desnormalizadas — 1 JOIN por dimensão</p>
+                </div>
+                <div class="schema-box snow">
+                    <h4>❄️ Snowflake Schema</h4>
+                    <svg class="schema-svg" viewBox="0 0 280 240" xmlns="http://www.w3.org/2000/svg">
+                        <!-- FATO -->
+                        <rect x="95" y="90" width="90" height="60" rx="8" fill="#1a2235" stroke="#00d4ff" stroke-width="2"/>
+                        <text x="140" y="110" text-anchor="middle" fill="#00d4ff" font-size="9" font-weight="bold">FATO_VENDAS</text>
+                        <text x="140" y="123" text-anchor="middle" fill="#94a3b8" font-size="7">sk_produto (FK)</text>
+                        <text x="140" y="133" text-anchor="middle" fill="#94a3b8" font-size="7">sk_cliente (FK)</text>
+                        <text x="140" y="143" text-anchor="middle" fill="#94a3b8" font-size="7">sk_tempo (FK)</text>
+                        <!-- DIM PRODUTO -->
+                        <rect x="100" y="40" width="80" height="44" rx="6" fill="#1a2235" stroke="#60a5fa" stroke-width="1.5"/>
+                        <text x="140" y="56" text-anchor="middle" fill="#60a5fa" font-size="8" font-weight="bold">DIM_PRODUTO</text>
+                        <text x="140" y="68" text-anchor="middle" fill="#94a3b8" font-size="7">sk_produto (PK)</text>
+                        <text x="140" y="78" text-anchor="middle" fill="#fbbf24" font-size="7">sk_subcat (FK) ▲</text>
+                        <line x1="140" y1="84" x2="140" y2="90" stroke="#60a5fa" stroke-width="1.5" stroke-dasharray="4,3"/>
+                        <!-- DIM SUBCATEGORIA -->
+                        <rect x="180" y="2" width="90" height="36" rx="6" fill="#1a2235" stroke="#f59e0b" stroke-width="1.5"/>
+                        <text x="225" y="17" text-anchor="middle" fill="#f59e0b" font-size="8" font-weight="bold">DIM_SUBCAT</text>
+                        <text x="225" y="29" text-anchor="middle" fill="#94a3b8" font-size="7">sk_subcat (PK)</text>
+                        <text x="225" y="37" text-anchor="middle" fill="#fbbf24" font-size="7">sk_categ (FK) ▲</text>
+                        <line x1="180" y1="20" x2="180" y2="20" stroke="#f59e0b" stroke-width="1" stroke-dasharray="3,3"/>
+                        <line x1="180" y1="60" x2="225" y2="38" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4,3"/>
+                        <!-- DIM CATEGORIA -->
+                        <rect x="2" y="2" width="80" height="34" rx="6" fill="#1a2235" stroke="#f97316" stroke-width="1.5"/>
+                        <text x="42" y="17" text-anchor="middle" fill="#f97316" font-size="8" font-weight="bold">DIM_CATEG</text>
+                        <text x="42" y="29" text-anchor="middle" fill="#94a3b8" font-size="7">sk_categ (PK)</text>
+                        <line x1="82" y1="18" x2="180" y2="18" stroke="#f97316" stroke-width="1.5" stroke-dasharray="4,3"/>
+                        <!-- DIM CLIENTE -->
+                        <rect x="100" y="188" width="80" height="44" rx="6" fill="#1a2235" stroke="#a78bfa" stroke-width="1.5"/>
+                        <text x="140" y="204" text-anchor="middle" fill="#a78bfa" font-size="8" font-weight="bold">DIM_CLIENTE</text>
+                        <text x="140" y="216" text-anchor="middle" fill="#94a3b8" font-size="7">sk_cliente (PK)</text>
+                        <text x="140" y="228" text-anchor="middle" fill="#fbbf24" font-size="7">sk_cidade (FK) ▲</text>
+                        <line x1="140" y1="150" x2="140" y2="188" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="4,3"/>
+                    </svg>
+                    <p style="font-size:0.78em;color:var(--muted);margin-top:10px;">Dimensões normalizadas — mais JOINs, menos redundância</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- COMPARAÇÃO -->
+        <div class="card">
+            <h3>📊 Star vs. Snowflake — Comparativo Direto</h3>
+            <div class="compare-wrap">
+                <table class="compare-table">
+                    <thead>
+                        <tr><th>Critério</th><th>⭐ Star Schema</th><th>❄️ Snowflake Schema</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Estrutura</td><td>Dimensões desnormalizadas</td><td>Dimensões normalizadas</td></tr>
+                        <tr><td>Número de tabelas</td><td class="tag-good">Menor</td><td class="tag-bad">Maior</td></tr>
+                        <tr><td>Complexidade SQL</td><td class="tag-good">Simples (poucos JOINs)</td><td class="tag-bad">Complexo (mais JOINs)</td></tr>
+                        <tr><td>Performance leitura</td><td class="tag-good">Mais rápido</td><td>Um pouco mais lento</td></tr>
+                        <tr><td>Redundância de dados</td><td class="tag-bad">Maior (dado repetido)</td><td class="tag-good">Menor</td></tr>
+                        <tr><td>Uso de espaço</td><td class="tag-bad">Maior</td><td class="tag-good">Menor</td></tr>
+                        <tr><td>Manutenção</td><td>Mais simples</td><td class="tag-good">Mais fácil alterar atributos</td></tr>
+                        <tr><td>Ferramentas de BI</td><td class="tag-good">Power BI, Tableau adoram</td><td>Suportado, mas mais config.</td></tr>
+                        <tr><td>Quando usar</td><td>Dimensões pequenas/médias</td><td>Dimensões muito grandes</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="info-box success">
+                <span class="icon">✅</span>
+                <span><strong>Regra prática do mercado:</strong> a maioria dos projetos começa com Star Schema. Migra para Snowflake somente quando dimensões ultrapassam milhões de linhas ou quando há necessidade estrita de normalização (ex: SCD Tipo 2 em grande escala).</span>
+            </div>
+        </div>
+
+        <!-- ACORDEÃO com conceitos extras -->
+        <div class="card">
+            <h3>🔍 Conceitos Complementares — Aprofunde-se</h3>
+            <div class="accordion">
+                <div class="acc-item">
+                    <div class="acc-head" onclick="toggleAcc(this)">
+                        <span>🔑 Surrogate Key vs. Natural Key — qual usar?</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="acc-body">
+                        <div class="acc-body-inner">
+                            <p><strong>Natural Key</strong> é a chave que já existe no sistema de origem: CPF do cliente, código do produto, número do pedido. <strong>Surrogate Key</strong> é um ID artificial gerado pelo DW (geralmente INTEGER auto-incremento).</p>
+                            <ul>
+                                <li><strong>Por que preferir Surrogate Key no DW?</strong> Porque a chave natural pode mudar no sistema de origem (ex: empresa muda seu código de produto). A surrogate key garante estabilidade histórica.</li>
+                                <li>Também permite rastrear múltiplas versões do mesmo registro (SCD Tipo 2), algo impossível com chave natural.</li>
+                                <li>Melhora performance: JOINs em INTEGER são mais rápidos que em VARCHAR.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-head" onclick="toggleAcc(this)">
+                        <span>📅 Por que a dim_tempo é especial?</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="acc-body">
+                        <div class="acc-body-inner">
+                            <p>A dimensão tempo é pré-carregada com todos os dias de um período (ex: 2000 a 2035 = ~12.775 linhas). Ela não vem do sistema de origem — é gerada pelo próprio DW.</p>
+                            <ul>
+                                <li>Permite análises como "vendas em fins de semana", "feriados nacionais", "início/fim de trimestre".</li>
+                                <li>A surrogate key costuma ser um inteiro no formato YYYYMMDD: 20240315 = 15 de março de 2024.</li>
+                                <li>Alguns DWs incluem atributos como semana do ano (ISO), período fiscal da empresa, flag de promoção.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-head" onclick="toggleAcc(this)">
+                        <span>📦 Galaxy Schema — quando ter múltiplas tabelas fato</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="acc-body">
+                        <div class="acc-body-inner">
+                            <p>Em DWs corporativos, é comum ter múltiplas tabelas fato compartilhando dimensões. Esse padrão é chamado de <strong>Galaxy Schema</strong> (ou Fact Constellation).</p>
+                            <ul>
+                                <li>Exemplo: fato_vendas e fato_estoque compartilham dim_produto e dim_tempo.</li>
+                                <li>Dimensões compartilhadas são chamadas de <strong>Conformed Dimensions</strong> — garantem que "produto" significa a mesma coisa em todos os processos de negócio.</li>
+                                <li>É o modelo mais completo mas também o mais complexo de manter.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-head" onclick="toggleAcc(this)">
+                        <span>🎯 Métricas Aditivas, Semi-aditivas e Não-aditivas</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="acc-body">
+                        <div class="acc-body-inner">
+                            <p>Nem toda métrica na tabela fato pode ser somada em todas as dimensões:</p>
+                            <ul>
+                                <li><strong>Aditiva:</strong> pode somar em qualquer dimensão. Ex: valor de venda, quantidade vendida.</li>
+                                <li><strong>Semi-aditiva:</strong> faz sentido somar no tempo mas não sempre. Ex: saldo bancário — soma por produto não faz sentido, mas soma temporal em um ponto sim.</li>
+                                <li><strong>Não-aditiva:</strong> nunca se soma. Ex: preço unitário, taxa de conversão. Deve-se calcular a média ponderada.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-box note">
+            <span class="icon">📱</span>
+            <span>Você está estudando pelo celular? Ótimo! Role para baixo para acessar os vídeos e exercícios. Tudo foi pensado para telas pequenas.</span>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════ -->
+    <!-- FASE 1 — VÍDEOS                                   -->
+    <!-- ══════════════════════════════════════════════════ -->
+    <div class="phase-section" id="phase-1">
+        <div class="section-header">
+            <div class="section-icon icon-blue">🎬</div>
+            <div><h2>Vídeos Recomendados</h2><p>Assista em qualquer ordem — todos têm legenda em português</p></div>
+        </div>
+
+        <div class="info-box tip">
+            <span class="icon">💡</span>
+            <span>Dica: use o YouTube em velocidade 1.25x para estudar mais rápido. Ative as legendas automáticas em português se precisar.</span>
+        </div>
+
+        <div class="video-card">
+            <div class="video-thumb">⭐</div>
+            <div class="video-info">
+                <h4>Star Schema vs Snowflake Schema — Comparação Completa</h4>
+                <div class="meta">▶ YouTube · ~14 min · Português</div>
+                <p>Explicação visual clara dos dois modelos com exemplos práticos de um DW de vendas. Ideal para começar — assista antes dos outros.</p>
+                <a href="https://www.youtube.com/results?search_query=star+schema+snowflake+schema+data+warehouse+portugues" target="_blank" class="btn-sm">▶ Buscar no YouTube</a>
+            </div>
+        </div>
+
+        <div class="video-card">
+            <div class="video-thumb">📊</div>
+            <div class="video-info">
+                <h4>Modelagem Dimensional — Kimball Method</h4>
+                <div class="meta">▶ YouTube · ~22 min · Inglês com legenda</div>
+                <p>O canal "Data Engineering" explica a metodologia Kimball que originou os dois schemas. Essencial para entender a filosofia por trás da modelagem dimensional.</p>
+                <a href="https://www.youtube.com/results?search_query=kimball+dimensional+modeling+star+schema+tutorial" target="_blank" class="btn-sm">▶ Buscar no YouTube</a>
+            </div>
+        </div>
+
+        <div class="video-card">
+            <div class="video-thumb">🔑</div>
+            <div class="video-info">
+                <h4>Surrogate Keys no Data Warehouse — Por que usar?</h4>
+                <div class="meta">▶ YouTube · ~10 min · Português</div>
+                <p>Vídeo curto e direto explicando a diferença entre chave natural e surrogate key, com exemplos reais de problemas que surgem sem surrogate keys.</p>
+                <a href="https://www.youtube.com/results?search_query=surrogate+key+data+warehouse+chave+substituta" target="_blank" class="btn-sm">▶ Buscar no YouTube</a>
+            </div>
+        </div>
+
+        <div class="video-card">
+            <div class="video-thumb">⚡</div>
+            <div class="video-info">
+                <h4>Criando Star Schema no Power BI — Tutorial Prático</h4>
+                <div class="meta">▶ YouTube · ~18 min · Português</div>
+                <p>Mostra como o Star Schema se conecta diretamente com ferramentas de BI. Você verá por que o Power BI recomenda fortemente esse modelo.</p>
+                <a href="https://www.youtube.com/results?search_query=star+schema+power+bi+tutorial+portugues" target="_blank" class="btn-sm">▶ Buscar no YouTube</a>
+            </div>
+        </div>
+
+        <div class="video-card">
+            <div class="video-thumb">🏗️</div>
+            <div class="video-info">
+                <h4>Tabelas Fato vs Dimensão — Diferenças e Boas Práticas</h4>
+                <div class="meta">▶ YouTube · ~12 min · Português</div>
+                <p>Foca especificamente nos tipos de tabela fato (transacional, snapshot, acumulado) e nos atributos típicos de uma boa dimensão. Complementa perfeitamente a teoria desta semana.</p>
+                <a href="https://www.youtube.com/results?search_query=tabela+fato+dimensão+data+warehouse+modelagem" target="_blank" class="btn-sm">▶ Buscar no YouTube</a>
+            </div>
+        </div>
+
+        <div class="info-box note">
+            <span class="icon">📝</span>
+            <span>Após assistir os vídeos, volte e faça os exercícios da aba <strong>Exercícios</strong>. O quiz está diretamente ligado ao conteúdo dos vídeos e da teoria.</span>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════ -->
+    <!-- FASE 2 — EXERCÍCIOS INTERATIVOS                   -->
+    <!-- ══════════════════════════════════════════════════ -->
+    <div class="phase-section" id="phase-2">
+        <div class="section-header">
+            <div class="section-icon icon-purple">🧩</div>
+            <div><h2>Exercícios Interativos</h2><p>Quiz + Classificação de tabelas — teste o que aprendeu</p></div>
+        </div>
+
+        <!-- QUIZ -->
+        <div class="card">
+            <h3>🎯 Quiz — Star Schema & Snowflake (8 questões)</h3>
+            <p style="margin-bottom:20px;">Clique na resposta correta. Cada acerto vale +25 XP. Feedback imediato após cada resposta.</p>
+
+            <div class="quiz-wrap" id="quiz-wrap">
+                <div class="quiz-progress" id="quiz-prog"></div>
+                <div id="quiz-cards"></div>
+                <div class="quiz-result" id="quiz-result">
+                    <div class="result-score" id="result-score"></div>
+                    <div class="result-msg" id="result-msg"></div>
+                    <button class="restart-btn" onclick="restartQuiz()">↺ Refazer Quiz</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- DRAG & DROP -->
+        <div class="card">
+            <h3>🗂️ Classifique os Atributos</h3>
+            <p style="margin-bottom:16px;">Arraste cada campo para a tabela correta: <span style="color:var(--star-color)">Tabela Fato</span> ou <span style="color:var(--snow-color)">Tabela Dimensão</span>.</p>
+
+            <div class="dnd-area" id="dnd-area">
+                <div class="dnd-bank" id="dnd-bank"></div>
+                <div class="dnd-zones">
+                    <div class="dnd-zone fact-z star-z" id="zone-fato" ondragover="dndOver(event)" ondrop="dndDrop(event,'fato')">
+                        <h4>⭐ Tabela Fato</h4>
+                        <div class="dropped-chips" id="drop-fato"></div>
+                    </div>
+                    <div class="dnd-zone dim-z snow-z" id="zone-dim" ondragover="dndOver(event)" ondrop="dndDrop(event,'dim')">
+                        <h4>❄️ Tabela Dimensão</h4>
+                        <div class="dropped-chips" id="drop-dim"></div>
+                    </div>
+                </div>
+                <button class="dnd-check" onclick="checkDnd()">✓ Verificar Classificação</button>
+                <div class="dnd-result" id="dnd-result"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════ -->
+    <!-- FASE 3 — ATIVIDADES                               -->
+    <!-- ══════════════════════════════════════════════════ -->
+    <div class="phase-section" id="phase-3">
+        <div class="section-header">
+            <div class="section-icon icon-green">✏️</div>
+            <div><h2>Atividades para Entregar</h2><p>Envie pelo Moodle até a data indicada pelo professor</p></div>
+        </div>
+
+        <div class="info-box tip">
+            <span class="icon">📱</span>
+            <span>Estudando pelo celular? Você pode usar o <strong>Google Docs</strong> ou <strong>Notion</strong> para redigir as respostas. Para os diagramas, tente o <strong>Lucidchart</strong> (tem app) ou mesmo uma foto de um rascunho à mão bem organizado.</span>
+        </div>
+
+        <div class="ativ-card">
+            <div class="ativ-header">
+                <div class="ativ-num">1</div>
+                <div><h3>Modelagem de um Star Schema</h3><div class="pts">🔮 +100 XP ao completar</div></div>
+            </div>
+            <p><strong>Contexto:</strong> Uma rede de farmácias quer analisar suas vendas mensais por produto, loja, farmacêutico e período.</p>
+            <p><strong>O que fazer:</strong></p>
+            <ol>
+                <li>Identifique as métricas (o que medir): quantidade, valor, desconto...</li>
+                <li>Identifique as dimensões (contexto): produto, loja, tempo, farmacêutico...</li>
+                <li>Crie o diagrama do Star Schema com as colunas principais de cada tabela.</li>
+                <li>Defina as surrogate keys e as chaves estrangeiras da tabela fato.</li>
+                <li>Escreva ao menos o CREATE TABLE da tabela fato e de duas dimensões.</li>
+            </ol>
+            <div class="tag-entregavel">📤 Entregável: Diagrama (foto/Lucidchart) + SQL no Moodle</div>
+        </div>
+
+        <div class="ativ-card">
+            <div class="ativ-header">
+                <div class="ativ-num">2</div>
+                <div><h3>Star → Snowflake: Transformação Guiada</h3><div class="pts">🔮 +120 XP ao completar</div></div>
+            </div>
+            <p><strong>Contexto:</strong> Você recebeu o Star Schema abaixo da atividade 1 de um colega (ou crie o seu próprio).</p>
+            <p><strong>O que fazer:</strong></p>
+            <ol>
+                <li>Escolha 2 dimensões para normalizar (ex: produto → produto + categoria + subcategoria).</li>
+                <li>Redesenhe essas dimensões no formato Snowflake, criando as sub-tabelas necessárias.</li>
+                <li>Atualize o diagrama mostrando o Snowflake resultante.</li>
+                <li>Escreva uma análise de <strong>3 parágrafos</strong> comparando os dois modelos para o cenário da farmácia: quais são as vantagens e desvantagens de cada um neste caso específico?</li>
+            </ol>
+            <div class="tag-entregavel">📤 Entregável: Diagrama Snowflake + análise textual no Moodle</div>
+        </div>
+
+        <div class="ativ-card">
+            <div class="ativ-header">
+                <div class="ativ-num">3</div>
+                <div><h3>Pesquisa: Schema no Mundo Real</h3><div class="pts">🔮 +80 XP ao completar</div></div>
+            </div>
+            <p><strong>O que fazer:</strong></p>
+            <ol>
+                <li>Pesquise <strong>uma empresa real</strong> que usa Data Warehouse (ex: Netflix, Nubank, Magazine Luiza, Amazon).</li>
+                <li>Descreva <strong>qual tipo de schema</strong> ela provavelmente usa e por quê (baseie-se em artigos, blog posts técnicos ou documentações públicas).</li>
+                <li>Liste as possíveis <strong>tabelas fato</strong> que essa empresa teria em seu DW.</li>
+                <li>Liste as possíveis <strong>dimensões compartilhadas</strong> entre essas tabelas fato.</li>
+                <li>Cite a fonte (link do artigo ou blog).</li>
+            </ol>
+            <div class="info-box note" style="margin:12px 0;">
+                <span class="icon">🔍</span>
+                <span>Dica de pesquisa: busque no Google por "<em>[nome da empresa] data warehouse architecture blog</em>" ou "<em>[empresa] engineering blog data modeling</em>". Nubank, iFood e outras empresas brasileiras publicam sobre isso.</span>
+            </div>
+            <div class="tag-entregavel">📤 Entregável: Documento de 1-2 páginas com fontes no Moodle</div>
+        </div>
+
+        <div class="info-box success">
+            <span class="icon">📧</span>
+            <span>Dúvidas sobre as atividades? Envie e-mail para <strong>isaque.katahira@fatecourinhos.edu.br</strong> com o assunto "BDN007 - Semana 07". O professor responde em até 48h úteis.</span>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════ -->
+    <!-- FASE 4 — MATERIAIS                                -->
+    <!-- ══════════════════════════════════════════════════ -->
+    <div class="phase-section" id="phase-4">
+        <div class="section-header">
+            <div class="section-icon icon-yellow">📖</div>
+            <div><h2>Materiais Complementares</h2><p>Todos gratuitos e acessíveis pelo celular</p></div>
+        </div>
+
+        <div class="material-item">
+            <span class="mat-icon">📚</span>
+            <div class="mat-info">
+                <h4>The Data Warehouse Toolkit — Kimball & Ross</h4>
+                <div class="meta">📖 Livro · Edição 3 · Inglês</div>
+                <p>A bíblia da modelagem dimensional. Os capítulos 2 e 3 cobrem exatamente Star e Snowflake Schema. Disponível em bibliotecas universitárias e versões digitais.</p>
+                <a href="https://www.kimballgroup.com/data-warehouse-business-intelligence-resources/" target="_blank" class="btn-sm">🔗 Site do Kimball Group</a>
+            </div>
+        </div>
+
+        <div class="material-item">
+            <span class="mat-icon">📄</span>
+            <div class="mat-info">
+                <h4>Kimball Dimensional Modeling Techniques — Referência Oficial</h4>
+                <div class="meta">📄 Artigo online gratuito</div>
+                <p>Guia oficial do Kimball Group com todas as técnicas de modelagem dimensional, incluindo os dois schemas, SCDs, conformed dimensions e muito mais.</p>
+                <a href="https://www.kimballgroup.com/data-warehouse-business-intelligence-resources/kimball-techniques/dimensional-modeling-techniques/" target="_blank" class="btn-sm">🔗 Acessar Guia</a>
+            </div>
+        </div>
+
+        <div class="material-item">
+            <span class="mat-icon">🎓</span>
+            <div class="mat-info">
+                <h4>Microsoft: Star Schema e Relações no Power BI</h4>
+                <div class="meta">🌐 Documentação oficial · Português disponível</div>
+                <p>A Microsoft explica por que recomenda Star Schema para todos os modelos no Power BI. Texto com exemplos visuais, ótimo para quem vai trabalhar com BI.</p>
+                <a href="https://learn.microsoft.com/pt-br/power-bi/guidance/star-schema" target="_blank" class="btn-sm">🔗 Ler Documentação</a>
+            </div>
+        </div>
+
+        <div class="material-item">
+            <span class="mat-icon">🛠️</span>
+            <div class="mat-info">
+                <h4>dbdiagram.io — Ferramenta Gratuita de Diagramas ER</h4>
+                <div class="meta">🌐 Web App · Funciona no celular</div>
+                <p>Crie diagramas Star e Snowflake escrevendo uma sintaxe simples. Gratuito, sem cadastro obrigatório, e exporta como imagem. Perfeito para as atividades desta semana.</p>
+                <a href="https://dbdiagram.io" target="_blank" class="btn-sm">🔗 Abrir dbdiagram.io</a>
+            </div>
+        </div>
+
+        <div class="material-item">
+            <span class="mat-icon">📊</span>
+            <div class="mat-info">
+                <h4>Lucidchart — Diagramas Colaborativos</h4>
+                <div class="meta">📱 App iOS e Android · Plano gratuito disponível</div>
+                <p>Ótima opção para criar os diagramas das atividades pelo celular. Tem templates prontos de Star Schema. O plano gratuito permite 3 diagramas.</p>
+                <a href="https://www.lucidchart.com" target="_blank" class="btn-sm">🔗 Acessar Lucidchart</a>
+            </div>
+        </div>
+
+        <div class="info-box tip">
+            <span class="icon">💡</span>
+            <span>Dica do professor: para as atividades desta semana, o <strong>dbdiagram.io</strong> é a ferramenta mais rápida. Você escreve o schema em texto e ele gera o diagrama visual automaticamente — muito prático pelo celular!</span>
+        </div>
+    </div>
+
+</div><!-- /main -->
+
+<!-- NAVEGAÇÃO RODAPÉ -->
+<div class="nav-bar">
+    <a href="semana06.html" class="nav-btn">← Semana 06</a>
+    <a href="index.html" class="nav-btn primary">🏠 Início</a>
+    <a href="semana08.html" class="nav-btn">Semana 08 →</a>
+</div>
+
+<footer>
+    <p>
+        <strong>BDN007 — Business Intelligence e Big Data</strong><br>
+        Desenvolvido por <strong>Prof. Isaque Katahira</strong> · FATEC Ourinhos · Centro Paula Souza<br>
+        Dúvidas ou bugs: <a href="mailto:isaque.katahira@fatecourinhos.edu.br">isaque.katahira@fatecourinhos.edu.br</a>
+    </p>
+</footer>
+
+<button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+// ════ XP SYSTEM ════
+let XP = 0;
+let quizCorrect = 0;
+let activDone = 0;
+const MAX_XP = 350;
+
+function addXP(amount) {
+    XP = Math.min(XP + amount, MAX_XP);
+    document.getElementById('xp-fill').style.width = (XP / MAX_XP * 100) + '%';
+    document.getElementById('xp-val').textContent = XP;
+    document.getElementById('xp-label').textContent = XP + ' / ' + MAX_XP + ' XP';
+}
+
+// ════ TABS ════
+function showPhase(n) {
+    document.querySelectorAll('.phase-section').forEach((s, i) => {
+        s.classList.toggle('visible', i === n);
+    });
+    document.querySelectorAll('.phase-btn').forEach((b, i) => {
+        b.classList.toggle('active', i === n);
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ════ ACCORDION ════
+function toggleAcc(head) {
+    var item = head.parentElement;
+    var body = item.querySelector('.acc-body');
+    var isOpen = item.classList.contains('open');
+    // fecha todos
+    document.querySelectorAll('.acc-item').forEach(function(i) {
+        i.classList.remove('open');
+        i.querySelector('.acc-body').style.maxHeight = '0';
+    });
+    if (!isOpen) {
+        item.classList.add('open');
+        body.style.maxHeight = body.scrollHeight + 'px';
+    }
+}
+
+// ════ QUIZ DATA ════
+var QUIZ = [
+    {
+        q: 'Qual é a principal característica do Star Schema em relação às tabelas Dimensão?',
+        opts: ['As dimensões são normalizadas em múltiplas sub-tabelas', 'As dimensões são desnormalizadas — todos os atributos em uma única tabela', 'Não existem tabelas dimensão — apenas a tabela fato', 'As dimensões compartilham sempre a mesma chave primária'],
+        correct: 1,
+        xp: 25,
+        fb: 'No Star Schema, as dimensões são desnormalizadas: atributos como cidade, estado e região ficam todos na mesma tabela dim_cliente, mesmo que isso gere redundância.'
+    },
+    {
+        q: 'Uma empresa tem 2 milhões de produtos e o atributo "categoria" se repete em 80% deles. Qual schema é mais indicado?',
+        opts: ['Star Schema, porque tem menos JOINs', 'Snowflake Schema, porque normaliza a dimensão produto, reduzindo redundância significativa', 'Galaxy Schema sempre que houver mais de 1 milhão de registros', 'Qualquer um — a escolha de schema não afeta o espaço em disco'],
+        correct: 1,
+        xp: 25,
+        fb: 'Com dimensões muito grandes e atributos muito repetitivos, o Snowflake compensa a complexidade de JOINs pela economia de espaço e facilidade de manutenção dos atributos normalizados.'
+    },
+    {
+        q: 'Qual é a função principal da Tabela Fato em um Data Warehouse?',
+        opts: ['Armazenar os dados mestres de clientes e produtos', 'Armazenar métricas e medidas dos eventos de negócio, com chaves estrangeiras para as dimensões', 'Substituir o banco de dados transacional (OLTP)', 'Armazenar os logs de acesso ao sistema de BI'],
+        correct: 1,
+        xp: 25,
+        fb: 'A tabela fato é o coração do DW: ela registra os eventos mensuráveis (vendas, transações, cliques) com as métricas numéricas e FK\'s apontando para cada dimensão.'
+    },
+    {
+        q: 'O que é uma Surrogate Key (chave substituta) no contexto de um DW?',
+        opts: ['A chave primária original do sistema de origem (ex: CPF, código de produto)', 'Um ID artificial gerado pelo DW, geralmente inteiro sequencial, independente do sistema de origem', 'Uma chave estrangeira que aponta para a tabela fato', 'O campo de data usado como chave na dimensão tempo'],
+        correct: 1,
+        xp: 25,
+        fb: 'Surrogate Key é gerada pelo próprio DW (normalmente um INTEGER auto-incremento). Protege o DW de mudanças nas chaves do sistema de origem e permite versionar registros históricos (SCD).'
+    },
+    {
+        q: 'Em um Snowflake Schema, a dim_produto é dividida em dim_produto → dim_subcategoria → dim_categoria. Isso é chamado de:',
+        opts: ['Denormalização dimensional', 'Normalização das dimensões (hierarquia dimensional)', 'Galaxy Schema de produto', 'Particionamento horizontal'],
+        correct: 1,
+        xp: 25,
+        fb: 'No Snowflake, as dimensões são normalizadas criando hierarquias de tabelas que refletem relacionamentos pai-filho entre os atributos. Cada nível é uma tabela separada com sua própria surrogate key.'
+    },
+    {
+        q: 'Por que a dim_tempo é geralmente pré-carregada com todos os dias de um período no DW?',
+        opts: ['Para economizar memória — é mais eficiente que calcular datas na hora da query', 'Para permitir análises ricas como "fins de semana", "feriados", "trimestre fiscal" sem depender de funções de data', 'Porque o SQL não consegue calcular diferenças de data sem uma tabela de calendário', 'Porque a data é a única dimensão que não precisa de surrogate key'],
+        correct: 1,
+        xp: 25,
+        fb: 'A dim_tempo pré-carregada permite atributos ricos como fl_feriado, nm_trimestre_fiscal, fl_fim_semana etc. Isso torna as análises muito mais poderosas e simples de escrever em SQL ou DAX.'
+    },
+    {
+        q: 'O que são "Conformed Dimensions" (Dimensões Conformadas)?',
+        opts: ['Dimensões que foram normalizadas no Snowflake Schema', 'Dimensões compartilhadas entre múltiplas tabelas fato, com significado e granularidade consistentes em todo o DW', 'Dimensões que contêm apenas dados do ano corrente', 'Dimensões criadas automaticamente por ferramentas de ETL'],
+        correct: 1,
+        xp: 25,
+        fb: 'Conformed Dimensions são a base do Galaxy Schema: dim_produto significa a mesma coisa na fato_vendas e na fato_estoque. Isso permite análises cruzadas entre processos de negócio distintos.'
+    },
+    {
+        q: 'Qual afirmação sobre métricas NÃO-ADITIVAS está correta?',
+        opts: ['Podem ser somadas em qualquer dimensão sem perder significado', 'Nunca devem ser incluídas na tabela fato', 'Não faz sentido somá-las — deve-se usar média ponderada ou outra agregação contextual', 'São exclusivas do Snowflake Schema'],
+        correct: 2,
+        xp: 25,
+        fb: 'Métricas não-aditivas (como preço unitário, taxa de conversão, margem %) não podem ser simplesmente somadas. Somar preços unitários de produtos diferentes não tem significado — usa-se média ponderada pela quantidade.'
+    }
+];
+
+var currentQ = 0;
+var answered = [];
+var quizDone = false;
+
+function buildQuizProgress() {
+    var prog = document.getElementById('quiz-prog');
+    prog.innerHTML = '';
+    QUIZ.forEach(function(_, i) {
+        var d = document.createElement('div');
+        d.className = 'qp-dot' + (i === currentQ ? ' active' : '') + (i < currentQ ? (answered[i] ? ' done' : ' wrong-d') : '');
+        prog.appendChild(d);
+    });
+}
+
+function buildQuizCard(idx) {
+    var container = document.getElementById('quiz-cards');
+    container.innerHTML = '';
+    if (idx >= QUIZ.length) {
+        showQuizResult();
+        return;
+    }
+    var q = QUIZ[idx];
+    var card = document.createElement('div');
+    card.className = 'quiz-card-q active';
+    card.innerHTML =
+        '<div class="quiz-meta">' +
+            '<span class="quiz-num">Questão ' + (idx + 1) + ' de ' + QUIZ.length + '</span>' +
+            '<span class="quiz-xp">+' + q.xp + ' XP</span>' +
+        '</div>' +
+        '<div class="quiz-q">' + q.q + '</div>' +
+        '<div class="quiz-opts">' +
+            q.opts.map(function(o, i) {
+                return '<button class="quiz-opt" onclick="answerQ(' + i + ',' + q.correct + ',' + q.xp + ')">' + o + '</button>';
+            }).join('') +
+        '</div>' +
+        '<div class="quiz-fb" id="qfb"></div>' +
+        '<button class="quiz-next" id="qnext" onclick="nextQ()">Próxima →</button>';
+    container.appendChild(card);
+    buildQuizProgress();
+}
+
+function answerQ(chosen, correct, xp) {
+    var opts = document.querySelectorAll('.quiz-opt');
+    opts.forEach(function(o) { o.disabled = true; });
+    var fb = document.getElementById('qfb');
+    var next = document.getElementById('qnext');
+    if (chosen === correct) {
+        opts[chosen].classList.add('correct');
+        fb.className = 'quiz-fb show ok';
+        fb.textContent = '✅ Correto! ' + QUIZ[currentQ].fb;
+        addXP(xp);
+        quizCorrect++;
+        document.getElementById('quiz-val').textContent = quizCorrect + '/8';
+        answered.push(true);
+    } else {
+        opts[chosen].classList.add('wrong');
+        opts[correct].classList.add('correct');
+        fb.className = 'quiz-fb show err';
+        fb.textContent = '❌ Incorreto. ' + QUIZ[currentQ].fb;
+        answered.push(false);
+    }
+    next.classList.add('show');
+}
+
+function nextQ() {
+    currentQ++;
+    buildQuizCard(currentQ);
+}
+
+function showQuizResult() {
+    document.getElementById('quiz-prog').innerHTML = '';
+    QUIZ.forEach(function(_, i) {
+        var d = document.createElement('div');
+        d.className = 'qp-dot ' + (answered[i] ? 'done' : 'wrong-d');
+        document.getElementById('quiz-prog').appendChild(d);
+    });
+    var res = document.getElementById('quiz-result');
+    var score = QUIZ.filter(function(_, i) { return answered[i]; }).length;
+    res.querySelector('.result-score').textContent = score + '/' + QUIZ.length;
+    var msgs = ['Continue estudando! Revise a teoria e tente novamente.', 'Bom progresso! Alguns conceitos merecem revisão.', 'Muito bem! Você domina os conceitos centrais.', '🏆 Perfeito! Excelente domínio do conteúdo.'];
+    var mIdx = score <= 3 ? 0 : score <= 5 ? 1 : score <= 7 ? 2 : 3;
+    res.querySelector('.result-msg').textContent = msgs[mIdx];
+    res.classList.add('show');
+    document.getElementById('quiz-cards').innerHTML = '';
+    quizDone = true;
+}
+
+function restartQuiz() {
+    currentQ = 0;
+    answered = [];
+    quizCorrect = 0;
+    quizDone = false;
+    document.getElementById('quiz-result').classList.remove('show');
+    document.getElementById('quiz-val').textContent = '0/8';
+    buildQuizCard(0);
+}
+
+// init quiz
+buildQuizCard(0);
+
+// ════ DRAG & DROP ════
+var DND_ITEMS = [
+    { id: 'vl_venda',    label: 'vl_venda (Valor)',       correct: 'fato' },
+    { id: 'nm_produto',  label: 'nm_produto (Nome)',      correct: 'dim'  },
+    { id: 'qt_itens',    label: 'qt_itens (Quantidade)',  correct: 'fato' },
+    { id: 'nm_cidade',   label: 'nm_cidade (Cidade)',     correct: 'dim'  },
+    { id: 'sk_cliente',  label: 'sk_cliente (FK)',        correct: 'fato' },
+    { id: 'nm_categoria',label: 'nm_categoria (Categ.)',  correct: 'dim'  },
+    { id: 'vl_desconto', label: 'vl_desconto (Desconto)', correct: 'fato' },
+    { id: 'dt_data',     label: 'dt_data (Data)',         correct: 'dim'  },
+];
+
+var dndPlaced = {}; // id -> zone
+
+function buildDnd() {
+    var bank = document.getElementById('dnd-bank');
+    bank.innerHTML = '';
+    DND_ITEMS.forEach(function(item) {
+        var chip = document.createElement('div');
+        chip.className = 'chip';
+        chip.draggable = true;
+        chip.dataset.id = item.id;
+        chip.textContent = item.label;
+        chip.addEventListener('dragstart', function(e) {
+            e.dataTransfer.setData('text/plain', item.id);
+            chip.classList.add('dragging');
+        });
+        chip.addEventListener('dragend', function() { chip.classList.remove('dragging'); });
+        // Touch support
+        chip.addEventListener('touchstart', touchStart, { passive: true });
+        chip.addEventListener('touchend', touchEnd, { passive: true });
+        bank.appendChild(chip);
+    });
+}
+
+var touchChip = null;
+
+function touchStart(e) {
+    touchChip = e.currentTarget.dataset.id;
+}
+
+function touchEnd(e) {
+    if (!touchChip) return;
+    var touch = e.changedTouches[0];
+    var el = document.elementFromPoint(touch.clientX, touch.clientY);
+    var zone = el ? el.closest('.dnd-zone') : null;
+    if (zone) {
+        var zoneId = zone.id === 'zone-fato' ? 'fato' : 'dim';
+        dropToZone(touchChip, zoneId);
+    }
+    touchChip = null;
+}
+
+function dndOver(e) { e.preventDefault(); e.currentTarget.classList.add('over'); }
+
+function dndDrop(e, zone) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('over');
+    var id = e.dataTransfer.getData('text/plain');
+    dropToZone(id, zone);
+}
+
+function dropToZone(id, zone) {
+    dndPlaced[id] = zone;
+    // rebuild zones
+    ['fato', 'dim'].forEach(function(z) {
+        var container = document.getElementById('drop-' + z);
+        container.innerHTML = '';
+        DND_ITEMS.forEach(function(item) {
+            if (dndPlaced[item.id] === z) {
+                var c = document.createElement('div');
+                c.className = 'chip';
+                c.textContent = item.label;
+                c.style.cursor = 'pointer';
+                c.onclick = function() { delete dndPlaced[item.id]; dropToZone(null, null); };
+                container.appendChild(c);
+            }
+        });
+    });
+    // remove from bank
+    var bank = document.getElementById('dnd-bank');
+    bank.innerHTML = '';
+    DND_ITEMS.forEach(function(item) {
+        if (!dndPlaced[item.id]) {
+            var chip = document.createElement('div');
+            chip.className = 'chip';
+            chip.draggable = true;
+            chip.dataset.id = item.id;
+            chip.textContent = item.label;
+            chip.addEventListener('dragstart', function(e) { e.dataTransfer.setData('text/plain', item.id); });
+            chip.addEventListener('touchstart', touchStart, { passive: true });
+            chip.addEventListener('touchend', touchEnd, { passive: true });
+            bank.appendChild(chip);
+        }
+    });
+}
+
+function checkDnd() {
+    var total = DND_ITEMS.length;
+    var placed = Object.keys(dndPlaced).length;
+    if (placed < total) {
+        document.getElementById('dnd-result').className = 'dnd-result fail';
+        document.getElementById('dnd-result').textContent = '⚠️ Classifique todos os ' + total + ' campos antes de verificar. Faltam ' + (total - placed) + '.';
+        return;
+    }
+    var correct = DND_ITEMS.filter(function(item) { return dndPlaced[item.id] === item.correct; }).length;
+    var res = document.getElementById('dnd-result');
+    if (correct === total) {
+        res.className = 'dnd-result ok';
+        res.textContent = '✅ Perfeito! Todos os ' + total + ' campos classificados corretamente. +50 XP!';
+        addXP(50);
+    } else {
+        res.className = 'dnd-result fail';
+        res.textContent = '❌ ' + correct + ' de ' + total + ' corretos. Dica: métricas numéricas (valor, quantidade) e FKs vão na Fato. Nomes, categorias e datas descritivas vão na Dimensão.';
+    }
+}
+
+buildDnd();
+
+// ════ SCROLL TOP ════
+window.addEventListener('scroll', function() {
+    document.getElementById('scroll-top').classList.toggle('show', window.scrollY > 300);
+});
+
+// ════ XP ON LOAD ════
+window.addEventListener('load', function() {
+    setTimeout(function() {
+        document.getElementById('xp-fill').style.width = '0%';
+    }, 100);
+});
+</script>
 </body>
 </html>

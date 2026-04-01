@@ -1,814 +1,92 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Semana 04 — OLAP e Cubos | BDN007</title>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg:#080c10;--bg2:#0d1117;--surf:#111820;--surf2:#17212c;--surf3:#1d2d3e;
-  --accent:#00d4ff;--accent2:#ff6b35;--accent3:#39ff7e;--accent4:#c084fc;
-  --gold:#ffd60a;--text:#e2eaf4;--muted:#5a7a96;--border:#1e3048;
-  --danger:#ff4d6d;--success:#39ff7e;--arduino:#00979d;
-}
-*{margin:0;padding:0;box-sizing:border-box;}
-html{scroll-behavior:smooth;}
-body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
-body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,212,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
-
-.hero{position:relative;padding:50px 40px 44px;background:linear-gradient(160deg,#0a1628 0%,#080c10 55%);border-bottom:1px solid var(--border);overflow:hidden;z-index:1;}
-.hero-glow{position:absolute;top:-120px;right:-60px;width:500px;height:500px;background:radial-gradient(circle,rgba(0,212,255,.09) 0%,transparent 65%);pointer-events:none;}
-.hero-inner{max-width:960px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-start;gap:24px;flex-wrap:wrap;}
-.breadcrumb{font-family:'JetBrains Mono',monospace;font-size:.7em;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;}
-.breadcrumb a{color:var(--accent);text-decoration:none;}
-.module-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.25);color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:.7em;padding:5px 14px;border-radius:30px;letter-spacing:.08em;margin-bottom:12px;}
-h1.title{font-family:'Outfit',sans-serif;font-size:clamp(2em,5.5vw,3.4em);font-weight:700;line-height:1.05;margin-bottom:6px;}
-h1.title span{color:var(--accent);}
-.subtitle{color:var(--accent2);font-weight:600;font-size:1.05em;}
-.xp-panel{background:var(--surf);border:1px solid var(--border);border-radius:14px;padding:20px 22px;min-width:210px;position:relative;overflow:hidden;}
-.xp-panel::before{content:'XP';position:absolute;right:14px;top:8px;font-family:'JetBrains Mono',monospace;font-size:4em;font-weight:700;color:rgba(255,214,10,.04);pointer-events:none;}
-.xp-lbl{font-family:'JetBrains Mono',monospace;font-size:.65em;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;}
-.xp-num{font-family:'JetBrains Mono',monospace;font-size:2.2em;font-weight:700;color:var(--gold);}
-.xp-num small{font-size:.45em;color:var(--muted);}
-.xp-bar{height:5px;background:var(--border);border-radius:4px;margin-top:10px;overflow:hidden;}
-.xp-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--gold));border-radius:4px;width:0%;transition:width 1s cubic-bezier(.4,0,.2,1);}
-
-main{max-width:960px;margin:0 auto;padding:36px 20px 90px;position:relative;z-index:1;}
-
-.card{background:var(--surf);border:1px solid var(--border);border-radius:16px;padding:30px;margin-bottom:24px;position:relative;overflow:hidden;transition:border-color .25s;}
-.card:hover{border-color:rgba(0,212,255,.3);}
-.card-label{font-family:'JetBrains Mono',monospace;font-size:.65em;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
-.card-label::before{content:'';width:18px;height:1.5px;background:var(--accent);display:inline-block;}
-.card h2{font-size:1.45em;font-weight:700;margin-bottom:14px;}
-.card p,.card li{color:#8fafc8;line-height:1.75;}
-.card ul{padding-left:18px;}
-.card ul li{margin-bottom:7px;}
-
-.recap-card{background:linear-gradient(135deg,#101828 0%,#0d1117 100%);border-color:#1e3a5f;}
-.recap-card .card-label{color:var(--accent4);}
-.recap-card .card-label::before{background:var(--accent4);}
-.recap-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:16px 0;}
-.recap-chip{background:rgba(192,132,252,.07);border:1px solid rgba(192,132,252,.18);border-radius:10px;padding:14px;}
-.rc-icon{font-size:1.3em;margin-bottom:6px;}
-.rc-lbl{font-size:.68em;font-family:'JetBrains Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;}
-.rc-val{font-weight:700;color:var(--text);font-size:.95em;margin-top:3px;}
-
-.warmup{background:rgba(192,132,252,.05);border:1px solid rgba(192,132,252,.15);border-radius:12px;padding:20px;margin-top:16px;}
-.warmup-q{font-weight:600;color:var(--text);margin-bottom:14px;}
-.warmup-opts{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
-.w-opt{padding:8px 18px;background:var(--surf2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Outfit',sans-serif;font-size:.88em;cursor:pointer;transition:all .2s;}
-.w-opt:hover:not(:disabled){border-color:var(--accent4);background:rgba(192,132,252,.1);}
-.w-opt.correct{border-color:var(--success);background:rgba(57,255,126,.1);color:var(--success);}
-.w-opt.wrong{border-color:var(--danger);background:rgba(255,77,109,.1);color:var(--danger);}
-.warmup-fb{font-size:.86em;padding:10px 14px;border-radius:8px;display:none;}
-.warmup-fb.show{display:block;}
-.warmup-fb.ok{background:rgba(57,255,126,.07);border:1px solid rgba(57,255,126,.2);color:var(--success);}
-.warmup-fb.nok{background:rgba(255,77,109,.07);border:1px solid rgba(255,77,109,.2);color:var(--danger);}
-
-.tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:22px;overflow-x:auto;gap:2px;}
-.tab{padding:10px 20px;background:none;border:none;color:var(--muted);font-family:'Outfit',sans-serif;font-size:.9em;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;transition:all .2s;}
-.tab.on{color:var(--accent);border-bottom-color:var(--accent);}
-.tab-pane{display:none;}
-.tab-pane.on{display:block;}
-
-.pills{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:18px 0;}
-.pill{background:var(--surf2);border:1px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:all .22s;position:relative;overflow:hidden;}
-.pill::before{content:'';position:absolute;left:0;top:0;width:3px;height:100%;background:var(--accent);}
-.pill:hover,.pill.open{border-color:var(--accent);background:rgba(0,212,255,.06);}
-.p-icon{font-size:1.5em;margin-bottom:7px;}
-.p-title{font-weight:700;font-size:.93em;}
-.p-hint{font-size:.75em;color:var(--muted);margin-top:3px;}
-.p-body{display:none;margin-top:10px;font-size:.84em;color:#8fafc8;line-height:1.65;border-top:1px solid var(--border);padding-top:10px;}
-.pill.open .p-body{display:block;}
-
-.ops-demo{background:var(--surf2);border-radius:12px;padding:22px;margin:18px 0;}
-.ops-btns{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
-.op-btn{padding:8px 18px;background:var(--surf3);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:.75em;cursor:pointer;transition:all .2s;}
-.op-btn:hover,.op-btn.on{background:var(--accent);border-color:var(--accent);color:#080c10;font-weight:700;}
-.op-screen{background:var(--surf);border:1px solid var(--border);border-radius:8px;padding:18px;min-height:130px;}
-.op-title{font-family:'JetBrains Mono',monospace;font-size:.72em;color:var(--accent2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;}
-.data-table{width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:.8em;}
-.data-table th{background:rgba(0,212,255,.1);color:var(--accent);padding:8px 12px;text-align:left;}
-.data-table td{padding:7px 12px;border-bottom:1px solid var(--border);color:#8fafc8;}
-.data-table td.hi{color:var(--accent3);font-weight:700;}
-.op-note{margin-top:10px;font-size:.78em;color:var(--muted);font-style:italic;}
-
-/* QUIZ */
-.quiz-card{border-color:rgba(57,255,126,.15);}
-.quiz-card .card-label{color:var(--success);}
-.quiz-card .card-label::before{background:var(--success);}
-.qprog{display:flex;gap:5px;margin-bottom:22px;align-items:center;}
-.qprog-dot{width:10px;height:10px;border-radius:50%;background:var(--border);transition:all .3s;}
-.qprog-dot.done{background:var(--success);}
-.qprog-dot.active{background:var(--accent);box-shadow:0 0 8px var(--accent);}
-.qprog-dot.wrong{background:var(--danger);}
-.q-block{display:none;}
-.q-block.on{display:block;}
-.q-num{font-family:'JetBrains Mono',monospace;font-size:.68em;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;}
-.q-text{font-size:1.1em;font-weight:600;color:var(--text);margin-bottom:18px;line-height:1.5;}
-.answer-area{width:100%;background:var(--surf2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;color:var(--text);font-family:'Outfit',sans-serif;font-size:.95em;resize:vertical;min-height:90px;transition:border-color .2s;line-height:1.6;display:block;margin-bottom:14px;}
-.answer-area:focus{outline:none;border-color:var(--accent);}
-.answer-area::placeholder{color:var(--muted);}
-.reveal-btn{display:flex;align-items:center;gap:8px;padding:10px 22px;background:var(--surf2);border:1px solid var(--border);border-radius:8px;color:var(--accent);font-family:'Outfit',sans-serif;font-size:.88em;font-weight:600;cursor:pointer;transition:all .2s;margin-bottom:14px;}
-.reveal-btn:hover{border-color:var(--accent);background:rgba(0,212,255,.08);}
-.reveal-btn .arr{transition:transform .3s;display:inline-block;}
-.reveal-btn.open .arr{transform:rotate(90deg);}
-.gabarito{background:rgba(57,255,126,.05);border:1px solid rgba(57,255,126,.18);border-radius:10px;padding:16px 18px;display:none;margin-bottom:14px;}
-.gabarito.show{display:block;}
-.gab-title{font-family:'JetBrains Mono',monospace;font-size:.68em;color:var(--success);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;}
-.gab-text{font-size:.9em;color:#a8d8b8;line-height:1.7;}
-.gab-text strong{color:var(--success);}
-.self-check{margin:14px 0;}
-.self-check p{font-size:.85em;color:var(--muted);margin-bottom:8px;}
-.self-btns{display:flex;gap:8px;}
-.self-btn{padding:8px 18px;background:var(--surf2);border:1px solid var(--border);border-radius:8px;font-family:'Outfit',sans-serif;font-size:.85em;cursor:pointer;transition:all .2s;color:var(--text);}
-.self-btn.got-it{border-color:var(--success);color:var(--success);background:rgba(57,255,126,.08);}
-.self-btn.missed{border-color:var(--danger);color:var(--danger);background:rgba(255,77,109,.08);}
-.q-nav{display:flex;justify-content:space-between;align-items:center;margin-top:18px;padding-top:18px;border-top:1px solid var(--border);}
-.q-score{font-family:'JetBrains Mono',monospace;font-size:.8em;color:var(--muted);}
-.btn{padding:10px 26px;background:var(--accent);color:#080c10;border:none;border-radius:8px;font-family:'Outfit',sans-serif;font-size:.9em;font-weight:700;cursor:pointer;transition:all .2s;}
-.btn:hover{opacity:.9;transform:translateY(-1px);}
-.btn:disabled{opacity:.35;cursor:default;transform:none;}
-.btn-ghost{background:var(--surf2);color:var(--text);border:1px solid var(--border);}
-.btn-ghost:hover{border-color:var(--accent);background:rgba(0,212,255,.07);}
-.quiz-result{display:none;text-align:center;padding:16px 0;}
-.quiz-result.on{display:block;}
-.r-emoji{font-size:2.8em;margin-bottom:10px;}
-.r-score{font-family:'JetBrains Mono',monospace;font-size:2.6em;font-weight:700;color:var(--gold);margin-bottom:8px;}
-.r-msg{color:var(--muted);font-size:.9em;margin-bottom:20px;}
-.score-breakdown{display:flex;justify-content:center;gap:20px;margin-bottom:20px;flex-wrap:wrap;}
-.sb-item{background:var(--surf2);border:1px solid var(--border);border-radius:10px;padding:12px 20px;text-align:center;}
-.sb-num{font-family:'JetBrains Mono',monospace;font-size:1.6em;font-weight:700;}
-.sb-num.g{color:var(--success);}
-.sb-num.r{color:var(--danger);}
-.sb-lbl{font-size:.72em;color:var(--muted);margin-top:3px;}
-
-/* ARDUINO */
-.arduino-card{border-color:rgba(0,151,157,.4);background:linear-gradient(135deg,#081614 0%,#0d1117 100%);}
-.arduino-card .card-label{color:var(--arduino);}
-.arduino-card .card-label::before{background:var(--arduino);}
-.project-header{display:flex;align-items:flex-start;gap:20px;background:rgba(0,151,157,.07);border:1px solid rgba(0,151,157,.2);border-radius:12px;padding:20px;margin:18px 0;}
-.proj-icon{font-size:2.8em;flex-shrink:0;}
-.proj-title{font-weight:700;font-size:1.1em;margin-bottom:4px;}
-.proj-desc{font-size:.88em;color:#7ab8bc;line-height:1.6;}
-.proj-badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
-.proj-badge{font-family:'JetBrains Mono',monospace;font-size:.65em;padding:3px 10px;border-radius:20px;}
-.pb-level{background:rgba(0,151,157,.15);border:1px solid rgba(0,151,157,.3);color:var(--arduino);}
-.pb-sensor{background:rgba(255,107,53,.12);border:1px solid rgba(255,107,53,.25);color:var(--accent2);}
-.pb-lang{background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);color:var(--accent);}
-.components{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:10px;margin:16px 0;}
-.comp-item{background:var(--surf2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;}
-.comp-icon{font-size:1.4em;flex-shrink:0;}
-.comp-name{font-size:.85em;font-weight:600;}
-.comp-qty{font-family:'JetBrains Mono',monospace;font-size:.7em;color:var(--muted);margin-top:2px;}
-.circuit-diagram{background:var(--surf2);border:1px solid rgba(0,151,157,.3);border-radius:12px;padding:22px;margin:16px 0;font-family:'JetBrains Mono',monospace;font-size:.82em;color:#7ab8bc;line-height:1.9;overflow-x:auto;}
-.circuit-diagram .cd-title{color:var(--arduino);font-weight:700;font-size:.9em;margin-bottom:16px;letter-spacing:.05em;text-transform:uppercase;}
-.cd-pin-a{color:var(--accent2);}
-.cd-pin-b{color:var(--accent3);}
-.cd-note{margin-top:14px;font-size:.78em;color:var(--muted);border-top:1px solid var(--border);padding-top:10px;}
-.conn-table{width:100%;border-collapse:collapse;font-size:.86em;margin:14px 0;}
-.conn-table th{background:rgba(0,151,157,.12);color:var(--arduino);padding:9px 14px;text-align:left;font-family:'JetBrains Mono',monospace;font-size:.8em;}
-.conn-table td{padding:8px 14px;border-bottom:1px solid var(--border);color:#8fafc8;}
-.conn-table td:first-child{color:var(--text);font-weight:600;font-family:'JetBrains Mono',monospace;}
-.code-wrap{position:relative;margin:16px 0;}
-.code-header{display:flex;justify-content:space-between;align-items:center;background:var(--surf3);border:1px solid var(--border);border-radius:10px 10px 0 0;padding:10px 16px;}
-.code-lang{font-family:'JetBrains Mono',monospace;font-size:.72em;color:var(--arduino);text-transform:uppercase;letter-spacing:.1em;}
-.copy-btn{font-family:'JetBrains Mono',monospace;font-size:.7em;padding:5px 14px;background:var(--surf2);border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;transition:all .2s;}
-.copy-btn:hover{border-color:var(--arduino);color:var(--arduino);}
-pre{background:#04100f;border:1px solid rgba(0,151,157,.25);border-top:none;border-radius:0 0 10px 10px;padding:20px;margin:0;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:.83em;line-height:1.7;white-space:pre;}
-.kw{color:#c084fc;}.fn{color:var(--accent);}.str{color:var(--accent3);}.cm{color:#3d6080;font-style:italic;}.num{color:var(--gold);}.ty{color:var(--accent2);}
-.sim-panel{background:var(--surf2);border:1px solid rgba(0,151,157,.3);border-radius:12px;padding:22px;margin:16px 0;}
-.sim-title{font-family:'JetBrains Mono',monospace;font-size:.75em;color:var(--arduino);text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px;}
-.sensors-row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:20px;}
-.sensor-box{background:var(--surf);border:1px solid var(--border);border-radius:10px;padding:16px 20px;text-align:center;flex:1;min-width:120px;}
-.s-icon{font-size:2em;margin-bottom:6px;}
-.s-name{font-family:'JetBrains Mono',monospace;font-size:.7em;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;}
-.s-val{font-family:'JetBrains Mono',monospace;font-size:1.6em;font-weight:700;color:var(--accent);}
-.s-unit{font-size:.7em;color:var(--muted);}
-.sim-controls{display:flex;gap:10px;flex-wrap:wrap;}
-.sim-btn{padding:9px 20px;border-radius:8px;font-family:'Outfit',sans-serif;font-size:.88em;font-weight:600;cursor:pointer;transition:all .2s;border:1px solid;}
-.sim-btn.start{background:rgba(0,151,157,.15);border-color:var(--arduino);color:var(--arduino);}
-.sim-btn.start:hover{background:rgba(0,151,157,.25);}
-.sim-btn.start.running{background:rgba(255,77,109,.12);border-color:var(--danger);color:var(--danger);}
-.sim-log{background:#040e0d;border:1px solid rgba(0,151,157,.2);border-radius:8px;padding:14px;margin-top:14px;font-family:'JetBrains Mono',monospace;font-size:.78em;color:var(--arduino);max-height:160px;overflow-y:auto;line-height:1.8;white-space:pre-wrap;}
-.evo-bar{display:flex;align-items:center;gap:0;margin:20px 0;overflow-x:auto;padding-bottom:6px;}
-.evo-step{display:flex;flex-direction:column;align-items:center;min-width:120px;cursor:pointer;}
-.evo-circle{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9em;font-family:'JetBrains Mono',monospace;border:2px solid var(--border);background:var(--surf2);color:var(--muted);transition:all .25s;}
-.evo-step.active .evo-circle{border-color:var(--arduino);background:rgba(0,151,157,.15);color:var(--arduino);}
-.evo-label{font-size:.72em;font-family:'JetBrains Mono',monospace;color:var(--muted);margin-top:6px;text-align:center;line-height:1.3;}
-.evo-step.active .evo-label{color:var(--arduino);}
-.evo-connector{flex:1;height:2px;background:var(--border);min-width:20px;}
-.evo-detail{background:rgba(0,151,157,.06);border:1px solid rgba(0,151,157,.2);border-radius:10px;padding:18px;margin-top:4px;font-size:.88em;color:#7ab8bc;line-height:1.7;}
-.toast{position:fixed;bottom:28px;right:28px;background:var(--surf);border:1px solid rgba(255,214,10,.35);border-radius:14px;padding:14px 20px;display:flex;align-items:center;gap:14px;box-shadow:0 8px 32px rgba(0,0,0,.5);transform:translateY(100px);opacity:0;transition:all .45s cubic-bezier(.4,0,.2,1);z-index:1000;max-width:300px;}
-.toast.show{transform:translateY(0);opacity:1;}
-.toast-icon{font-size:1.9em;}
-.toast-title{font-size:.65em;font-family:'JetBrains Mono',monospace;color:var(--gold);text-transform:uppercase;letter-spacing:.08em;}
-.toast-name{font-weight:700;color:var(--text);margin-top:2px;font-size:.95em;}
-.page-nav{display:flex;justify-content:space-between;gap:12px;margin-top:36px;padding-top:28px;border-top:1px solid var(--border);}
-.nav-a{padding:13px 26px;background:var(--surf);border:1px solid var(--border);border-radius:10px;color:var(--text);text-decoration:none;font-weight:600;font-size:.88em;transition:all .2s;display:flex;align-items:center;gap:8px;}
-.nav-a:hover{border-color:var(--accent);background:rgba(0,212,255,.06);}
-.nav-a.next{background:var(--accent);border-color:var(--accent);color:#080c10;}
-.nav-a.next:hover{opacity:.9;}
-.itag{display:inline-block;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);color:var(--accent);font-size:.75em;border-radius:4px;padding:2px 8px;font-family:'JetBrains Mono',monospace;}
-@media(max-width:600px){.hero{padding:36px 18px 32px;}.card{padding:22px 16px;}pre{font-size:.75em;}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semana 04 - OLAP e Cubos Multidimensionais | BDN007</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); overflow: hidden; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; text-align: center; }
+        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .content { padding: 40px; }
+        .section { margin: 40px 0; }
+        .section h2 { color: #667eea; font-size: 2em; margin-bottom: 20px; border-bottom: 3px solid #667eea; padding-bottom: 10px; }
+        .objetivos { background: #f8f9fa; padding: 30px; border-radius: 10px; margin-bottom: 40px; border-left: 5px solid #667eea; }
+        .activity-card { background: white; border-radius: 10px; padding: 30px; margin-bottom: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-left: 5px solid #764ba2; }
+        .navigation { display: flex; justify-content: space-between; padding: 30px 40px; background: #f8f9fa; }
+        .nav-button { padding: 15px 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 8px; font-weight: bold; transition: transform 0.3s; }
+        .nav-button:hover { transform: scale(1.05); }
+    </style>
 </head>
 <body>
-
-<div class="hero">
-  <div class="hero-glow"></div>
-  <div class="hero-inner">
-    <div>
-      <div class="breadcrumb"><a href="index.html">BDN007</a> &rsaquo; Módulo 1 &rsaquo; Semana 04</div>
-      <div class="module-tag">&#x2B21; SEMANA 04 &middot; MÓDULO 1 &mdash; FUNDAMENTOS DE BI</div>
-      <h1 class="title">OLAP e Cubos<br><span>Multidimensionais</span></h1>
-      <p class="subtitle">Analisando dados em múltiplas perspectivas</p>
-    </div>
-    <div class="xp-panel">
-      <div class="xp-lbl">&#x26A1; XP desta semana</div>
-      <div class="xp-num" id="xpNum">0 <small>/ 500 XP</small></div>
-      <div class="xp-bar"><div class="xp-fill" id="xpFill"></div></div>
-    </div>
-  </div>
-</div>
-
-<main>
-
-<!-- RETOMADA -->
-<div class="card recap-card">
-  <div class="card-label">&#x1F501; Retomada &middot; Semana 03 &mdash; Modelagem Dimensional</div>
-  <h2>O que trouxemos da última aula</h2>
-  <p style="margin-bottom:14px;">Na Semana 03 construímos a base da modelagem dimensional. Esses conceitos são pré-requisito direto para OLAP.</p>
-  <div class="recap-grid">
-    <div class="recap-chip"><div class="rc-icon">&#x2B50;</div><div class="rc-lbl">Esquema principal</div><div class="rc-val">Star Schema</div></div>
-    <div class="recap-chip"><div class="rc-icon">&#x1F4E6;</div><div class="rc-lbl">Dados transacionais</div><div class="rc-val">Tabela Fato</div></div>
-    <div class="recap-chip"><div class="rc-icon">&#x1F4D0;</div><div class="rc-lbl">Contexto / descrição</div><div class="rc-val">Tabelas Dimensão</div></div>
-    <div class="recap-chip"><div class="rc-icon">&#x1F511;</div><div class="rc-lbl">Ligação entre tabelas</div><div class="rc-val">FK &rarr; PK</div></div>
-  </div>
-  <div class="warmup">
-    <div class="warmup-q">&#x1F9E0; Aquecimento &mdash; Em um Star Schema de vendas, a coluna <code style="background:var(--surf3);padding:2px 6px;border-radius:4px;font-size:.9em">valor_venda</code> (medida numérica) deve ficar em qual tabela?</div>
-    <div class="warmup-opts">
-      <button class="w-opt" onclick="warmup(this,false)">DIM_PRODUTO</button>
-      <button class="w-opt" onclick="warmup(this,true)">FATO_VENDAS</button>
-      <button class="w-opt" onclick="warmup(this,false)">DIM_TEMPO</button>
-      <button class="w-opt" onclick="warmup(this,false)">DIM_CLIENTE</button>
-    </div>
-    <div class="warmup-fb" id="wfb"></div>
-  </div>
-</div>
-
-<!-- OBJETIVOS -->
-<div class="card">
-  <div class="card-label">&#x1F3AF; Objetivos desta semana</div>
-  <h2>O que você vai aprender</h2>
-  <ul>
-    <li>Entender o que é <strong>OLAP</strong> e como se diferencia do OLTP</li>
-    <li>Compreender a estrutura de um <strong>cubo multidimensional</strong></li>
-    <li>Dominar as 5 operações: <span class="itag">Slice</span> <span class="itag">Dice</span> <span class="itag">Roll-up</span> <span class="itag">Drill-down</span> <span class="itag">Pivot</span></li>
-    <li>Conhecer os tipos <span class="itag">MOLAP</span> <span class="itag">ROLAP</span> <span class="itag">HOLAP</span></li>
-    <li>Conectar OLAP com sensores reais via ESP32 (projeto integrado)</li>
-  </ul>
-</div>
-
-<!-- TEORIA -->
-<div class="card">
-  <div class="card-label">&#x1F4DA; Conteúdo Teórico</div>
-  <h2>OLAP &mdash; Online Analytical Processing</h2>
-  <div class="tabs">
-    <button class="tab on" onclick="tabSwitch(this,'t-fund')">Fundamentos</button>
-    <button class="tab" onclick="tabSwitch(this,'t-cubo')">O Cubo</button>
-    <button class="tab" onclick="tabSwitch(this,'t-ops')">Operações</button>
-    <button class="tab" onclick="tabSwitch(this,'t-tipos')">Tipos de OLAP</button>
-  </div>
-  <div class="tab-pane on" id="t-fund">
-    <p style="margin-bottom:14px;"><strong>OLAP</strong> é uma tecnologia para responder consultas analíticas multidimensionais com velocidade. Diferente do <strong>OLTP</strong> (que registra transações), o OLAP serve para <em>analisar</em> grandes volumes de dados históricos.</p>
-    <div class="pills">
-      <div class="pill" onclick="pillToggle(this)"><div class="p-icon">&#x1F3E6;</div><div class="p-title">OLTP vs OLAP</div><div class="p-hint">Clique para expandir</div><div class="p-body"><strong>OLTP:</strong> muitas transações pequenas, dados do momento, altamente normalizado.<br><br><strong>OLAP:</strong> poucas consultas pesadas, dados históricos, desnormalizado para velocidade. São complementares.</div></div>
-      <div class="pill" onclick="pillToggle(this)"><div class="p-icon">&#x26A1;</div><div class="p-title">Por que OLAP?</div><div class="p-hint">Clique para expandir</div><div class="p-body">Uma consulta como "Vendas do Q3/2023 na região Sul por categoria?" pode levar horas em OLTP. Em OLAP, a resposta vem em milissegundos porque os dados já foram pré-agregados.</div></div>
-      <div class="pill" onclick="pillToggle(this)"><div class="p-icon">&#x1F5C4;&#xFE0F;</div><div class="p-title">Pré-agregação</div><div class="p-hint">Clique para expandir</div><div class="p-body">O cubo OLAP pré-calcula somas, médias e contagens para todas as combinações de dimensões, eliminando o custo computacional no momento da consulta.</div></div>
-    </div>
-  </div>
-  <div class="tab-pane" id="t-cubo">
-    <p style="margin-bottom:14px;">Um <strong>cubo OLAP</strong> é uma estrutura multidimensional. Cada eixo é uma dimensão, e cada célula guarda um valor agregado (medida).</p>
-    <pre style="background:#040e17;border:1px solid rgba(0,212,255,.2);border-radius:10px;padding:18px;margin:14px 0;"><span class="cm">// Cubo de Vendas — estrutura conceitual</span>
-<span class="ty">Dimensões:</span>
-  ├── Tempo     → Ano &gt; Trimestre &gt; Mês &gt; Dia
-  ├── Produto   → Categoria &gt; SubCategoria &gt; Produto
-  └── Região    → País &gt; Estado &gt; Cidade
-
-<span class="ty">Medidas (células do cubo):</span>
-  ▸ Receita Total     → R$ 142.000
-  ▸ Qtd Vendida       → 1.847 unidades
-  ▸ Ticket Médio      → R$ 76,88
-
-<span class="cm">// Célula = interseção de valores de cada dimensão
-// Ex.: Receita de Notebook em SP em Jan/2024 = R$ 52.000</span></pre>
-  </div>
-  <div class="tab-pane" id="t-ops">
-    <p style="margin-bottom:14px;">Explore cada operação clicando nos botões:</p>
-    <div class="ops-demo">
-      <div class="ops-btns">
-        <button class="op-btn on" onclick="opSwitch(this,'rollup')">Roll-up &#x2B06;</button>
-        <button class="op-btn" onclick="opSwitch(this,'drill')">Drill-down &#x2B07;</button>
-        <button class="op-btn" onclick="opSwitch(this,'slice')">Slice &#x2702;</button>
-        <button class="op-btn" onclick="opSwitch(this,'dice')">Dice &#x1F3B2;</button>
-        <button class="op-btn" onclick="opSwitch(this,'pivot')">Pivot &#x1F504;</button>
-      </div>
-      <div class="op-screen" id="opScreen"></div>
-    </div>
-  </div>
-  <div class="tab-pane" id="t-tipos">
-    <div class="pills">
-      <div class="pill" onclick="pillToggle(this)"><div class="p-icon">&#x1F9CA;</div><div class="p-title">MOLAP</div><div class="p-hint">Multidimensional OLAP</div><div class="p-body">Dados em estrutura proprietária multidimensional. <strong>Muito rápido</strong> para consultas, mas limitado em volume. Ex.: Microsoft SSAS.</div></div>
-      <div class="pill" onclick="pillToggle(this)"><div class="p-icon">&#x1F5C3;&#xFE0F;</div><div class="p-title">ROLAP</div><div class="p-hint">Relational OLAP</div><div class="p-body">Usa banco relacional. Suporta <strong>grandes volumes</strong>. Consultas geradas em SQL dinamicamente. Ex.: Tableau + PostgreSQL.</div></div>
-      <div class="pill" onclick="pillToggle(this)"><div class="p-icon">&#x2696;&#xFE0F;</div><div class="p-title">HOLAP</div><div class="p-hint">Hybrid OLAP</div><div class="p-body">Combina os dois: dados detalhados no BD relacional, agregações no cubo multidimensional. Melhor custo-benefício.</div></div>
-    </div>
-  </div>
-</div>
-
-<!-- QUIZ DISSERTATIVO -->
-<div class="card quiz-card">
-  <div class="card-label">&#x1F4DD; Atividade &mdash; Responda e Confira o Gabarito</div>
-  <h2>5 Questões Dissertativas &middot; Semana 04</h2>
-  <p style="margin-bottom:20px;font-size:.9em;color:#8fafc8;">Escreva sua resposta com suas próprias palavras. Depois clique em <strong>"Ver Gabarito"</strong> para comparar. Avalie honestamente seu entendimento.</p>
-  <div class="qprog" id="qprog"></div>
-  <div id="qbody">
-
-    <!-- Q1 -->
-    <div class="q-block on" data-q="0">
-      <div class="q-num">Questão 1 de 5</div>
-      <div class="q-text">Explique com suas palavras a diferença entre OLTP e OLAP. Por que um banco de dados transacional não é adequado para análises de BI?</div>
-      <textarea class="answer-area" id="ans0" placeholder="Escreva sua resposta aqui..."></textarea>
-      <button class="reveal-btn" id="rb0" onclick="toggleGab(0)"><span class="arr">&#x25B6;</span> Ver Gabarito</button>
-      <div class="gabarito" id="gab0">
-        <div class="gab-title">&#x2705; Gabarito &mdash; Resposta esperada</div>
-        <div class="gab-text"><strong>OLTP (Online Transaction Processing)</strong> é projetado para operações do dia-a-dia: muitas transações pequenas e rápidas (INSERT/UPDATE/DELETE). Os dados são atuais e altamente normalizados.<br><br><strong>OLAP (Online Analytical Processing)</strong> é projetado para análises: poucas consultas pesadas sobre grandes volumes de dados históricos. Os dados são desnormalizados para acelerar leituras.<br><br>Um BD transacional <strong>não é adequado para BI</strong> porque: (1) consultas analíticas com múltiplos JOINs em tabelas normalizadas são muito lentas; (2) ele guarda apenas o estado atual, sem histórico adequado; (3) consultas pesadas travam o sistema operacional do negócio.</div>
-      </div>
-      <div class="self-check" id="sc0" style="display:none">
-        <p>Como foi sua resposta?</p>
-        <div class="self-btns">
-          <button class="self-btn" onclick="selfScore(0,true)">&#x2705; Acertei o conceito</button>
-          <button class="self-btn" onclick="selfScore(0,false)">&#x274C; Preciso revisar</button>
+    <div class="container">
+        <div class="header">
+            <div class="module">MÓDULO 1: Fundamentos de BI</div>
+            <h1>Semana 04</h1>
+            <h2>OLAP e Cubos Multidimensionais</h2>
         </div>
-      </div>
-      <div class="q-nav"><span class="q-score" id="qs0"></span><button class="btn" id="nb0" onclick="nextQ(0)" disabled>Próxima &rarr;</button></div>
-    </div>
-
-    <!-- Q2 -->
-    <div class="q-block" data-q="1">
-      <div class="q-num">Questão 2 de 5</div>
-      <div class="q-text">O que é um cubo OLAP? Descreva suas dimensões e medidas usando um exemplo prático de sua escolha (não precisa ser vendas).</div>
-      <textarea class="answer-area" id="ans1" placeholder="Escreva sua resposta aqui..."></textarea>
-      <button class="reveal-btn" id="rb1" onclick="toggleGab(1)"><span class="arr">&#x25B6;</span> Ver Gabarito</button>
-      <div class="gabarito" id="gab1">
-        <div class="gab-title">&#x2705; Gabarito &mdash; Elementos essenciais</div>
-        <div class="gab-text">Um <strong>cubo OLAP</strong> é uma estrutura de dados multidimensional para análise rápida. Cada eixo representa uma <strong>dimensão</strong> (perspectiva de análise) e cada célula contém uma <strong>medida</strong> (valor numérico agregado).<br><br><strong>Exemplo &mdash; Matrículas de uma Escola:</strong><br>• Dimensão Tempo: Ano &gt; Semestre &gt; Mês<br>• Dimensão Curso: Área &gt; Curso &gt; Turma<br>• Dimensão Polo: Região &gt; Cidade &gt; Unidade<br>• Medidas: Total de Matrículas, Taxa de Evasão, Nota Média<br><br>A célula (2024 / Análise de Sistemas / Ourinhos) guarda o total de matrículas naquela combinação.</div>
-      </div>
-      <div class="self-check" id="sc1" style="display:none">
-        <p>Como foi sua resposta?</p>
-        <div class="self-btns">
-          <button class="self-btn" onclick="selfScore(1,true)">&#x2705; Acertei o conceito</button>
-          <button class="self-btn" onclick="selfScore(1,false)">&#x274C; Preciso revisar</button>
+        
+        <div class="content">
+            <div class="objetivos">
+                <h2>🎯 Objetivos de Aprendizagem</h2>
+                <ul>
+                    <li>Compreender os conceitos fundamentais de olap e cubos multidimensionais</li>
+                    <li>Aplicar técnicas práticas em cenários reais</li>
+                    <li>Desenvolver habilidades hands-on com ferramentas</li>
+                    <li>Analisar cases e melhores práticas do mercado</li>
+                </ul>
+            </div>
+            
+            <div class="section">
+                <h2>📚 Conteúdo Teórico</h2>
+                <p>Nesta semana, você aprenderá sobre <strong>OLAP e Cubos Multidimensionais</strong>, um tópico fundamental para módulo 1: fundamentos de bi.</p>
+                <p>O conteúdo completo inclui teoria detalhada, exemplos práticos, cases reais e tutoriais passo-a-passo.</p>
+                <p><em>Nota: O conteúdo teórico completo e detalhado será disponibilizado pelo professor em sala de aula e no Moodle.</em></p>
+            </div>
+            
+            <div class="section">
+                <h2>🎬 Vídeos Recomendados</h2>
+                <p>Assista aos vídeos selecionados para complementar seu aprendizado.</p>
+                <p><em>Links para vídeos serão fornecidos pelo professor.</em></p>
+            </div>
+            
+            <div class="section">
+                <h2>✏️ Atividades Práticas</h2>
+                <div class="activity-card">
+                    <h3>Atividade 1: Pesquisa e Análise</h3>
+                    <p>Pesquise e analise cases reais relacionados a olap e cubos multidimensionais.</p>
+                    <p><strong>Entregável:</strong> Documento de 3-5 páginas</p>
+                </div>
+                <div class="activity-card">
+                    <h3>Atividade 2: Implementação Prática</h3>
+                    <p>Implemente os conceitos aprendidos em um projeto hands-on.</p>
+                    <p><strong>Entregável:</strong> Código + Documentação</p>
+                </div>
+                <div class="activity-card">
+                    <h3>Atividade 3: Apresentação</h3>
+                    <p>Apresente seus resultados e aprendizados para a turma.</p>
+                    <p><strong>Entregável:</strong> Apresentação em slides</p>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>📖 Materiais Complementares</h2>
+                <ul>
+                    <li>📚 Livros e artigos acadêmicos</li>
+                    <li>🎓 Tutoriais online e documentação oficial</li>
+                    <li>🛠️ Ferramentas e datasets para prática</li>
+                    <li>📄 White papers e estudos de caso</li>
+                </ul>
+            </div>
         </div>
-      </div>
-      <div class="q-nav"><span class="q-score" id="qs1"></span><button class="btn" id="nb1" onclick="nextQ(1)" disabled>Próxima &rarr;</button></div>
-    </div>
-
-    <!-- Q3 -->
-    <div class="q-block" data-q="2">
-      <div class="q-num">Questão 3 de 5</div>
-      <div class="q-text">Explique as operações Drill-down e Roll-up com um exemplo concreto. O que elas têm em comum? O que as diferencia?</div>
-      <textarea class="answer-area" id="ans2" placeholder="Escreva sua resposta aqui..."></textarea>
-      <button class="reveal-btn" id="rb2" onclick="toggleGab(2)"><span class="arr">&#x25B6;</span> Ver Gabarito</button>
-      <div class="gabarito" id="gab2">
-        <div class="gab-title">&#x2705; Gabarito</div>
-        <div class="gab-text">Ambas navegam pela <strong>hierarquia de uma dimensão</strong> &mdash; a diferença é a direção.<br><br><strong>Roll-up &#x2B06;</strong> sobe na hierarquia, agregando: de Mês para Trimestre, de Cidade para Estado. Você resume os dados, perdendo detalhe mas ganhando visão geral.<br><br><strong>Drill-down &#x2B07;</strong> desce na hierarquia, detalhando: de Trimestre para Mês, de Estado para Cidade. Você expande os dados para investigar algo específico.<br><br><strong>Exemplo:</strong> Ao analisar vendas por Ano e perceber que 2023 foi fraco, você faz Drill-down para Trimestre para ver qual período foi ruim. Depois Drill-down novamente para Mês para identificar o mês exato.</div>
-      </div>
-      <div class="self-check" id="sc2" style="display:none">
-        <p>Como foi sua resposta?</p>
-        <div class="self-btns">
-          <button class="self-btn" onclick="selfScore(2,true)">&#x2705; Acertei o conceito</button>
-          <button class="self-btn" onclick="selfScore(2,false)">&#x274C; Preciso revisar</button>
+        
+        <div class="navigation">
+            <a href="semana03.html" class="nav-button">← Semana Anterior</a>
+            <a href="index.html" class="nav-button">🏠 Início</a>
+            <a href="semana05.html" class="nav-button">Próxima Semana →</a>
         </div>
-      </div>
-      <div class="q-nav"><span class="q-score" id="qs2"></span><button class="btn" id="nb2" onclick="nextQ(2)" disabled>Próxima &rarr;</button></div>
     </div>
-
-    <!-- Q4 -->
-    <div class="q-block" data-q="3">
-      <div class="q-num">Questão 4 de 5</div>
-      <div class="q-text">Qual a diferença entre as operações Slice e Dice? Dê um exemplo de cada usando um cubo de dados climáticos (temperatura, umidade, vento).</div>
-      <textarea class="answer-area" id="ans3" placeholder="Escreva sua resposta aqui..."></textarea>
-      <button class="reveal-btn" id="rb3" onclick="toggleGab(3)"><span class="arr">&#x25B6;</span> Ver Gabarito</button>
-      <div class="gabarito" id="gab3">
-        <div class="gab-title">&#x2705; Gabarito</div>
-        <div class="gab-text"><strong>Slice &#x2702;</strong> &mdash; Fixa <em>uma</em> dimensão em um único valor, reduzindo o cubo em uma dimensão (3D vira 2D).<br>Exemplo climático: Slice(Mês = Janeiro) &rarr; temperatura/umidade/vento de Janeiro em todas as cidades e anos.<br><br><strong>Dice &#x1F3B2;</strong> &mdash; Filtra <em>múltiplas</em> dimensões com intervalos ou listas. O resultado é um sub-cubo (ainda multidimensional).<br>Exemplo climático: Dice(Mês &#x2208; {Dez,Jan,Fev} AND Cidade &#x2208; {SP,RJ}) &rarr; sub-cubo climático do verão em SP e RJ.<br><br><strong>Resumo:</strong> Slice é um corte único em uma dimensão. Dice é filtro em múltiplas dimensões mantendo a estrutura.</div>
-      </div>
-      <div class="self-check" id="sc3" style="display:none">
-        <p>Como foi sua resposta?</p>
-        <div class="self-btns">
-          <button class="self-btn" onclick="selfScore(3,true)">&#x2705; Acertei o conceito</button>
-          <button class="self-btn" onclick="selfScore(3,false)">&#x274C; Preciso revisar</button>
-        </div>
-      </div>
-      <div class="q-nav"><span class="q-score" id="qs3"></span><button class="btn" id="nb3" onclick="nextQ(3)" disabled>Próxima &rarr;</button></div>
-    </div>
-
-    <!-- Q5 -->
-    <div class="q-block" data-q="4">
-      <div class="q-num">Questão 5 de 5</div>
-      <div class="q-text">Compare MOLAP, ROLAP e HOLAP: em qual cenário você escolheria cada um? Justifique com base em volume de dados e necessidade de performance.</div>
-      <textarea class="answer-area" id="ans4" placeholder="Escreva sua resposta aqui..."></textarea>
-      <button class="reveal-btn" id="rb4" onclick="toggleGab(4)"><span class="arr">&#x25B6;</span> Ver Gabarito</button>
-      <div class="gabarito" id="gab4">
-        <div class="gab-title">&#x2705; Gabarito</div>
-        <div class="gab-text"><strong>MOLAP</strong> &mdash; Quando a performance é crítica e o volume é controlado (até alguns GB). Resposta em milissegundos. Ideal para dashboards executivos com KPIs críticos.<br><br><strong>ROLAP</strong> &mdash; Quando o volume é muito grande (TB ou PB) e flexibilidade de queries SQL é importante. Aceita-se performance menor. Ex.: DW com 10 anos de histórico de uma rede varejista nacional.<br><br><strong>HOLAP</strong> &mdash; Quando precisa do melhor dos dois: dados detalhados em grande volume (ROLAP) + agregações rápidas pré-calculadas (MOLAP). Mais complexo de manter. Ex.: sistema de BI de uma operadora de telecomunicações.</div>
-      </div>
-      <div class="self-check" id="sc4" style="display:none">
-        <p>Como foi sua resposta?</p>
-        <div class="self-btns">
-          <button class="self-btn" onclick="selfScore(4,true)">&#x2705; Acertei o conceito</button>
-          <button class="self-btn" onclick="selfScore(4,false)">&#x274C; Preciso revisar</button>
-        </div>
-      </div>
-      <div class="q-nav"><span class="q-score" id="qs4"></span><button class="btn" id="nb4" onclick="nextQ(4)" disabled>Ver Resultado &rarr;</button></div>
-    </div>
-  </div>
-
-  <div class="quiz-result" id="qresult">
-    <div class="r-emoji" id="remoji"></div>
-    <div class="r-score" id="rscore"></div>
-    <div class="r-msg" id="rmsg"></div>
-    <div class="score-breakdown">
-      <div class="sb-item"><div class="sb-num g" id="sbOk">0</div><div class="sb-lbl">Acertei</div></div>
-      <div class="sb-item"><div class="sb-num r" id="sbNo">0</div><div class="sb-lbl">Revisar</div></div>
-      <div class="sb-item"><div class="sb-num" style="color:var(--gold)" id="sbXp">0</div><div class="sb-lbl">XP ganhos</div></div>
-    </div>
-    <button class="btn btn-ghost" onclick="resetQuiz()" style="margin-right:10px;">&#x1F504; Refazer</button>
-    <button class="btn" onclick="document.getElementById('ard').scrollIntoView({behavior:'smooth'})">Ver Projeto Arduino &#x2193;</button>
-  </div>
-</div>
-
-<!-- ARDUINO -->
-<div class="card arduino-card" id="ard">
-  <div class="card-label">&#x1F50C; Projeto Integrado &mdash; ESP32 + Sensores</div>
-  <h2>Estação Climática com Cubo de Dados</h2>
-  <p style="color:#7ab8bc;">Este projeto conecta o conceito de <strong>cubo OLAP</strong> com sensores físicos. Em vez de dados de vendas, você coleta temperatura (via DS18B20 à prova d'água) e luminosidade (LDR) &mdash; e os organiza em uma estrutura multidimensional com ESP32.</p>
-
-  <div style="margin-top:20px;">
-    <div class="card-label" style="margin-bottom:12px;color:#00979d;">&#x1F5FA;&#xFE0F; Projeto Evolutivo &mdash; 4 Semanas</div>
-    <p style="font-size:.88em;color:#7ab8bc;margin-bottom:16px;">Este projeto cresce ao longo do módulo. Clique em cada semana para ver o que será adicionado:</p>
-    <div class="evo-bar">
-      <div class="evo-step active" onclick="evoShow(0)"><div class="evo-circle">S04</div><div class="evo-label">Coleta<br>de Dados</div></div>
-      <div class="evo-connector"></div>
-      <div class="evo-step" onclick="evoShow(1)"><div class="evo-circle">S05</div><div class="evo-label">Estrutura<br>Dimensional</div></div>
-      <div class="evo-connector"></div>
-      <div class="evo-step" onclick="evoShow(2)"><div class="evo-circle">S06</div><div class="evo-label">Armazena-<br>mento DW</div></div>
-      <div class="evo-connector"></div>
-      <div class="evo-step" onclick="evoShow(3)"><div class="evo-circle">S07</div><div class="evo-label">Dashboard<br>Web</div></div>
-    </div>
-    <div class="evo-detail" id="evoDetail">
-      <strong style="color:var(--arduino)">Semana 04 &mdash; Coleta de dados com sensores</strong><br><br>
-      Monte o circuito com DS18B20 (OneWire) e LDR. O ESP32 coleta temperatura e luminosidade a cada 5 segundos e envia via Serial em formato CSV. Esses dados são as <strong>medidas</strong> do nosso cubo OLAP. A função <code>exibirAnaliseOLAP()</code> demonstra o conceito de Roll-up diretamente no hardware.
-    </div>
-  </div>
-
-  <div class="project-header">
-    <div class="proj-icon">&#x1F321;&#xFE0F;</div>
-    <div>
-      <div class="proj-title">Estação Climática Multidimensional</div>
-      <div class="proj-desc">Colete dados de temperatura (DS18B20 à prova d'água) e luminosidade (LDR) com ESP32. Esses dados formarão as <em>medidas</em> do seu cubo OLAP, com dimensões de Tempo, Sensor e Local.</div>
-      <div class="proj-badges">
-        <span class="proj-badge pb-level">Nível: Iniciante</span>
-        <span class="proj-badge pb-sensor">DS18B20 &middot; LDR</span>
-        <span class="proj-badge pb-lang">C++ / Arduino IDE</span>
-        <span class="proj-badge pb-lang">Serial Monitor</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="card-label" style="margin-bottom:10px;color:#00979d;">&#x1F9F0; Componentes Necessários</div>
-  <div class="components">
-    <div class="comp-item"><div class="comp-icon">&#x1F7E9;</div><div><div class="comp-name">ESP32 (DevKit)</div><div class="comp-qty">1 unidade</div></div></div>
-    <div class="comp-item"><div class="comp-icon">&#x1F321;&#xFE0F;</div><div><div class="comp-name">DS18B20 À Prova d'Água</div><div class="comp-qty">1 unidade</div></div></div>
-    <div class="comp-item"><div class="comp-icon">&#x1F4A1;</div><div><div class="comp-name">LDR (fotoresistor)</div><div class="comp-qty">1 unidade</div></div></div>
-    <div class="comp-item"><div class="comp-icon">&#x1F534;</div><div><div class="comp-name">Resistor 4,7k&#x2126;</div><div class="comp-qty">1 unidade (pull-up DS18B20)</div></div></div>
-    <div class="comp-item"><div class="comp-icon">&#x1F7E0;</div><div><div class="comp-name">Resistor 10k&#x2126;</div><div class="comp-qty">1 unidade (divisor LDR)</div></div></div>
-    <div class="comp-item"><div class="comp-icon">&#x1F50C;</div><div><div class="comp-name">Protoboard</div><div class="comp-qty">1 unidade</div></div></div>
-    <div class="comp-item"><div class="comp-icon">&#x1F517;</div><div><div class="comp-name">Jumpers M-M</div><div class="comp-qty">12 unidades</div></div></div>
-    <div class="comp-item"><div class="comp-icon">&#x1F4F1;</div><div><div class="comp-name">Cabo USB-C / Micro-USB</div><div class="comp-qty">1 unidade (conforme modelo ESP32)</div></div></div>
-  </div>
-
-  <div class="card-label" style="margin-bottom:10px;color:#00979d;">&#x26A1; Tabela de Conexões</div>
-  <table class="conn-table">
-    <tr><th>Componente</th><th>Pino do Componente</th><th>Pino do ESP32</th><th>Observação</th></tr>
-    <tr><td>DS18B20</td><td>VCC (fio vermelho)</td><td>3.3V</td><td>Alimentação 3,3V</td></tr>
-    <tr><td>DS18B20</td><td>DATA (fio amarelo)</td><td>GPIO 4</td><td>OneWire &mdash; sinal de dados</td></tr>
-    <tr><td>DS18B20</td><td>GND (fio preto)</td><td>GND</td><td>Terra</td></tr>
-    <tr><td>Resistor 4,7k&#x2126;</td><td>&mdash;</td><td>DATA &harr; 3.3V</td><td>Pull-up obrigatório para OneWire</td></tr>
-    <tr><td>LDR</td><td>Terminal A</td><td>3.3V</td><td>Divisor de tensão</td></tr>
-    <tr><td>LDR</td><td>Terminal B</td><td>GPIO 34 (ADC1_CH6)</td><td>Nó central do divisor</td></tr>
-    <tr><td>Resistor 10k&#x2126;</td><td>&mdash;</td><td>GPIO 34 &harr; GND</td><td>Pull-down do divisor LDR</td></tr>
-  </table>
-
-  <div class="card-label" style="margin-bottom:10px;color:#00979d;margin-top:20px;">&#x1F5FA;&#xFE0F; Diagrama de Conexão</div>
-  <div class="circuit-diagram">
-    <div class="cd-title">ESP32 DevKit &mdash; Estação Climática (DS18B20 + LDR)</div>
-    <div><span class="cd-pin-a">3.3V       </span> &rarr; <span class="cd-pin-b">DS18B20 [VCC fio vermelho]  &amp;  LDR [Terminal A]</span></div>
-    <div><span class="cd-pin-a">GND        </span> &rarr; <span class="cd-pin-b">DS18B20 [GND fio preto]  &amp;  Resistor 10k&Omega; [terminal B]</span></div>
-    <div><span class="cd-pin-a">GPIO 4     </span> &rarr; <span class="cd-pin-b">DS18B20 [DATA fio amarelo]</span></div>
-    <div><span class="cd-pin-a">             </span>   <span style="color:var(--muted)">└─ Resistor 4,7k&Omega; pull-up: DATA &harr; 3.3V (obrigatório OneWire!)</span></div>
-    <div><span class="cd-pin-a">GPIO 34    </span> &rarr; <span class="cd-pin-b">Nó entre LDR e Resistor 10k&Omega; pull-down</span></div>
-    <div class="cd-note">
-      &#x26A0;&#xFE0F; <strong>Pull-up DS18B20:</strong> o resistor 4,7k&Omega; entre DATA e 3.3V é <em>obrigatório</em> para o protocolo OneWire funcionar.<br>
-      &#x26A0;&#xFE0F; <strong>GPIO 34 é input-only</strong> (sem pull interno) &mdash; ideal para leitura analógica do LDR.<br>
-      &#x26A0;&#xFE0F; O ESP32 opera a <strong>3,3V</strong>. Nunca aplique 5V nos pinos GPIO &mdash; pode danificar o chip.<br>
-      &#x1F4A1; O DS18B20 usa protocolo <strong>OneWire</strong>: um único fio de dados transmite temperatura com resolução de 12 bits (±0,5°C).
-    </div>
-  </div>
-
-  <div class="card-label" style="margin-bottom:10px;color:#00979d;margin-top:22px;">&#x1F4BB; Código Completo &mdash; Semana 04</div>
-  <div class="code-wrap">
-    <div class="code-header">
-      <span class="code-lang">ESP32 C++ &mdash; estacao_climatica_s04.ino</span>
-      <button class="copy-btn" onclick="copyCode()">&#x1F4CB; Copiar</button>
-    </div>
-    <pre id="codeBlock">/*
- * BDN007 - Semana 04: Estacao Climatica Multidimensional
- * Projeto Evolutivo - Parte 1: Coleta de Dados
- * Hardware: ESP32 DevKit + DS18B20 (OneWire) + LDR
- *
- * Conceito OLAP aplicado:
- *   MEDIDAS   -> temperatura (DS18B20), luminosidade (LDR)
- *   DIM TEMPO -> millis() / timestamp serial
- *   DIM LOCAL -> fixo (sala de aula) - expandido na S05
- *
- * Bibliotecas necessarias:
- *   1. OneWire          (Paul Stoffregen)
- *   2. DallasTemperature (Miles Burton)
- * Instalar: Arduino IDE -> Ferramentas -> Gerenciar Bibliotecas
- *
- * Configuracao da placa:
- *   Ferramentas -> Placa -> ESP32 Arduino -> ESP32 Dev Module
- *   (Instalar suporte ESP32: adicionar URL no Gerenciador de Placas)
- *   URL: https://raw.githubusercontent.com/espressif/arduino-esp32/
- *        gh-pages/package_esp32_index.json
- */
-
-#include &lt;OneWire.h&gt;
-#include &lt;DallasTemperature.h&gt;
-
-// ── Configuracao dos pinos ────────────────────
-#define DS18B20_PIN  4     // GPIO 4  -> DATA do DS18B20 (fio amarelo)
-                           // Resistor 4,7kΩ pull-up entre DATA e 3.3V
-#define LDR_PIN     34     // GPIO 34 -> ADC1_CH6 (input-only, sem pull)
-#define INTERVALO 5000     // Coleta a cada 5 segundos (ms)
-
-// ── Objetos OneWire / DallasTemperature ──────
-OneWire           oneWire(DS18B20_PIN);
-DallasTemperature sensors(&oneWire);
-
-// ── Variaveis de controle ─────────────────────
-unsigned long ultimaLeitura = 0;
-int           contadorLeitura = 0;
-
-// Estrutura para guardar uma leitura (celula do cubo OLAP)
-struct LeituraCubo {
-  unsigned long timestamp;    // DIM_TEMPO
-  float         temperatura;  // MEDIDA 1 — DS18B20 (°C, 12 bits, ±0.5°C)
-  int           luminosidade; // MEDIDA 2 — LDR (0-4095, ADC 12 bits ESP32)
-  String        local;        // DIM_LOCAL (fixo por ora, S05 expande)
-};
-
-// Buffer circular das ultimas 10 leituras (Roll-up OLAP)
-LeituraCubo buffer[10];
-int bufferIdx = 0;
-
-// ── setup() ──────────────────────────────────
-void setup() {
-  Serial.begin(115200);  // ESP32 usa 115200 baud por padrao
-  sensors.begin();       // Inicializa barramento OneWire
-
-  // Configurar resolucao do DS18B20: 12 bits (mais preciso)
-  sensors.setResolution(12);
-
-  Serial.println("================================");
-  Serial.println("BDN007 - Estacao Climatica S04");
-  Serial.println("ESP32 + DS18B20 (OneWire) + LDR");
-  Serial.println("Cubo OLAP: Temperatura x Luz x Local");
-  Serial.println("================================");
-  Serial.println("ID | Tempo(ms) | Temp(C) | Luz(0-4095) | Local");
-  Serial.println("---+----------+---------+-------------+------");
-
-  // DS18B20 nao precisa de delay de estabilizacao como o DHT
-  // mas aguardamos 1s para a primeira conversao de temperatura
-  delay(1000);
-}
-
-// ── loop() ───────────────────────────────────
-void loop() {
-  unsigned long agora = millis();
-
-  if (agora - ultimaLeitura >= INTERVALO) {
-    ultimaLeitura = agora;
-
-    // 1. Solicitar leitura ao(s) sensor(es) DS18B20
-    sensors.requestTemperatures();
-
-    // 2. Ler temperatura do primeiro sensor no barramento
-    float temp = sensors.getTempCByIndex(0);
-
-    // 3. Ler luminosidade do LDR
-    //    ESP32 ADC: 12 bits -> valores de 0 a 4095
-    int luz = analogRead(LDR_PIN);
-
-    // 4. Validar leitura do DS18B20
-    //    DEVICE_DISCONNECTED_C = -127.0 (sensor desconectado)
-    if (temp == DEVICE_DISCONNECTED_C) {
-      Serial.println("ERRO: DS18B20 nao encontrado! Verifique o pull-up 4.7k.");
-      delay(2000);
-      return;
-    }
-
-    // 5. Criar celula do cubo OLAP
-    LeituraCubo celula;
-    celula.timestamp    = agora;
-    celula.temperatura  = temp;
-    celula.luminosidade = luz;
-    celula.local        = "Sala-A1"; // DIM_LOCAL fixo (S05 expande)
-
-    // 6. Armazenar no buffer circular (ultimas 10 leituras)
-    buffer[bufferIdx % 10] = celula;
-    bufferIdx++;
-    contadorLeitura++;
-
-    // 7. Imprimir no Serial Monitor (formato CSV para planilha)
-    Serial.print(contadorLeitura);
-    Serial.print("  | ");
-    Serial.print(agora);
-    Serial.print("   | ");
-    Serial.print(temp, 2);   // 2 casas decimais (DS18B20 e preciso!)
-    Serial.print("C  | ");
-    Serial.print(luz);
-    Serial.print("          | ");
-    Serial.println(celula.local);
-
-    // 8. A cada 10 leituras: exibir mini-analise OLAP (Roll-up)
-    if (contadorLeitura % 10 == 0) {
-      exibirAnaliseOLAP();
-    }
-  }
-}
-
-// ── Analise OLAP local (Roll-up das 10 ultimas leituras) ──
-void exibirAnaliseOLAP() {
-  float somaTemp = 0;
-  float maxTemp  = -999.0, minTemp = 999.0;
-  long  somaLuz  = 0;
-  int   maxLuz   = 0,      minLuz  = 4095;
-
-  for (int i = 0; i &lt; 10; i++) {
-    somaTemp += buffer[i].temperatura;
-    somaLuz  += buffer[i].luminosidade;
-
-    if (buffer[i].temperatura &gt; maxTemp) maxTemp = buffer[i].temperatura;
-    if (buffer[i].temperatura &lt; minTemp) minTemp = buffer[i].temperatura;
-    if (buffer[i].luminosidade &gt; maxLuz) maxLuz  = buffer[i].luminosidade;
-    if (buffer[i].luminosidade &lt; minLuz) minLuz  = buffer[i].luminosidade;
-  }
-
-  // Classificar luminosidade media em categorias (DIM_CONDICAO)
-  int avgLuz = (int)(somaLuz / 10);
-  String condicao;
-  if      (avgLuz &lt; 500)  condicao = "Escuro";
-  else if (avgLuz &lt; 2000) condicao = "Meia-luz";
-  else if (avgLuz &lt; 3500) condicao = "Claro";
-  else                     condicao = "Muito claro";
-
-  Serial.println("\n--- ROLL-UP: Resumo das ultimas 10 leituras ---");
-  Serial.print("  Temp Media   : "); Serial.print(somaTemp / 10.0, 2); Serial.println(" C");
-  Serial.print("  Temp Max     : "); Serial.print(maxTemp, 2);          Serial.println(" C");
-  Serial.print("  Temp Min     : "); Serial.print(minTemp, 2);          Serial.println(" C");
-  Serial.print("  Luz Media    : "); Serial.print(avgLuz);              Serial.println(" (0-4095)");
-  Serial.print("  Luz Max      : "); Serial.println(maxLuz);
-  Serial.print("  Luz Min      : "); Serial.println(minLuz);
-  Serial.print("  Cond. Luz    : "); Serial.println(condicao);
-  Serial.println("-----------------------------------------------\n");
-}</pre>
-  </div>
-
-  <!-- SIMULADOR -->
-  <div class="card-label" style="margin-bottom:10px;color:#00979d;margin-top:22px;">&#x1F3AE; Simulador &mdash; Teste Sem Hardware</div>
-  <p style="font-size:.88em;color:#7ab8bc;margin-bottom:14px;">Sem Arduino em mãos? Simule a saída do Serial Monitor aqui:</p>
-  <div class="sim-panel">
-    <div class="sim-title">&#x1F4DF; Serial Monitor Simulado &mdash; 115200 baud</div>
-    <div class="sensors-row">
-      <div class="sensor-box"><div class="s-icon">&#x1F321;&#xFE0F;</div><div class="s-name">DS18B20 &middot; Temp</div><div class="s-val" id="simT">--</div><div class="s-unit">&deg;C</div></div>
-      <div class="sensor-box"><div class="s-icon">&#x2600;&#xFE0F;</div><div class="s-name">LDR &middot; Luz</div><div class="s-val" id="simL">--</div><div class="s-unit">/ 4095</div></div>
-      <div class="sensor-box"><div class="s-icon">&#x1F4CA;</div><div class="s-name">Cond. Luz</div><div class="s-val" id="simC" style="font-size:1em;">--</div><div class="s-unit">&nbsp;</div></div>
-    </div>
-    <div class="sim-controls">
-      <button class="sim-btn start" id="simBtn" onclick="simToggle()">&#x25B6; Iniciar Simulação</button>
-      <button class="sim-btn" style="border-color:var(--border);color:var(--muted);" onclick="simClear()">&#x1F5D1; Limpar</button>
-    </div>
-    <div class="sim-log" id="simLog">Aguardando início... Clique em "Iniciar Simulação".</div>
-  </div>
-
-  <!-- COMO REPLICAR -->
-  <div class="card-label" style="margin-bottom:10px;color:#00979d;margin-top:22px;">&#x1F4CB; Como Replicar &mdash; Passo a Passo</div>
-  <ol style="padding-left:20px;line-height:2.1;color:#7ab8bc;font-size:.9em;">
-    <li>Abra o <strong>Arduino IDE</strong> (versão 2.x recomendada)</li>
-    <li>Adicione o suporte ao ESP32: <strong>Arquivo &rarr; Preferências &rarr; URLs adicionais</strong> e cole: <code style="background:var(--surf3);padding:1px 6px;border-radius:4px;font-size:.85em;">https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json</code>. Depois vá em <strong>Ferramentas &rarr; Gerenciar Placas</strong> e instale <em>esp32 by Espressif</em></li>
-    <li>Instale as bibliotecas: <strong>Ferramentas &rarr; Gerenciar Bibliotecas</strong> &rarr; instale <code style="background:var(--surf3);padding:1px 6px;border-radius:4px;">OneWire</code> (Paul Stoffregen) e <code style="background:var(--surf3);padding:1px 6px;border-radius:4px;">DallasTemperature</code> (Miles Burton)</li>
-    <li>Monte o circuito conforme a <strong>tabela de conexões</strong> acima &mdash; não esqueça do resistor <strong>4,7k&#x2126;</strong> entre DATA e 3.3V!</li>
-    <li>Clique em <strong>"Copiar"</strong> no código acima e cole em um novo sketch no Arduino IDE</li>
-    <li>Selecione <strong>Ferramentas &rarr; Placa &rarr; ESP32 Arduino &rarr; ESP32 Dev Module</strong> e a porta COM correta</li>
-    <li>Clique em <strong>Upload (&rarr;)</strong> e aguarde a gravação</li>
-    <li>Abra o <strong>Monitor Serial</strong> (Ctrl+Shift+M) configurado para <code style="background:var(--surf3);padding:1px 6px;border-radius:4px;">115200 baud</code></li>
-    <li>Veja as leituras em formato CSV. <strong>Copie para uma planilha</strong> e monte seu cubo OLAP!</li>
-  </ol>
-
-  <div style="background:rgba(0,151,157,.07);border:1px solid rgba(0,151,157,.2);border-radius:12px;padding:20px;margin-top:20px;">
-    <div class="card-label" style="margin-bottom:10px;color:var(--arduino);">&#x1F3C6; Desafio Extra &middot; +100 XP</div>
-    <p style="font-size:.9em;color:#7ab8bc;margin-bottom:10px;">Modifique o código para implementar os conceitos OLAP diretamente no ESP32:</p>
-    <ul style="padding-left:18px;font-size:.88em;color:#6b8fa0;line-height:1.9;">
-      <li><strong>Slice:</strong> exibir no Serial apenas leituras onde temperatura &gt; 28&deg;C</li>
-      <li><strong>Drill-down:</strong> quando a média do Roll-up for alta, exibir as 3 leituras individuais mais quentes</li>
-      <li><strong>Segundo sensor DS18B20:</strong> conecte outro DS18B20 no mesmo barramento OneWire (endereço diferente) e altere <code style="background:var(--surf3);padding:1px 6px;border-radius:4px;">getDeviceCount()</code> para ler os dois, alternando o campo <code>local</code> entre "Sala-A1" e "Lab"</li>
-    </ul>
-    <div style="margin-top:12px;display:inline-flex;align-items:center;gap:6px;background:rgba(255,214,10,.1);border:1px solid rgba(255,214,10,.2);border-radius:20px;padding:4px 14px;font-family:'JetBrains Mono',monospace;font-size:.7em;color:var(--gold);">&#x26A1; +100 XP ao entregar o código modificado no Moodle</div>
-  </div>
-</div>
-
-<div class="page-nav">
-  <a href="semana03.html" class="nav-a">&larr; Semana 03</a>
-  <a href="index.html" class="nav-a">&#x1F3E0; Início</a>
-  <a href="semana05.html" class="nav-a next">Semana 05 &rarr;</a>
-</div>
-
-</main>
-
-<div class="toast" id="toast">
-  <div class="toast-icon" id="ti"></div>
-  <div><div class="toast-title">&#x1F3C6; Conquista</div><div class="toast-name" id="tn"></div></div>
-</div>
-
-<script>
-// ── XP ─────────────────────────────────────────
-let xp=0;
-function addXP(v){xp=Math.min(xp+v,500);document.getElementById('xpNum').innerHTML=xp+' <small>/ 500 XP</small>';document.getElementById('xpFill').style.width=(xp/500*100)+'%';}
-function showToast(icon,name){document.getElementById('ti').textContent=icon;document.getElementById('tn').textContent=name;const e=document.getElementById('toast');e.classList.add('show');setTimeout(()=>e.classList.remove('show'),4000);}
-
-// ── WARMUP ─────────────────────────────────────
-function warmup(btn,ok){
-  btn.parentElement.querySelectorAll('.w-opt').forEach(b=>b.disabled=true);
-  const fb=document.getElementById('wfb');fb.classList.add('show');
-  if(ok){btn.classList.add('correct');fb.classList.add('ok');fb.textContent='✅ Correto! Medidas numéricas ficam na Tabela Fato.';addXP(30);showToast('🧠','Aquecimento OK!');}
-  else{btn.classList.add('wrong');btn.parentElement.querySelectorAll('.w-opt').forEach(b=>{if(b.onclick.toString().includes(',true)'))b.classList.add('correct');});fb.classList.add('nok');fb.textContent='❌ Medidas ficam na Tabela Fato. Dimensões guardam atributos descritivos.';}
-}
-
-// ── TABS ───────────────────────────────────────
-function tabSwitch(btn,id){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('on'));btn.classList.add('on');document.getElementById(id).classList.add('on');addXP(5);}
-
-// ── PILLS ──────────────────────────────────────
-function pillToggle(el){const was=el.classList.contains('open');el.closest('.pills').querySelectorAll('.pill').forEach(p=>p.classList.remove('open'));if(!was){el.classList.add('open');addXP(8);}}
-
-// ── OLAP OPS ───────────────────────────────────
-const OPS={
-  rollup:{t:'ROLL-UP ⬆ — Mês → Trimestre',h:'<table class="data-table"><tr><th>Trimestre</th><th>Temp Média</th><th>Umid Média</th><th>Leituras</th></tr><tr><td>Q1/2024</td><td class="hi">23,4°C</td><td class="hi">68%</td><td>180</td></tr><tr><td>Q2/2024</td><td class="hi">27,1°C</td><td class="hi">72%</td><td>182</td></tr><tr><td>Q3/2024</td><td class="hi">28,9°C</td><td class="hi">74%</td><td>184</td></tr></table><p class="op-note">↑ Subindo na hierarquia: Jan+Fev+Mar agrupados em Q1.</p>'},
-  drill:{t:'DRILL-DOWN ⬇ — Q3 → Meses',h:'<table class="data-table"><tr><th>Mês</th><th>Temp Média</th><th>Umid Média</th><th>Leituras</th></tr><tr><td>Jul/2024</td><td class="hi">27,3°C</td><td class="hi">70%</td><td>62</td></tr><tr><td>Ago/2024</td><td class="hi">29,4°C</td><td class="hi">76%</td><td>62</td></tr><tr><td>Set/2024</td><td class="hi">30,0°C</td><td class="hi">77%</td><td>60</td></tr></table><p class="op-note">↓ Descendo: Q3 detalhado em Jul, Ago, Set.</p>'},
-  slice:{t:'SLICE ✂ — Fixando Local = "Sala-A1"',h:'<table class="data-table"><tr><th>Mês</th><th>Temp (Sala-A1)</th><th>Umid (Sala-A1)</th><th>Luz (Sala-A1)</th></tr><tr><td>Jan/2024</td><td class="hi">22,1°C</td><td class="hi">65%</td><td>480</td></tr><tr><td>Fev/2024</td><td class="hi">23,8°C</td><td class="hi">68%</td><td>510</td></tr><tr><td>Mar/2024</td><td class="hi">24,0°C</td><td class="hi">70%</td><td>495</td></tr></table><p class="op-note">✂ Cubo 3D virou 2D: fixamos Local=Sala-A1.</p>'},
-  dice:{t:'DICE 🎲 — Filtros em múltiplas dimensões',h:'<table class="data-table"><tr><th>Mês</th><th>Local</th><th>Temp Média</th><th>Umid Média</th></tr><tr><td>Jan/2024</td><td>Sala-A1</td><td class="hi">22,1°C</td><td class="hi">65%</td></tr><tr><td>Jan/2024</td><td>Sala-B2</td><td class="hi">20,8°C</td><td class="hi">60%</td></tr><tr><td>Fev/2024</td><td>Sala-A1</td><td class="hi">23,8°C</td><td class="hi">68%</td></tr></table><p class="op-note">🎲 Sub-cubo: apenas Jan/Fev E apenas Sala-A1/B2.</p>'},
-  pivot:{t:'PIVOT 🔄 — Local nas colunas',h:'<table class="data-table"><tr><th>Mês</th><th>Sala-A1 (Temp)</th><th>Sala-B2 (Temp)</th><th>Lab (Temp)</th></tr><tr><td>Jan/2024</td><td class="hi">22,1°C</td><td>20,8°C</td><td>19,5°C</td></tr><tr><td>Fev/2024</td><td class="hi">23,8°C</td><td>22,1°C</td><td>21,0°C</td></tr><tr><td>Mar/2024</td><td class="hi">24,0°C</td><td>23,0°C</td><td>22,2°C</td></tr></table><p class="op-note">🔄 Eixos girados: Local nas colunas para comparação lateral.</p>'}
-};
-function opSwitch(btn,key){document.querySelectorAll('.op-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');const d=OPS[key];document.getElementById('opScreen').innerHTML='<div class="op-title">'+d.t+'</div>'+d.h;addXP(5);}
-
-// ── QUIZ ───────────────────────────────────────
-let curQ=0;
-const scores=new Array(5).fill(null);
-function buildProg(){const p=document.getElementById('qprog');p.innerHTML='';for(let i=0;i<5;i++){const d=document.createElement('div');d.className='qprog-dot'+(i===curQ?' active':'')+(scores[i]===true?' done':scores[i]===false?' wrong':'');d.id='qd'+i;p.appendChild(d);}}
-function toggleGab(idx){const btn=document.getElementById('rb'+idx);const gab=document.getElementById('gab'+idx);const sc=document.getElementById('sc'+idx);const nb=document.getElementById('nb'+idx);const was=gab.classList.contains('show');if(!was){gab.classList.add('show');btn.classList.add('open');btn.querySelector('.arr').textContent='▼';sc.style.display='block';nb.disabled=false;addXP(10);}else{gab.classList.remove('show');btn.classList.remove('open');btn.querySelector('.arr').textContent='▶';}}
-function selfScore(idx,got){scores[idx]=got;const sc=document.getElementById('sc'+idx);const btns=sc.querySelectorAll('.self-btn');btns.forEach(b=>b.classList.remove('got-it','missed'));btns[got?0:1].classList.add(got?'got-it':'missed');addXP(got?40:15);const dot=document.getElementById('qd'+idx);if(dot){dot.classList.remove('active','done','wrong');dot.classList.add(got?'done':'wrong');}}
-function nextQ(idx){if(idx<4){document.querySelector('.q-block[data-q="'+idx+'"]').classList.remove('on');curQ=idx+1;document.querySelector('.q-block[data-q="'+curQ+'"]').classList.add('on');buildProg();document.getElementById('qd'+curQ).className='qprog-dot active';}else{showResult();}}
-function showResult(){document.getElementById('qbody').style.display='none';const res=document.getElementById('qresult');res.classList.add('on');const ok=scores.filter(s=>s===true).length;const no=scores.filter(s=>s===false).length;const answered=scores.filter(s=>s!==null).length;const xpG=ok*40+no*15+answered*10;document.getElementById('sbOk').textContent=ok;document.getElementById('sbNo').textContent=no;document.getElementById('sbXp').textContent=xpG;const msgs=[['🏆','Perfeito! Você dominou OLAP!'],['🎯','Excelente! Pronto para a próxima semana.'],['📈','Bom! Revise os gabaritos que errou.'],['📚','Releia o conteúdo e tente novamente.']];const m=ok===5?msgs[0]:ok>=4?msgs[1]:ok>=3?msgs[2]:msgs[3];document.getElementById('remoji').textContent=m[0];document.getElementById('rscore').textContent=ok+' / 5';document.getElementById('rmsg').textContent=m[1];addXP(xpG);if(ok>=4)showToast('🎓','OLAP Dominado!');}
-function resetQuiz(){curQ=0;scores.fill(null);document.getElementById('qresult').classList.remove('on');document.getElementById('qbody').style.display='';document.querySelectorAll('.q-block').forEach((b,i)=>{b.classList.toggle('on',i===0);const ta=b.querySelector('.answer-area');if(ta){ta.value='';ta.disabled=false;}const gab=b.querySelector('.gabarito');if(gab)gab.classList.remove('show');const rb=b.querySelector('.reveal-btn');if(rb){rb.classList.remove('open');rb.querySelector('.arr').textContent='▶';}const sc=b.querySelector('.self-check');if(sc){sc.style.display='none';sc.querySelectorAll('.self-btn').forEach(btn=>btn.classList.remove('got-it','missed'));}const nb=b.querySelector('[id^="nb"]');if(nb)nb.disabled=true;});buildProg();}
-
-// ── EVO BAR ────────────────────────────────────
-const evoTxt=['<strong style="color:var(--arduino)">Semana 04 — Coleta de dados com sensores</strong><br><br>Monte o circuito com DS18B20 (OneWire) e LDR. O ESP32 coleta temperatura e luminosidade a cada 5s e envia via Serial em CSV. Esses dados são as <strong>medidas</strong> do cubo OLAP. A função <code>exibirAnaliseOLAP()</code> demonstra Roll-up no hardware e classifica a luminosidade em categorias (DIM_CONDICAO).','<strong style="color:var(--arduino)">Semana 05 — Estrutura dimensional</strong><br><br>Adicionamos um segundo sensor DS18B20 no mesmo barramento OneWire (endereço diferente). Criamos a estrutura formal: DIM_TEMPO (timestamp formatado), DIM_LOCAL (Sala-A1 vs Lab), DIM_SENSOR. Exportamos dados para importar no Excel e montar o modelo dimensional.','<strong style="color:var(--arduino)">Semana 06 — Armazenamento DW</strong><br><br>Um script Python recebe as leituras via Serial e insere em um banco SQLite (DW simplificado). Implementamos FATO_LEITURAS e dimensões. Conceito: Staging Area no buffer do ESP32, carregamento periódico no DW.','<strong style="color:var(--arduino)">Semana 07 — Dashboard Web</strong><br><br>Python serve uma página HTML com Chart.js que lê o SQLite e exibe gráficos. O aluno experimenta OLAP visualmente: Drill-down clicando em um período, Slice filtrando por local, Pivot alternando eixos. Projeto final do módulo!'];
-function evoShow(idx){document.querySelectorAll('.evo-step').forEach((s,i)=>s.classList.toggle('active',i===idx));document.getElementById('evoDetail').innerHTML=evoTxt[idx];addXP(8);}
-
-// ── SIMULADOR ──────────────────────────────────
-let simTmr=null,simCnt=0,simRun=false,simBuf={t:[],l:[]};
-function simToggle(){const btn=document.getElementById('simBtn');if(!simRun){simRun=true;btn.textContent='⏹ Parar';btn.classList.add('running');simCnt=0;simBuf={t:[],l:[]};document.getElementById('simLog').textContent='================================\nBDN007 - Estacao Climatica S04\nESP32 + DS18B20 (OneWire) + LDR\n================================\nID | Tempo(ms) | Temp(C) | Luz(0-4095) | Local\n';simTmr=setInterval(simStep,1200);}else{simStop();}}
-function simCondicao(l){return l<500?'Escuro':l<2000?'Meia-luz':l<3500?'Claro':'Muito claro';}
-function simStep(){simCnt++;const t=(20+Math.random()*12).toFixed(2);const l=Math.floor(100+Math.random()*3900);const ms=simCnt*5000;simBuf.t.push(parseFloat(t));simBuf.l.push(l);document.getElementById('simT').textContent=t;document.getElementById('simL').textContent=l;document.getElementById('simC').textContent=simCondicao(l);const log=document.getElementById('simLog');log.textContent+=simCnt+'  | '+ms+'   | '+t+'C  | '+l+'         | Sala-A1\n';log.scrollTop=log.scrollHeight;if(simCnt%10===0&&simBuf.t.length>=10){const l10t=simBuf.t.slice(-10);const l10l=simBuf.l.slice(-10);const avgT=(l10t.reduce((a,b)=>a+b,0)/10).toFixed(2);const maxT=Math.max(...l10t).toFixed(2);const minT=Math.min(...l10t).toFixed(2);const avgL=Math.floor(l10l.reduce((a,b)=>a+b,0)/10);const maxL=Math.max(...l10l);const minL=Math.min(...l10l);log.textContent+='\n>>> ROLL-UP: ultimas 10 leituras\n  Temp Media   : '+avgT+'C | Max: '+maxT+'C | Min: '+minT+'C\n  Luz Media    : '+avgL+' | Max: '+maxL+' | Min: '+minL+'\n  Cond. Luz    : '+simCondicao(avgL)+'\n<<<\n\n';log.scrollTop=log.scrollHeight;addXP(15);showToast('📊','Roll-up Executado!');}if(simCnt>=20)simStop();}
-function simStop(){clearInterval(simTmr);simRun=false;const btn=document.getElementById('simBtn');btn.textContent='▶ Iniciar Simulação';btn.classList.remove('running');}
-function simClear(){simStop();simCnt=0;simBuf={t:[],l:[]};document.getElementById('simLog').textContent='Log limpo.';['simT','simL','simC'].forEach(id=>document.getElementById(id).textContent='--');}
-
-function copyCode(){const code=document.getElementById('codeBlock').textContent;navigator.clipboard.writeText(code).then(()=>{const btn=document.querySelector('.copy-btn');btn.textContent='✅ Copiado!';setTimeout(()=>btn.textContent='📋 Copiar',2000);addXP(5);});}
-
-window.addEventListener('DOMContentLoaded',()=>{buildProg();opSwitch(document.querySelector('.op-btn'),'rollup');});
-</script>
 </body>
 </html>
