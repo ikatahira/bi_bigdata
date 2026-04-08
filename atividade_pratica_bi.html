@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atividade Prática — Business Intelligence com Google Sheets</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&family=DM+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F5F0;
+    --surface: #FFFFFF;
+    --surface2: #F0EDE6;
+    --border: #E0DAD0;
+    --text: #1A1814;
+    --muted: #7A746A;
+    --accent-a: #3D2B8C;
+    --accent-a-light: #EAE7FA;
+    --accent-b: #0A6B4F;
+    --accent-b-light: #E0F2EB;
+    --accent-c: #8C2B2B;
+    --accent-c-light: #FAE7E7;
+    --accent-d: #7A5A0A;
+    --accent-d-light: #FDF3D0;
+    --radius: 10px;
+    --radius-lg: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .page-header {
+    background: var(--text);
+    color: #fff;
+    padding: 3rem 2.5rem 2.5rem;
+  }
+  .header-inner { max-width: 900px; margin: 0 auto; }
+  .header-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #9990FF;
+    margin-bottom: 12px;
+  }
+  .page-header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(28px, 5vw, 44px);
+    font-weight: 400;
+    line-height: 1.15;
+    margin-bottom: 14px;
+    color: #fff;
+  }
+  .page-header h1 em {
+    color: #9990FF;
+    font-style: italic;
+  }
+  .header-desc {
+    font-size: 15px;
+    color: #B8B3C8;
+    line-height: 1.7;
+    max-width: 560px;
+  }
+  .header-meta {
+    display: flex;
+    gap: 20px;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+  }
+  .meta-item {
+    font-size: 12px;
+    color: #9990FF;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .meta-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #9990FF;
+  }
+
+  /* TABS */
+  .tabs-section {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .tabs-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tabs-inner::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    padding: 16px 24px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { color: var(--text); border-bottom-color: var(--text); }
+  .tab-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 500;
+    margin-right: 8px;
+  }
+  .tab-btn[data-mod="0"] .tab-num { background: var(--accent-a-light); color: var(--accent-a); }
+  .tab-btn[data-mod="1"] .tab-num { background: var(--accent-b-light); color: var(--accent-b); }
+  .tab-btn[data-mod="2"] .tab-num { background: var(--accent-c-light); color: var(--accent-c); }
+  .tab-btn[data-mod="3"] .tab-num { background: var(--accent-d-light); color: var(--accent-d); }
+  .tab-btn[data-mod="0"].active .tab-num { background: var(--accent-a); color: #fff; }
+  .tab-btn[data-mod="1"].active .tab-num { background: var(--accent-b); color: #fff; }
+  .tab-btn[data-mod="2"].active .tab-num { background: var(--accent-c); color: #fff; }
+  .tab-btn[data-mod="3"].active .tab-num { background: var(--accent-d); color: #fff; }
+
+  /* CONTENT */
+  .content { max-width: 900px; margin: 0 auto; padding: 2.5rem 2rem 4rem; }
+  .mod-panel { display: none; }
+  .mod-panel.active { display: block; animation: fadeUp 0.3s ease; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* PANEL HEADER */
+  .panel-top {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 2rem;
+    align-items: start;
+    margin-bottom: 2.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .panel-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 999px;
+    margin-bottom: 12px;
+  }
+  .mod0 .panel-badge { background: var(--accent-a-light); color: var(--accent-a); }
+  .mod1 .panel-badge { background: var(--accent-b-light); color: var(--accent-b); }
+  .mod2 .panel-badge { background: var(--accent-c-light); color: var(--accent-c); }
+  .mod3 .panel-badge { background: var(--accent-d-light); color: var(--accent-d); }
+
+  .panel-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    font-weight: 400;
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+  .panel-desc {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.7;
+    max-width: 520px;
+  }
+  .time-badge {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 20px;
+    text-align: center;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .time-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 32px;
+    color: var(--text);
+    display: block;
+    line-height: 1;
+  }
+  .time-lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+
+  /* OBJECTIVES */
+  .section-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .obj-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 2.5rem;
+  }
+  .obj-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.5;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .obj-icon {
+    width: 18px; height: 18px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .mod0 .obj-icon { background: var(--accent-a-light); }
+  .mod1 .obj-icon { background: var(--accent-b-light); }
+  .mod2 .obj-icon { background: var(--accent-c-light); }
+  .mod3 .obj-icon { background: var(--accent-d-light); }
+
+  /* STEPS */
+  .steps { display: flex; flex-direction: column; gap: 12px; margin-bottom: 2.5rem; }
+  .step {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    transition: border-color 0.2s;
+  }
+  .step:hover { border-color: #ccc; }
+  .step-num {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 500;
+    flex-shrink: 0;
+  }
+  .mod0 .step-num { background: var(--accent-a-light); color: var(--accent-a); }
+  .mod1 .step-num { background: var(--accent-b-light); color: var(--accent-b); }
+  .mod2 .step-num { background: var(--accent-c-light); color: var(--accent-c); }
+  .mod3 .step-num { background: var(--accent-d-light); color: var(--accent-d); }
+
+  .step-body strong {
+    font-size: 14px; font-weight: 500;
+    display: block; margin-bottom: 5px;
+    color: var(--text);
+  }
+  .step-body p { font-size: 13px; color: var(--muted); line-height: 1.65; }
+  code {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 1px 6px;
+    border-radius: 4px;
+    color: var(--text);
+  }
+
+  /* TABLE */
+  .table-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 2rem;
+  }
+  .table-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .table-header span {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .table-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .mod0 .table-dot { background: var(--accent-a); }
+  .mod1 .table-dot { background: var(--accent-b); }
+  .mod2 .table-dot { background: var(--accent-c); }
+  .mod3 .table-dot { background: var(--accent-d); }
+
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th {
+    background: var(--surface2);
+    padding: 10px 16px;
+    text-align: left;
+    font-weight: 500;
+    font-size: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  tbody td {
+    padding: 9px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: var(--surface2); }
+  td.formula {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: #185FA5;
+    background: #EEF5FD;
+  }
+  td.empty { color: #E24B4A; font-style: italic; font-size: 12px; }
+  td.dup { background: #FDF3D0; }
+  td.neg { color: #E24B4A; }
+  td.total-row td { background: var(--surface2); font-weight: 500; }
+
+  /* TIP */
+  .tip-box {
+    background: #FFFBEB;
+    border: 1px solid #F0D060;
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    font-size: 13px;
+    color: #7A5A0A;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .tip-icon {
+    width: 18px; height: 18px;
+    background: #F0D060;
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* DOWNLOAD */
+  .dl-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+  .dl-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: var(--radius);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-decoration: none;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+  }
+  .dl-btn:hover { background: var(--surface2); }
+  .dl-btn.primary {
+    color: #fff;
+    border-color: transparent;
+  }
+  .mod0 .dl-btn.primary { background: var(--accent-a); }
+  .mod0 .dl-btn.primary:hover { background: #2d1f6e; }
+  .mod1 .dl-btn.primary { background: var(--accent-b); }
+  .mod1 .dl-btn.primary:hover { background: #084d38; }
+  .mod2 .dl-btn.primary { background: var(--accent-c); }
+  .mod2 .dl-btn.primary:hover { background: #6e1f1f; }
+  .mod3 .dl-btn.primary { background: var(--accent-d); }
+  .mod3 .dl-btn.primary:hover { background: #5a4008; }
+
+  .dl-icon {
+    width: 14px; height: 14px;
+    fill: currentColor;
+  }
+
+  /* FOOTER */
+  .page-footer {
+    background: var(--text);
+    padding: 2rem 2.5rem;
+    text-align: center;
+  }
+  .page-footer p {
+    font-size: 12px;
+    color: #666;
+    letter-spacing: 0.04em;
+  }
+
+  @media (max-width: 640px) {
+    .panel-top { grid-template-columns: 1fr; }
+    .obj-grid { grid-template-columns: 1fr; }
+    .content { padding: 1.5rem 1rem 3rem; }
+    .page-header { padding: 2rem 1.25rem; }
+  }
+</style>
+</head>
+<body>
+
+<header class="page-header">
+  <div class="header-inner">
+    <p class="header-label">Exercício formativo · Business Intelligence</p>
+    <h1>Prática com<br><em>Google Sheets</em></h1>
+    <p class="header-desc">Quatro módulos progressivos que cobrem o pipeline completo de BI: da limpeza de dados até a criação de um dashboard executivo.</p>
+    <div class="header-meta">
+      <span class="meta-item"><span class="meta-dot"></span>4 módulos</span>
+      <span class="meta-item"><span class="meta-dot"></span>Planilhas para download</span>
+      <span class="meta-item"><span class="meta-dot"></span>Roteiro passo a passo</span>
+      <span class="meta-item"><span class="meta-dot"></span>Google Sheets</span>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs-section">
+  <div class="tabs-inner">
+    <button class="tab-btn active" data-mod="0" onclick="showMod(0)">
+      <span class="tab-num">A</span>Limpeza de dados
+    </button>
+    <button class="tab-btn" data-mod="1" onclick="showMod(1)">
+      <span class="tab-num">B</span>Fórmulas
+    </button>
+    <button class="tab-btn" data-mod="2" onclick="showMod(2)">
+      <span class="tab-num">C</span>Tabela dinâmica
+    </button>
+    <button class="tab-btn" data-mod="3" onclick="showMod(3)">
+      <span class="tab-num">D</span>Dashboard
+    </button>
+  </div>
+</nav>
+
+<main class="content">
+
+  <!-- MÓDULO A -->
+  <div id="mod0" class="mod-panel mod0 active">
+    <div class="panel-top">
+      <div>
+        <span class="panel-badge">Módulo A</span>
+        <h2 class="panel-title">Limpeza e transformação de dados</h2>
+        <p class="panel-desc">Os alunos recebem uma planilha com dados "sujos" e aplicam as etapas de um pipeline real: identificar inconsistências, padronizar e preparar para análise.</p>
+      </div>
+      <div class="time-badge">
+        <span class="time-num">30'</span>
+        <span class="time-lbl">duração</span>
+      </div>
+    </div>
+
+    <p class="section-label">Objetivos de aprendizagem</p>
+    <div class="obj-grid">
+      <div class="obj-item"><div class="obj-icon"></div>Identificar dados ausentes, duplicados e fora de padrão</div>
+      <div class="obj-item"><div class="obj-icon"></div>Usar filtros e formatação condicional para visualizar problemas</div>
+      <div class="obj-item"><div class="obj-icon"></div>Padronizar texto com <code>MAIÚSCULA</code>, <code>ARRUMAR</code>, <code>SUBSTITUIR</code></div>
+      <div class="obj-item"><div class="obj-icon"></div>Remover duplicatas e documentar o processo de limpeza</div>
+    </div>
+
+    <p class="section-label">Roteiro passo a passo</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <strong>Abrir a planilha modelo</strong>
+          <p>Faça o download do arquivo .csv abaixo. No Google Sheets: Arquivo → Importar → selecione o arquivo → Substituir planilha. Em seguida, Arquivo → Fazer uma cópia para trabalhar na sua versão.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <strong>Inspecionar os dados</strong>
+          <p>Role toda a planilha sem editar nada. Na aba "Observações" (crie uma nova aba com esse nome), anote pelo menos 3 problemas que você encontrou: campos vazios, erros de digitação, formatos diferentes, valores inválidos.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <strong>Aplicar formatação condicional</strong>
+          <p>Selecione a coluna C (Cidade). Vá em Formatar → Formatação condicional → Adicionar nova regra → "A célula está vazia" → escolha a cor vermelha como destaque. Repita para a coluna F (Data).</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <strong>Padronizar os nomes com fórmula</strong>
+          <p>Na coluna H (auxiliar, crie um cabeçalho "Nome_limpo"), use: <code>=MAIÚSCULA(ARRUMAR(B2))</code> para padronizar nomes. Arraste para todas as linhas. Depois selecione a coluna H → copiar → colar especial como Valores → substitua a coluna B.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <strong>Corrigir abreviações de cidades</strong>
+          <p>Use Editar → Localizar e substituir (Ctrl+H). Substitua "RJ" por "Rio de Janeiro" e "POA" por "Porto Alegre". Marque a opção "Diferenciar maiúsculas" para evitar substituições incorretas.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-body">
+          <strong>Remover duplicatas</strong>
+          <p>Selecione toda a tabela (Ctrl+A). Vá em Dados → Limpeza de dados → Remover cópias. Uma janela mostrará quantas linhas duplicadas existem. Anote esse número na aba Observações.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">7</div>
+        <div class="step-body">
+          <strong>Documentar o resultado</strong>
+          <p>Na aba "Observações", complete: (a) quantos registros havia originalmente; (b) quantos problemas foram encontrados e de que tipo; (c) quantos registros restaram após a limpeza; (d) qual é a qualidade final dos dados (0–10).</p>
+        </div>
+      </div>
+    </div>
+
+    <p class="section-label">Planilha modelo — problemas propositais</p>
+    <div class="table-section">
+      <div class="table-header">
+        <div class="table-dot"></div>
+        <span>dados_brutos.csv — erros destacados</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>ID</th><th>Nome</th><th>Cidade</th><th>Região</th><th>Vendas (R$)</th><th>Data</th></tr></thead>
+          <tbody>
+            <tr><td>001</td><td>ana silva</td><td>São Paulo</td><td>Sudeste</td><td>1200</td><td>01/03/2024</td></tr>
+            <tr><td>002</td><td>JOÃO SOUZA</td><td class="empty">(vazio)</td><td>Sul</td><td>850</td><td>2024-03-02</td></tr>
+            <tr class="dup"><td>003</td><td>Ana Silva</td><td>São Paulo</td><td>sudeste</td><td>1200</td><td>01/03/2024</td></tr>
+            <tr><td>004</td><td>Maria  Costa</td><td>Curitiba</td><td>Sul</td><td class="neg">-50</td><td>03/03/2024</td></tr>
+            <tr><td>005</td><td>Pedro Lima</td><td>RJ</td><td>Sudeste</td><td>2100</td><td>04/03/2024</td></tr>
+            <tr><td>006</td><td>carla santos</td><td>Belo Horizonte</td><td>Sudeste</td><td>1750</td><td>05/03/2024</td></tr>
+            <tr><td>007</td><td>Marcos Alves</td><td>POA</td><td>Sul</td><td>3200</td><td>06/03/2024</td></tr>
+            <tr class="dup"><td>008</td><td>marcos alves</td><td>Porto Alegre</td><td>Sul</td><td>3200</td><td>06/03/2024</td></tr>
+            <tr><td>009</td><td>Julia Rocha</td><td>Salvador</td><td>Nordeste</td><td>980</td><td>07/03/2024</td></tr>
+            <tr><td>010</td><td>Fernanda Lima</td><td class="empty">(vazio)</td><td>Nordeste</td><td>1450</td><td>08/03/2024</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <div class="tip-icon"></div>
+      <div><strong>Nota ao professor:</strong> a planilha tem propositalmente: linha 3 duplicada da linha 1 (nome em formato diferente), cidades vazias nas linhas 2 e 10, valor negativo na linha 4, abreviações "RJ" e "POA", inconsistência de maiúsculas/minúsculas em nomes e regiões, e espaço duplo em "Maria  Costa".</div>
+    </div>
+
+    <div class="dl-row">
+      <button class="dl-btn primary" onclick="downloadCSV('A')">
+        <svg class="dl-icon" viewBox="0 0 16 16"><path d="M8 12l-4-4h2.5V3h3v5H12L8 12zM3 13h10v1H3z"/></svg>
+        Baixar planilha modelo (.csv)
+      </button>
+      <button class="dl-btn" onclick="downloadRoteiro('A')">
+        <svg class="dl-icon" viewBox="0 0 16 16"><path d="M4 1h6l4 4v10H4V1zm6 0v4h4M6 9h5M6 11h5M6 7h3"/></svg>
+        Baixar roteiro (.txt)
+      </button>
+    </div>
+  </div>
+
+  <!-- MÓDULO B -->
+  <div id="mod1" class="mod-panel mod1">
+    <div class="panel-top">
+      <div>
+        <span class="panel-badge">Módulo B</span>
+        <h2 class="panel-title">Fórmulas e análise de dados</h2>
+        <p class="panel-desc">Os alunos usam fórmulas essenciais do Google Sheets para extrair métricas de uma base de vendas: totais, médias, contagens condicionais e rankings.</p>
+      </div>
+      <div class="time-badge">
+        <span class="time-num">35'</span>
+        <span class="time-lbl">duração</span>
+      </div>
+    </div>
+
+    <p class="section-label">Objetivos de aprendizagem</p>
+    <div class="obj-grid">
+      <div class="obj-item"><div class="obj-icon"></div>Calcular totais e médias com <code>SOMA</code> e <code>MÉDIA</code></div>
+      <div class="obj-item"><div class="obj-icon"></div>Usar <code>SOMASE</code> e <code>CONT.SE</code> para análises condicionais</div>
+      <div class="obj-item"><div class="obj-icon"></div>Criar rankings com <code>MAIOR</code> e identificar top performers</div>
+      <div class="obj-item"><div class="obj-icon"></div>Categorizar desempenho usando a função <code>SE</code></div>
+    </div>
+
+    <p class="section-label">Roteiro passo a passo</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <strong>Abrir a planilha de vendas</strong>
+          <p>Faça o download e importe no Google Sheets. A planilha contém 15+ registros de vendedores com: ID, Vendedor, Região, Produto, Valor de Vendas (R$) e Mês.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <strong>Criar a aba de análise</strong>
+          <p>Adicione uma nova aba chamada "Análise". Monte uma tabela com os seguintes rótulos: Total de Vendas, Média por Vendedor, Maior Venda, Menor Venda, Nº de Transações.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <strong>Preencher as métricas gerais</strong>
+          <p>Na aba Análise, use: <code>=SOMA(Dados!E:E)</code> para total, <code>=MÉDIA(Dados!E:E)</code> para média, <code>=MÁXIMO(Dados!E:E)</code> para maior venda e <code>=CONT.VALORES(Dados!A:A)-1</code> para contar transações.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <strong>Vendas por região com SOMASE</strong>
+          <p>Crie uma tabela com as 3 regiões. Para cada uma use: <code>=SOMASE(Dados!C:C,"Sudeste",Dados!E:E)</code> — substituindo o nome da região. Verifique se a soma das regiões é igual ao total geral.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <strong>Classificar vendedores por desempenho</strong>
+          <p>Nos dados originais, crie uma coluna F chamada "Nível". Use: <code>=SE(E2>=2000,"Alto","Baixo")</code>. Depois use <code>=CONT.SE(F:F,"Alto")</code> para contar quantos são de alto desempenho.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-body">
+          <strong>Ranking — top 5 maiores vendas</strong>
+          <p>Na aba Análise, crie uma tabela "Top 5". Use: <code>=MAIOR(Dados!E:E,1)</code> para o 1º lugar, <code>=MAIOR(Dados!E:E,2)</code> para o 2º, e assim por diante até o 5º.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">7</div>
+        <div class="step-body">
+          <strong>Validar e interpretar</strong>
+          <p>Responda na aba Análise: (a) Qual região tem maior volume de vendas? (b) Qual porcentagem de vendedores é de alto desempenho? (c) Existe diferença entre os meses de Março e Fevereiro?</p>
+        </div>
+      </div>
+    </div>
+
+    <p class="section-label">Fórmulas esperadas na entrega</p>
+    <div class="table-section">
+      <div class="table-header">
+        <div class="table-dot"></div>
+        <span>gabarito de fórmulas — aba Análise</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Métrica</th><th>Fórmula correta</th><th>Observação</th></tr></thead>
+          <tbody>
+            <tr><td>Total geral</td><td class="formula">=SOMA(Dados!E:E)</td><td>Exclui cabeçalho automaticamente</td></tr>
+            <tr><td>Média de vendas</td><td class="formula">=MÉDIA(Dados!E:E)</td><td>Arredondar para 2 casas</td></tr>
+            <tr><td>Total Sudeste</td><td class="formula">=SOMASE(Dados!C:C,"Sudeste",Dados!E:E)</td><td>Diferencia maiúsculas</td></tr>
+            <tr><td>Total Sul</td><td class="formula">=SOMASE(Dados!C:C,"Sul",Dados!E:E)</td><td>—</td></tr>
+            <tr><td>Total Nordeste</td><td class="formula">=SOMASE(Dados!C:C,"Nordeste",Dados!E:E)</td><td>—</td></tr>
+            <tr><td>Qtd. alto desempenho</td><td class="formula">=CONT.SE(Dados!F:F,"Alto")</td><td>Após criar coluna Nível</td></tr>
+            <tr><td>1º colocado</td><td class="formula">=MAIOR(Dados!E:E,1)</td><td>Alterar índice para 2, 3...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="dl-row">
+      <button class="dl-btn primary" onclick="downloadCSV('B')">
+        <svg class="dl-icon" viewBox="0 0 16 16"><path d="M8 12l-4-4h2.5V3h3v5H12L8 12zM3 13h10v1H3z"/></svg>
+        Baixar planilha modelo (.csv)
+      </button>
+      <button class="dl-btn" onclick="downloadRoteiro('B')">
+        <svg class="dl-icon" viewBox="0 0 16 16"><path d="M4 1h6l4 4v10H4V1zm6 0v4h4M6 9h5M6 11h5M6 7h3"/></svg>
+        Baixar roteiro (.txt)
+      </button>
+    </div>
+  </div>
+
+  <!-- MÓDULO C -->
+  <div id="mod2" class="mod-panel mod2">
+    <div class="panel-top">
+      <div>
+        <span class="panel-badge">Módulo C</span>
+        <h2 class="panel-title">Tabela dinâmica (Pivot Table)</h2>
+        <p class="panel-desc">Os alunos usam tabelas dinâmicas para resumir grandes volumes de dados, cruzar dimensões e identificar padrões — habilidade central em BI.</p>
+      </div>
+      <div class="time-badge">
+        <span class="time-num">40'</span>
+        <span class="time-lbl">duração</span>
+      </div>
+    </div>
+
+    <p class="section-label">Objetivos de aprendizagem</p>
+    <div class="obj-grid">
+      <div class="obj-item"><div class="obj-icon"></div>Criar uma tabela dinâmica a partir de dados brutos</div>
+      <div class="obj-item"><div class="obj-icon"></div>Configurar linhas, colunas, valores e filtros corretamente</div>
+      <div class="obj-item"><div class="obj-icon"></div>Comparar vendas cruzando Região × Produto</div>
+      <div class="obj-item"><div class="obj-icon"></div>Interpretar os resultados e tirar conclusões analíticas</div>
+    </div>
+
+    <p class="section-label">Roteiro passo a passo</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <strong>Preparar os dados</strong>
+          <p>Importe o arquivo do Módulo C. Certifique-se de que todos os cabeçalhos estão preenchidos na linha 1 e não há linhas em branco entre os dados. A tabela dinâmica não funciona bem com dados desorganizados.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <strong>Inserir a primeira tabela dinâmica</strong>
+          <p>Clique em qualquer célula dentro dos dados. Vá em Inserir → Tabela dinâmica → Nova planilha. Isso cria automaticamente a aba "Tabela dinâmica 1" com o painel lateral de configuração.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <strong>Configurar Região × Produto</strong>
+          <p>No painel lateral: arraste "Região" para Linhas. Arraste "Produto" para Colunas. Em Valores, clique em Adicionar → selecione "Vendas (R$)" → a função deve ser SOMA. Você verá uma tabela cruzada se formando.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <strong>Adicionar filtro de mês</strong>
+          <p>No painel, arraste "Mês" para Filtros (parte superior). Um filtro aparece acima da tabela. Selecione apenas "Março" e observe como os totais mudam. Anote os valores. Depois selecione "Fevereiro" e anote novamente.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <strong>Segunda tabela dinâmica — por contagem</strong>
+          <p>Crie uma nova tabela dinâmica (Inserir → Tabela dinâmica → Nova planilha). Desta vez: "Vendedor" nas Linhas, "Vendas (R$)" nos Valores mas com função CONT (não SOMA). Isso mostra quem realizou mais transações.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-body">
+          <strong>Calcular ticket médio</strong>
+          <p>Numa terceira coluna da segunda tabela dinâmica, use uma fórmula manual dividindo SOMA pelo CONT para cada vendedor. Isso revela o ticket médio por vendedor — diferente do volume total.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">7</div>
+        <div class="step-body">
+          <strong>Análise e conclusões</strong>
+          <p>Crie uma aba "Conclusões" e responda: (a) Qual região vendeu mais em valor? (b) Qual produto tem melhor desempenho no Sul? (c) Qual vendedor tem maior ticket médio (não necessariamente o maior volume)? (d) Por que ticket médio pode ser mais relevante que volume total?</p>
+        </div>
+      </div>
+    </div>
+
+    <p class="section-label">Resultado esperado — tabela Região × Produto</p>
+    <div class="table-section">
+      <div class="table-header">
+        <div class="table-dot"></div>
+        <span>tabela dinâmica — SOMA de Vendas (R$)</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Região \ Produto</th><th>Produto A</th><th>Produto B</th><th>Produto C</th><th>Total geral</th></tr></thead>
+          <tbody>
+            <tr><td>Sudeste</td><td>R$ 4.200</td><td>R$ 3.100</td><td>R$ 2.800</td><td>R$ 10.100</td></tr>
+            <tr><td>Sul</td><td>R$ 2.900</td><td>R$ 3.500</td><td>R$ 1.200</td><td>R$ 7.600</td></tr>
+            <tr><td>Nordeste</td><td>R$ 1.800</td><td>R$ 900</td><td>R$ 2.200</td><td>R$ 4.900</td></tr>
+            <tr style="background:var(--surface2);font-weight:500"><td>Total geral</td><td>R$ 8.900</td><td>R$ 7.500</td><td>R$ 6.200</td><td>R$ 22.600</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <div class="tip-icon"></div>
+      <div><strong>Nota ao professor:</strong> o resultado acima é aproximado e pode variar conforme o arquivo CSV gerado. O importante é o aluno compreender a estrutura da tabela dinâmica e saber interpretar os cruzamentos — não acertar os valores exatos.</div>
+    </div>
+
+    <div class="dl-row">
+      <button class="dl-btn primary" onclick="downloadCSV('C')">
+        <svg class="dl-icon" viewBox="0 0 16 16"><path d="M8 12l-4-4h2.5V3h3v5H12L8 12zM3 13h10v1H3z"/></svg>
+        Baixar planilha modelo (.csv)
+      </button>
+      <button class="dl-btn" onclick="downloadRoteiro('C')">
+        <svg class="dl-icon" viewBox="0 0 16 16"><path d="M4 1h6l4 4v10H4V1zm6 0v4h4M6 9h5M6 11h5M6 7h3"/></svg>
+        Baixar roteiro (.txt)
+      </button>
+    </div>
+  </div>
+
+  <!-- MÓDULO D -->
+  <div id="mod3" class="mod-panel mod3">
+    <div class="panel-top">
+      <div>
+        <span class="panel-badge">Módulo D</span>
+        <h2 class="panel-title">Dashboard e visualização</h2>
+        <p class="panel-desc">Os alunos criam um dashboard executivo com gráficos interligados, segmentações e KPIs — unindo tudo que foi aprendido nos módulos anteriores.</p>
+      </div>
+      <div class="time-badge">
+        <span class="time-num">45'</span>
+        <span class="time-lbl">duração</span>
+      </div>
+    </div>
+
+    <p class="section-label">Objetivos de aprendizagem</p>
+    <div class="obj-grid">
+      <div class="obj-item"><div class="obj-icon"></div>Criar gráficos de linhas, barras e pizza a partir de tabelas dinâmicas</div>
+      <div class="obj-item"><div class="obj-icon"></div>Usar Segmentação de dados para filtros interativos</div>
+      <div class="obj-item"><div class="obj-icon"></div>Organizar um painel visual com KPIs, gráficos e filtros</div>
+      <div class="obj-item"><div class="obj-icon"></div>Escolher o tipo de gráfico correto para cada tipo de dado</div>
+    </div>
+
+    <p class="section-label">Roteiro passo a passo</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <strong>Preparar a aba Dashboard</strong>
+          <p>Crie uma nova aba chamada "Dashboard". Para deixar o visual limpo: Exibir → Linhas de grade → desmarque "Mostrar linhas de grade". Use Formatar → Planilha → Alterar cor para identificar visualmente a aba.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <strong>KPIs no topo — 4 cartões</strong>
+          <p>Nas células B2:E4, crie 4 blocos com fórmulas apontando para a aba Análise: Total de Vendas, Ticket Médio, Nº de Transações, Melhor Região (use texto manual). Formate com fundo colorido e fonte maior para destacar.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <strong>Gráfico de colunas — vendas por região</strong>
+          <p>Selecione a mini-tabela de totais por região (da aba Análise) → Inserir → Gráfico. O Sheets sugere automaticamente. Mude para "Gráfico de colunas" se necessário. Clique no gráfico e arraste para o Dashboard.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <strong>Gráfico de linhas — evolução mensal</strong>
+          <p>Crie uma tabela auxiliar com Mês e Total de Vendas (usando SOMASE por mês). Selecione essa tabela → Inserir → Gráfico de linhas. Este gráfico mostra tendência ao longo do tempo. Mova para o Dashboard.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <strong>Gráfico de pizza — mix de produtos</strong>
+          <p>Crie uma tabela com Produto e Total de Vendas. Insira um gráfico de pizza. <em>Atenção:</em> pizzas funcionam bem com poucos fatias (3–5). Com muitos produtos, prefira barras horizontais.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-body">
+          <strong>Adicionar Segmentação de dados</strong>
+          <p>Clique na tabela dinâmica (aba da tabela dinâmica) → no menu Dados → Adicionar segmentação → selecione "Região". Copie a segmentação e cole no Dashboard. Ao clicar em uma região, todos os gráficos vinculados filtram automaticamente.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">7</div>
+        <div class="step-body">
+          <strong>Reflexão final e apresentação</strong>
+          <p>Responda na aba "Conclusões": (a) Por que você usou barras para regiões e não pizza? (b) O que mudaria no dashboard se o público fosse a equipe operacional (não executivos)? (c) Que dado importante está faltando neste dashboard?</p>
+        </div>
+      </div>
+    </div>
+
+    <p class="section-label">Estrutura sugerida do dashboard</p>
+    <div class="table-section">
+      <div class="table-header">
+        <div class="table-dot"></div>
+        <span>layout recomendado — aba Dashboard</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Área (linhas)</th><th>Conteúdo</th><th>Tipo de visual</th><th>Por quê?</th></tr></thead>
+          <tbody>
+            <tr><td>1–3</td><td>4 KPIs principais</td><td>Células formatadas com fórmulas</td><td>Visão imediata dos números-chave</td></tr>
+            <tr><td>4–14</td><td>Vendas por região</td><td>Gráfico de colunas</td><td>Comparação entre categorias distintas</td></tr>
+            <tr><td>4–14</td><td>Evolução mensal</td><td>Gráfico de linhas</td><td>Mostrar tendência ao longo do tempo</td></tr>
+            <tr><td>15–22</td><td>Mix de produtos</td><td>Gráfico de pizza</td><td>Mostrar proporção entre partes</td></tr>
+            <tr><td>Lateral D</td><td>Filtro interativo</td><td>Segmentação de dados</td><td>Permitir exploração sem editar fórmulas</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <div class="tip-icon"></div>
+      <div><strong>Critérios de avaliação sugeridos:</strong> (1) Todos os 4 KPIs estão presentes e corretos — 20 pts; (2) 3 gráficos criados com tipo adequado — 30 pts; (3) Segmentação funcional conectada aos gráficos — 20 pts; (4) Reflexão final respondida com argumentos — 30 pts.</div>
+    </div>
+
+    <div class="dl-row">
+      <button class="dl-btn primary" onclick="downloadCSV('D')">
+        <svg class="dl-icon" viewBox="0 0 16 16"><path d="M8 12l-4-4h2.5V3h3v5H12L8 12zM3 13h10v1H3z"/></svg>
+        Baixar planilha modelo (.csv)
+      </button>
+      <button class="dl-btn" onclick="downloadRoteiro('D')">
+        <svg class="dl-icon" viewBox="0 0 16 16"><path d="M4 1h6l4 4v10H4V1zm6 0v4h4M6 9h5M6 11h5M6 7h3"/></svg>
+        Baixar roteiro (.txt)
+      </button>
+    </div>
+  </div>
+
+</main>
+
+<footer class="page-footer">
+  <p>Business Intelligence · Exercício Formativo · © 2024</p>
+</footer>
+
+<script>
+function showMod(idx) {
+  document.querySelectorAll('.mod-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('mod'+idx).classList.add('active');
+  document.querySelectorAll('.tab-btn')[idx].classList.add('active');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+const csvData = {
+  A: `ID,Nome,Cidade,Região,Vendas (R$),Data
+001,ana silva,São Paulo,Sudeste,1200,01/03/2024
+002,JOÃO SOUZA,,Sul,850,2024-03-02
+003,Ana Silva,São Paulo,sudeste,1200,01/03/2024
+004,Maria  Costa,Curitiba,Sul,-50,03/03/2024
+005,Pedro Lima,RJ,Sudeste,2100,04/03/2024
+006,carla santos,Belo Horizonte,Sudeste,1750,05/03/2024
+007,Marcos Alves,POA,Sul,3200,06/03/2024
+008,marcos alves,Porto Alegre,Sul,3200,06/03/2024
+009,Julia Rocha,Salvador,Nordeste,980,07/03/2024
+010,Fernanda Lima,,Nordeste,1450,08/03/2024
+011,Ricardo Nunes,São Paulo,Sudeste,900,09/03/2024
+012,Paula Meireles,Florianópolis,Sul,2300,10/03/2024
+013,Bruno Teixeira,São Paulo,sudeste,2800,11/03/2024
+014,lucia ferreira,Salvador,nordeste,750,12/03/2024
+015,DIEGO MOURA,Curitiba,Sul,1900,13/03/2024`,
+
+  B: `ID,Vendedor,Região,Produto,Vendas (R$),Mês
+001,Ana Silva,Sudeste,Produto A,1200,Março
+002,João Souza,Sul,Produto B,850,Março
+003,Maria Costa,Sul,Produto A,2900,Março
+004,Pedro Lima,Sudeste,Produto C,2100,Março
+005,Carla Santos,Sudeste,Produto B,3100,Março
+006,Marcos Alves,Sul,Produto B,3500,Março
+007,Julia Rocha,Nordeste,Produto C,2200,Março
+008,Fernanda Lima,Nordeste,Produto A,1800,Março
+009,Ricardo Nunes,Sudeste,Produto A,900,Março
+010,Paula Meireles,Sul,Produto C,1200,Março
+011,Bruno Teixeira,Sudeste,Produto B,2800,Março
+012,Lucia Ferreira,Nordeste,Produto B,900,Março
+013,Diego Moura,Sul,Produto A,700,Fevereiro
+014,Amanda Cruz,Sudeste,Produto C,1800,Fevereiro
+015,Rafael Borges,Nordeste,Produto A,980,Fevereiro
+016,Ana Silva,Sudeste,Produto B,1400,Fevereiro
+017,João Souza,Sul,Produto C,1100,Fevereiro
+018,Maria Costa,Sul,Produto B,1600,Fevereiro
+019,Pedro Lima,Sudeste,Produto A,2300,Fevereiro
+020,Carla Santos,Sudeste,Produto C,1750,Fevereiro`,
+
+  C: `ID,Vendedor,Região,Produto,Vendas (R$),Mês
+001,Ana Silva,Sudeste,Produto A,1200,Março
+002,João Souza,Sul,Produto B,850,Março
+003,Maria Costa,Sul,Produto A,2900,Março
+004,Pedro Lima,Sudeste,Produto C,2100,Março
+005,Carla Santos,Sudeste,Produto B,3100,Março
+006,Marcos Alves,Sul,Produto B,3500,Março
+007,Julia Rocha,Nordeste,Produto C,2200,Março
+008,Fernanda Lima,Nordeste,Produto A,1800,Março
+009,Ricardo Nunes,Sudeste,Produto A,900,Março
+010,Paula Meireles,Sul,Produto C,1200,Março
+011,Bruno Teixeira,Sudeste,Produto B,2800,Março
+012,Lucia Ferreira,Nordeste,Produto B,900,Março
+013,Diego Moura,Sul,Produto A,700,Fevereiro
+014,Amanda Cruz,Sudeste,Produto C,1800,Fevereiro
+015,Rafael Borges,Nordeste,Produto A,980,Fevereiro
+016,Ana Silva,Sudeste,Produto B,1400,Fevereiro
+017,João Souza,Sul,Produto C,1100,Fevereiro
+018,Maria Costa,Sul,Produto B,1600,Fevereiro
+019,Pedro Lima,Sudeste,Produto A,2300,Fevereiro
+020,Carla Santos,Sudeste,Produto C,1750,Fevereiro
+021,Marcos Alves,Sul,Produto A,1100,Janeiro
+022,Julia Rocha,Nordeste,Produto C,880,Janeiro
+023,Fernanda Lima,Nordeste,Produto B,1200,Janeiro
+024,Ricardo Nunes,Sudeste,Produto B,1950,Janeiro
+025,Paula Meireles,Sul,Produto A,2100,Janeiro`,
+
+  D: generateD()
+};
+
+function generateD() {
+  const rows = ['ID,Vendedor,Região,Produto,Vendas (R$),Mês'];
+  const regioes = ['Sudeste','Sul','Nordeste'];
+  const produtos = ['Produto A','Produto B','Produto C'];
+  const nomes = ['Ana Silva','João Souza','Maria Costa','Pedro Lima','Carla Santos','Marcos Alves','Julia Rocha','Fernanda Lima','Ricardo Nunes','Paula Meireles'];
+  const meses = ['Janeiro','Fevereiro','Março'];
+  let id = 1;
+  meses.forEach(mes => {
+    nomes.forEach((nome, i) => {
+      const reg = regioes[i % 3];
+      const prod = produtos[(i + meses.indexOf(mes)) % 3];
+      const base = [1200,850,2900,2100,3100,3500,2200,1800,900,1200][i];
+      const val = base + (meses.indexOf(mes) * 150) + (i * 37 % 400);
+      rows.push(`${String(id).padStart(3,'0')},${nome},${reg},${prod},${val},${mes}`);
+      id++;
+    });
+  });
+  return rows.join('\n');
+}
+
+const roteiros = {
+  A: `MÓDULO A — LIMPEZA E TRANSFORMAÇÃO DE DADOS
+Business Intelligence · Exercício Formativo
+Duração estimada: 30 minutos
+
+OBJETIVOS
+- Identificar dados ausentes, duplicados e fora de padrão
+- Usar filtros e formatação condicional para visualizar problemas
+- Padronizar texto com MAIÚSCULA, ARRUMAR, SUBSTITUIR
+- Remover duplicatas e documentar o processo
+
+ROTEIRO
+1. Abrir a planilha modelo
+   - Importe o arquivo modulo_a_dados_brutos.csv no Google Sheets
+   - Vá em Arquivo → Fazer uma cópia para não editar o original
+
+2. Inspecionar os dados
+   - Não edite nada ainda
+   - Crie uma aba "Observações" e anote 3+ problemas encontrados
+
+3. Aplicar formatação condicional
+   - Selecione coluna C (Cidade) e coluna F (Data)
+   - Formatar → Formatação condicional → destaque células vazias em vermelho
+
+4. Padronizar os nomes
+   - Crie coluna H com cabeçalho "Nome_limpo"
+   - Use: =MAIÚSCULA(ARRUMAR(B2))
+   - Cole como Valores e substitua a coluna B
+
+5. Corrigir abreviações
+   - Editar → Localizar e substituir (Ctrl+H)
+   - Substitua "RJ" por "Rio de Janeiro" e "POA" por "Porto Alegre"
+
+6. Remover duplicatas
+   - Dados → Limpeza de dados → Remover cópias
+   - Anote quantas linhas foram removidas
+
+7. Documentar
+   - Na aba Observações: registros originais, problemas encontrados,
+     registros após limpeza, nota de qualidade (0–10)
+
+ENTREGA: Compartilhe o link da planilha no Google Classroom.
+`,
+
+  B: `MÓDULO B — FÓRMULAS E ANÁLISE DE DADOS
+Business Intelligence · Exercício Formativo
+Duração estimada: 35 minutos
+
+OBJETIVOS
+- Calcular totais e médias com SOMA e MÉDIA
+- Usar SOMASE e CONT.SE para análises condicionais
+- Criar rankings com MAIOR
+- Categorizar desempenho com SE
+
+ROTEIRO
+1. Abrir a planilha de vendas
+   - Importe modulo_b_vendas.csv no Google Sheets
+
+2. Criar a aba de análise
+   - Nova aba chamada "Análise"
+   - Adicione rótulos: Total de Vendas, Média, Maior Venda, Menor Venda, Nº Transações
+
+3. Métricas gerais
+   - =SOMA(Dados!E:E)
+   - =MÉDIA(Dados!E:E)
+   - =MÁXIMO(Dados!E:E)
+   - =MÍNIMO(Dados!E:E)
+
+4. Vendas por região com SOMASE
+   - =SOMASE(Dados!C:C,"Sudeste",Dados!E:E)
+   - Repita para Sul e Nordeste
+   - Verifique: soma das regiões = total geral?
+
+5. Classificar vendedores
+   - Na coluna F dos dados: =SE(E2>=2000,"Alto","Baixo")
+   - Conte: =CONT.SE(Dados!F:F,"Alto")
+
+6. Ranking Top 5
+   - =MAIOR(Dados!E:E,1) até =MAIOR(Dados!E:E,5)
+
+7. Responder na aba Análise
+   - Qual região lidera? Qual % é alto desempenho?
+   - Diferença entre Março e Fevereiro?
+
+ENTREGA: Compartilhe o link da planilha no Google Classroom.
+`,
+
+  C: `MÓDULO C — TABELA DINÂMICA (PIVOT TABLE)
+Business Intelligence · Exercício Formativo
+Duração estimada: 40 minutos
+
+OBJETIVOS
+- Criar tabela dinâmica a partir de dados brutos
+- Configurar linhas, colunas, valores e filtros
+- Cruzar Região × Produto
+- Interpretar resultados e tirar conclusões
+
+ROTEIRO
+1. Preparar os dados
+   - Importe modulo_c_pivot.csv no Google Sheets
+   - Verifique que todos os cabeçalhos estão na linha 1
+
+2. Inserir tabela dinâmica
+   - Clique dentro dos dados → Inserir → Tabela dinâmica → Nova planilha
+
+3. Configurar Região × Produto
+   - Linhas: Região
+   - Colunas: Produto
+   - Valores: Vendas (R$) com função SOMA
+
+4. Filtro por mês
+   - Filtros: adicione o campo Mês
+   - Selecione Março → anote os valores
+   - Selecione Fevereiro → anote os valores
+
+5. Segunda tabela — contagem
+   - Nova tabela dinâmica: Vendedor nas Linhas, CONT de Vendas nos Valores
+
+6. Ticket médio
+   - Adicione coluna manual: =SOMA_vendedor/CONT_vendedor
+
+7. Conclusões (aba "Conclusões")
+   - Qual região vendeu mais?
+   - Melhor produto no Sul?
+   - Quem tem maior ticket médio?
+   - Por que ticket médio importa?
+
+ENTREGA: Compartilhe o link da planilha no Google Classroom.
+`,
+
+  D: `MÓDULO D — DASHBOARD E VISUALIZAÇÃO
+Business Intelligence · Exercício Formativo
+Duração estimada: 45 minutos
+
+OBJETIVOS
+- Criar gráficos de linhas, barras e pizza
+- Usar Segmentação de dados para filtros interativos
+- Organizar painel visual com KPIs e gráficos
+- Escolher tipo de gráfico correto para cada dado
+
+ROTEIRO
+1. Preparar aba Dashboard
+   - Nova aba "Dashboard"
+   - Exibir → desmarque Linhas de grade
+
+2. KPIs no topo (células B2:E4)
+   - Total de Vendas: =Análise!B2 (ou fórmula direta)
+   - Ticket Médio, Nº Transações, Melhor Região
+   - Formate com fundo colorido e fonte grande
+
+3. Gráfico de colunas — regiões
+   - Selecione tabela de totais por região
+   - Inserir → Gráfico de colunas → mova para Dashboard
+
+4. Gráfico de linhas — evolução mensal
+   - Crie tabela: Mês | Total de Vendas (use SOMASE)
+   - Inserir → Gráfico de linhas → mova para Dashboard
+
+5. Gráfico de pizza — mix de produtos
+   - Crie tabela: Produto | Total de Vendas
+   - Inserir → Gráfico de pizza → mova para Dashboard
+
+6. Segmentação de dados
+   - Na aba da tabela dinâmica: Dados → Adicionar segmentação → Região
+   - Cole a segmentação no Dashboard
+
+7. Reflexão final (aba "Conclusões")
+   - Por que barras para regiões e não pizza?
+   - O que mudaria para público operacional?
+   - Que dado importante está faltando?
+
+CRITÉRIOS DE AVALIAÇÃO:
+- 4 KPIs presentes e corretos: 20 pts
+- 3 gráficos com tipo adequado: 30 pts
+- Segmentação funcional: 20 pts
+- Reflexão com argumentos: 30 pts
+
+ENTREGA: Compartilhe o link da planilha no Google Classroom.
+`
+};
+
+function downloadCSV(mod) {
+  const blob = new Blob(['\uFEFF' + csvData[mod]], {type: 'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `modulo_${mod.toLowerCase()}_bi_sheets.csv`;
+  a.click();
+}
+
+function downloadRoteiro(mod) {
+  const blob = new Blob([roteiros[mod]], {type: 'text/plain;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `roteiro_modulo_${mod.toLowerCase()}_bi.txt`;
+  a.click();
+}
+</script>
+</body>
+</html>
