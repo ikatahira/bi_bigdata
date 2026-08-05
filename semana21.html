@@ -236,6 +236,12 @@ table.cmp td{ color:#c7dde3; }
 .mission-step.done span.txt{ color:var(--mist); text-decoration:line-through; }
 .mission-step .txt{ font-size:0.95em; }
 .mission-deliverable{ margin-top:18px; font-size:0.88em; color:var(--foam); font-family:var(--font-mono); background:rgba(45,226,200,0.06); border:1px solid rgba(45,226,200,0.25); padding:12px 16px; border-radius:8px; }
+.solution-details{ margin-top:18px; border:1px solid rgba(255,255,255,0.12); border-radius:10px; padding:14px 18px; background:rgba(0,0,0,0.15); }
+.solution-details summary{ cursor:pointer; font-family:var(--font-display); font-size:0.98em; color:var(--foam); list-style:none; }
+.solution-details summary::-webkit-details-marker{ display:none; }
+.solution-details summary::before{ content:'▸ '; color:var(--bioluminescent); }
+.solution-details[open] summary::before{ content:'▾ '; }
+.solution-details p{ font-size:0.9em; }
 .kaggle-link{ display:inline-flex; align-items:center; gap:8px; margin-top:16px; color:var(--bioluminescent); text-decoration:none; font-family:var(--font-mono); font-size:0.85em; border-bottom:1px dashed var(--bioluminescent); }
 code.inline{ background:rgba(255,255,255,0.08); padding:2px 7px; border-radius:5px; font-family:var(--font-mono); font-size:0.9em; color:var(--gold); }
 pre.code-block{ background:#03080e; border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:16px 18px; overflow-x:auto; font-family:var(--font-mono); font-size:0.85em; color:#a8e6d9; margin:16px 0; }
@@ -369,6 +375,37 @@ pre.code-block{ background:#03080e; border:1px solid rgba(255,255,255,0.1); bord
       </ul>
       <a class="kaggle-link" href="https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce" target="_blank">↗ kaggle.com/datasets/olistbr/brazilian-ecommerce</a>
       <div class="mission-deliverable">📝 Entregável: uma "Ficha de Mergulho" de meia página respondendo — quantas tabelas? quantas linhas ao todo? isso é Big Data segundo o que vimos hoje? justifique com um dos critérios (volume, velocidade ou variedade).</div>
+
+      <details class="solution-details">
+        <summary>💡 Resolução: contar arquivos e linhas em Python</summary>
+        <p style="margin-top:14px;">Se vocês abriram o dataset em um Kaggle Notebook, este script conta quantos arquivos CSV existem e quantas linhas cada um tem, sem precisar carregar tudo na memória de uma vez:</p>
+        <pre class="code-block">import os
+import pandas as pd
+
+total_linhas = 0
+arquivos_info = []
+
+for dirname, _, filenames in os.walk('/kaggle/input'):
+    for filename in filenames:
+        caminho = os.path.join(dirname, filename)
+        if filename.endswith('.csv'):
+            try:
+                # conta linhas sem carregar o arquivo inteiro na memória
+                with open(caminho, 'r', encoding='utf-8', errors='ignore') as f:
+                    n_linhas = sum(1 for _ in f) - 1  # -1 para desconsiderar o cabeçalho
+                arquivos_info.append((filename, n_linhas))
+                total_linhas += n_linhas
+            except Exception as e:
+                print(f"Erro ao ler {filename}: {e}")
+
+print(f"Quantidade de arquivos CSV: {len(arquivos_info)}\n")
+for nome, linhas in arquivos_info:
+    print(f"{nome}: {linhas:,} linhas")
+
+print(f"\nTotal de linhas (somando todos os arquivos): {total_linhas:,}")</pre>
+        <p>Repare que ele conta as linhas lendo o arquivo linha a linha (<code class="inline">sum(1 for _ in f)</code>) em vez de carregar tudo com <code class="inline">pd.read_csv()</code> de uma vez — uma boa prática quando ainda não se sabe o tamanho do arquivo.</p>
+        <a class="kaggle-link" href="https://www.kaggle.com/code/ikatahira1/notebook1898ad8284" target="_blank">↗ Ver notebook completo no Kaggle</a>
+      </details>
     </div>
   </div>
 </section>
