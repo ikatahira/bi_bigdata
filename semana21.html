@@ -7,7 +7,271 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/dive-theme.css">
+<style>
+/* ===========================================================
+   DIVE THEME — estilo compartilhado do projeto "Data Diver"
+   Usado pelas páginas semana21.html a semana25.html (BDN007)
+   =========================================================== */
+:root{
+  --abyss-black:#040b14;
+  --mid-teal:#0f3a52;
+  --bioluminescent:#2de2c8;
+  --bioluminescent-dim:#1a9e8c;
+  --gold:#f5b942;
+  --coral:#ff6b6b;
+  --foam:#eaf6f6;
+  --mist:#8fadbc;
+  --font-display:'Space Grotesk', sans-serif;
+  --font-body:'Inter', sans-serif;
+  --font-mono:'JetBrains Mono', monospace;
+}
+
+/* Tons de cada zona (mais escuro conforme a semana avança) */
+body[data-zone="1"]{ --z-top:#0c2438; --z-mid:#071726; --z-bot:#050f1c; }
+body[data-zone="2"]{ --z-top:#0a2334; --z-mid:#0a1f30; --z-bot:#081a28; }
+body[data-zone="3"]{ --z-top:#081a28; --z-mid:#071522; --z-bot:#060f1a; }
+body[data-zone="4"]{ --z-top:#060f1a; --z-mid:#050c15; --z-bot:#040a10; }
+body[data-zone="5"]{ --z-top:#040a10; --z-mid:#03070c; --z-bot:#020508; }
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:var(--font-body);
+  background:var(--abyss-black);
+  color:var(--foam);
+  line-height:1.65;
+  padding-top:98px;
+  overflow-x:hidden;
+}
+strong{color:var(--foam);}
+
+/* ---------- HUD ---------- */
+#hud{
+  position:fixed; top:0; left:0; right:0; height:56px; z-index:1000;
+  background:rgba(4,11,20,0.92);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid rgba(45,226,200,0.25);
+  display:flex; align-items:center; gap:18px;
+  padding:0 20px;
+}
+#hud .depth-track{
+  flex:1; height:8px; background:#0d2233; border-radius:6px; position:relative; overflow:hidden;
+  box-shadow:inset 0 0 4px rgba(0,0,0,0.6);
+}
+#hud .depth-fill{
+  position:absolute; left:0; top:0; bottom:0; width:0%;
+  background:linear-gradient(90deg, var(--bioluminescent-dim), var(--bioluminescent));
+  transition:width 0.6s ease;
+}
+#hud .depth-label{ font-family:var(--font-mono); font-size:0.72em; color:var(--mist); white-space:nowrap; min-width:96px; }
+#hud .xp-label{ font-family:var(--font-mono); font-weight:700; color:var(--gold); font-size:0.85em; white-space:nowrap; }
+#hud .badges{ display:flex; gap:6px; font-size:1.1em; min-width:70px; justify-content:flex-end; }
+#hud .badges span{ opacity:0.15; transition:opacity 0.4s, transform 0.4s; }
+#hud .badges span.on{ opacity:1; transform:scale(1.15); }
+
+/* ---------- MODULE MAP (trilha do projeto) ---------- */
+#moduleMap{
+  position:fixed; top:56px; left:0; right:0; z-index:999;
+  background:rgba(4,11,20,0.85); backdrop-filter:blur(6px);
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  display:flex; justify-content:center; gap:0; padding:8px 10px; overflow-x:auto;
+}
+.map-node{
+  display:flex; flex-direction:column; align-items:center; gap:2px;
+  padding:4px 14px; text-decoration:none; position:relative; min-width:76px;
+  font-family:var(--font-mono); flex-shrink:0;
+}
+.map-node .dot{
+  width:11px; height:11px; border-radius:50%; background:#213244; border:2px solid rgba(255,255,255,0.15);
+  transition:all 0.3s;
+}
+.map-node .num{ font-size:0.62em; color:var(--mist); margin-top:3px; }
+.map-node .zn{ font-size:0.56em; color:#5c7788; white-space:nowrap; }
+.map-node::after{
+  content:''; position:absolute; top:10px; right:-6px; width:12px; height:2px; background:rgba(255,255,255,0.1);
+}
+.map-node:last-child::after{ display:none; }
+.map-node.current .dot{ background:var(--bioluminescent); border-color:var(--bioluminescent); box-shadow:0 0 10px var(--bioluminescent); }
+.map-node.current .num, .map-node.current .zn{ color:var(--bioluminescent); }
+.map-node.done .dot{ background:var(--gold); border-color:var(--gold); }
+@media (max-width:640px){
+  body{ padding-top:120px; }
+  .map-node{ min-width:60px; padding:4px 8px; }
+}
+
+/* ---------- HERO ---------- */
+.hero{
+  min-height:80vh; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; padding:50px 20px;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(45,226,200,0.12), transparent 60%),
+    linear-gradient(180deg, var(--z-top) 0%, var(--z-mid) 55%, var(--z-bot) 100%);
+  position:relative; overflow:hidden;
+}
+.bubble{
+  position:absolute; bottom:-40px; border-radius:50%;
+  background:rgba(234,246,246,0.08); border:1px solid rgba(234,246,246,0.15);
+  animation:rise linear infinite;
+}
+@keyframes rise{ to{ transform:translateY(-110vh) translateX(var(--drift,0px)); opacity:0; } }
+.hero .eyebrow{
+  font-family:var(--font-mono); letter-spacing:0.15em; color:var(--bioluminescent); font-size:0.85em;
+  text-transform:uppercase; margin-bottom:18px;
+}
+.hero h1{
+  font-family:var(--font-display); font-weight:700; font-size:clamp(2em, 5.5vw, 3.6em);
+  color:var(--foam); line-height:1.08; margin-bottom:14px;
+  text-shadow:0 0 40px rgba(45,226,200,0.25);
+}
+.hero .subtitle{ font-family:var(--font-display); font-size:1.2em; color:var(--bioluminescent); margin-bottom:20px; }
+.hero p.lead{ max-width:640px; color:var(--mist); font-size:1.1em; margin-bottom:30px; }
+.dive-btn{
+  font-family:var(--font-display); font-weight:700; font-size:1.02em;
+  background:var(--bioluminescent); color:var(--abyss-black); border:none;
+  padding:15px 36px; border-radius:40px; cursor:pointer;
+  box-shadow:0 0 30px rgba(45,226,200,0.4);
+  transition:transform 0.25s, box-shadow 0.25s;
+  text-decoration:none; display:inline-block;
+}
+.dive-btn:hover{ transform:translateY(-3px); box-shadow:0 0 45px rgba(45,226,200,0.6); }
+.scroll-hint{ margin-top:40px; color:var(--mist); font-size:0.8em; font-family:var(--font-mono); animation:bob 2s ease-in-out infinite; }
+@keyframes bob{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(8px);} }
+
+/* ---------- SECTIONS / ZONE BODY ---------- */
+.zone{ padding:80px 20px 90px; position:relative; background:linear-gradient(180deg, var(--z-top) 0%, var(--z-mid) 45%, var(--z-bot) 100%); }
+.zone-inner{ max-width:900px; margin:0 auto; }
+.zone-tag{
+  font-family:var(--font-mono); font-size:0.78em; color:var(--bioluminescent);
+  letter-spacing:0.12em; text-transform:uppercase; margin-bottom:10px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+}
+.zone-tag .depth-range{ color:var(--mist); }
+.zone h2{ font-family:var(--font-display); font-weight:700; font-size:clamp(1.6em,4vw,2.4em); color:var(--foam); margin-bottom:20px; }
+.zone h3.sub{ font-family:var(--font-display); font-size:1.3em; color:var(--bioluminescent); margin:30px 0 14px; }
+.zone p{ color:#c7dde3; margin-bottom:16px; font-size:1.02em; max-width:70ch; }
+
+/* ---------- FLIP CARDS ---------- */
+.card-row{ display:grid; grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); gap:20px; margin:26px 0; }
+.flip-card{ perspective:1000px; height:200px; cursor:pointer; }
+.flip-inner{ position:relative; width:100%; height:100%; transition:transform 0.6s; transform-style:preserve-3d; }
+.flip-card.flipped .flip-inner{ transform:rotateY(180deg); }
+.flip-front, .flip-back{ position:absolute; inset:0; backface-visibility:hidden; border-radius:14px; padding:22px; display:flex; flex-direction:column; justify-content:center; }
+.flip-front{ background:rgba(45,226,200,0.06); border:1px solid rgba(45,226,200,0.35); }
+.flip-front .icon{ font-size:1.7em; margin-bottom:10px; }
+.flip-front h4{ font-family:var(--font-display); color:var(--bioluminescent); font-size:1.1em; }
+.flip-front .hint{ margin-top:auto; font-family:var(--font-mono); font-size:0.68em; color:var(--mist); }
+.flip-back{ background:var(--mid-teal); transform:rotateY(180deg); font-size:0.9em; color:var(--foam); border:1px solid rgba(45,226,200,0.5); }
+
+/* ---------- QUIZ ---------- */
+.quiz-block{ background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:26px; margin:26px 0; }
+.quiz-block .q-label{ font-family:var(--font-mono); font-size:0.72em; color:var(--gold); margin-bottom:10px; text-transform:uppercase; letter-spacing:0.08em; }
+.quiz-block h3{ font-family:var(--font-display); font-size:1.2em; margin-bottom:16px; color:var(--foam); }
+.options{ display:flex; flex-direction:column; gap:10px; }
+.opt-btn{ text-align:left; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); color:var(--foam); padding:13px 17px; border-radius:10px; cursor:pointer; font-size:0.96em; font-family:var(--font-body); transition:all 0.2s; }
+.opt-btn:hover:not(:disabled){ background:rgba(45,226,200,0.1); border-color:var(--bioluminescent); }
+.opt-btn.correct{ background:rgba(45,226,200,0.18); border-color:var(--bioluminescent); color:var(--bioluminescent); }
+.opt-btn.wrong{ background:rgba(255,107,107,0.15); border-color:var(--coral); color:#ffb3b3; }
+.opt-btn:disabled{ cursor:default; opacity:0.75; }
+.feedback{ margin-top:14px; font-size:0.88em; font-family:var(--font-mono); min-height:1.2em; }
+.feedback.ok{ color:var(--bioluminescent); }
+.feedback.bad{ color:var(--coral); }
+
+/* ---------- TRUE/FALSE ---------- */
+.tf-item{ background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:16px 18px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap; }
+.tf-item p{ margin:0; flex:1; min-width:220px; }
+.tf-buttons{ display:flex; gap:8px; }
+.tf-btn{ font-family:var(--font-mono); font-weight:700; font-size:0.78em; padding:9px 15px; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:transparent; color:var(--foam); cursor:pointer; }
+.tf-btn.true-btn:hover:not(:disabled){ border-color:var(--bioluminescent); color:var(--bioluminescent); }
+.tf-btn.false-btn:hover:not(:disabled){ border-color:var(--coral); color:var(--coral); }
+.tf-btn.chosen-correct{ background:rgba(45,226,200,0.2); border-color:var(--bioluminescent); color:var(--bioluminescent); }
+.tf-btn.chosen-wrong{ background:rgba(255,107,107,0.2); border-color:var(--coral); color:#ffb3b3; }
+.tf-btn:disabled{ cursor:default; }
+.tf-explain{ flex-basis:100%; font-size:0.83em; color:var(--mist); font-family:var(--font-mono); display:none; }
+.tf-item.answered .tf-explain{ display:block; }
+
+/* ---------- CLASSIFY GAME ---------- */
+.classify-stage{ background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:28px; margin:26px 0; text-align:center; }
+.classify-card{ font-family:var(--font-display); font-size:1.2em; color:var(--foam); background:var(--mid-teal); border-radius:12px; padding:24px; margin-bottom:20px; min-height:70px; display:flex; align-items:center; justify-content:center; }
+.classify-buttons{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+.classify-btn{ font-family:var(--font-mono); font-size:0.82em; font-weight:700; padding:12px 18px; border-radius:10px; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.04); color:var(--foam); cursor:pointer; transition:all 0.2s; }
+.classify-btn:hover:not(:disabled){ border-color:var(--bioluminescent); }
+.classify-progress{ margin-top:16px; font-family:var(--font-mono); font-size:0.78em; color:var(--mist); }
+.classify-feedback{ margin-top:14px; font-family:var(--font-mono); font-size:0.92em; min-height:1.4em; }
+
+/* ---------- COMPARISON TABLE ---------- */
+table.cmp{ width:100%; border-collapse:collapse; margin:24px 0; font-size:0.9em; }
+table.cmp th, table.cmp td{ padding:11px 13px; border-bottom:1px solid rgba(255,255,255,0.1); text-align:left; }
+table.cmp th{ font-family:var(--font-mono); color:var(--bioluminescent); font-size:0.76em; text-transform:uppercase; letter-spacing:0.05em; }
+table.cmp td{ color:#c7dde3; }
+
+/* ---------- SCENARIOS ---------- */
+.scenario{ background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:20px; margin-bottom:14px; }
+.scenario p.text{ margin-bottom:12px; }
+.scenario-buttons{ display:flex; gap:10px; flex-wrap:wrap; }
+.scenario-btn{ flex:1; min-width:140px; font-family:var(--font-mono); font-weight:700; font-size:0.82em; padding:11px; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:transparent; color:var(--foam); cursor:pointer; }
+.scenario-btn:disabled{ cursor:default; }
+.scenario-btn.right{ background:rgba(45,226,200,0.2); border-color:var(--bioluminescent); color:var(--bioluminescent); }
+.scenario-btn.wrongpick{ background:rgba(255,107,107,0.2); border-color:var(--coral); color:#ffb3b3; }
+.scenario-explain{ margin-top:10px; font-size:0.83em; color:var(--mist); display:none; font-family:var(--font-mono); }
+.scenario.answered .scenario-explain{ display:block; }
+
+/* ---------- MISSION / PROJECT LOG ---------- */
+.mission-card{
+  background:linear-gradient(135deg, rgba(245,185,66,0.07), rgba(245,185,66,0.02));
+  border:1px solid rgba(245,185,66,0.35); border-radius:16px; padding:28px; margin:30px 0;
+}
+.mission-card .m-label{ font-family:var(--font-mono); font-size:0.72em; color:var(--gold); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:8px; }
+.mission-card h3{ font-family:var(--font-display); font-size:1.35em; color:var(--foam); margin-bottom:14px; }
+.mission-card .m-context{ background:rgba(0,0,0,0.2); border-left:3px solid var(--gold); padding:12px 16px; border-radius:6px; font-size:0.9em; color:var(--mist); margin-bottom:18px; }
+.mission-steps{ list-style:none; display:flex; flex-direction:column; gap:10px; }
+.mission-step{
+  display:flex; align-items:flex-start; gap:12px; cursor:pointer; padding:12px 14px; border-radius:10px;
+  background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); transition:all 0.25s;
+}
+.mission-step:hover{ border-color:var(--gold); }
+.mission-step .check{
+  flex-shrink:0; width:22px; height:22px; border-radius:6px; border:2px solid var(--gold);
+  display:flex; align-items:center; justify-content:center; font-size:0.75em; margin-top:1px; transition:all 0.25s;
+}
+.mission-step.done .check{ background:var(--gold); color:var(--abyss-black); }
+.mission-step.done span.txt{ color:var(--mist); text-decoration:line-through; }
+.mission-step .txt{ font-size:0.95em; }
+.mission-deliverable{ margin-top:18px; font-size:0.88em; color:var(--foam); font-family:var(--font-mono); background:rgba(45,226,200,0.06); border:1px solid rgba(45,226,200,0.25); padding:12px 16px; border-radius:8px; }
+.kaggle-link{ display:inline-flex; align-items:center; gap:8px; margin-top:16px; color:var(--bioluminescent); text-decoration:none; font-family:var(--font-mono); font-size:0.85em; border-bottom:1px dashed var(--bioluminescent); }
+code.inline{ background:rgba(255,255,255,0.08); padding:2px 7px; border-radius:5px; font-family:var(--font-mono); font-size:0.9em; color:var(--gold); }
+pre.code-block{ background:#03080e; border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:16px 18px; overflow-x:auto; font-family:var(--font-mono); font-size:0.85em; color:#a8e6d9; margin:16px 0; }
+
+/* ---------- SEQUENTIAL / FINAL QUIZ PROGRESS ---------- */
+.seq-progress{ font-family:var(--font-mono); font-size:0.78em; color:var(--gold); margin-bottom:8px; }
+
+/* ---------- RESULT ---------- */
+.result{
+  min-height:75vh; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; padding:60px 20px;
+  background:radial-gradient(ellipse at 50% 30%, rgba(245,185,66,0.12), transparent 60%), var(--abyss-black);
+}
+.result .medal{ font-size:3.6em; margin-bottom:18px; }
+.result h2{ font-family:var(--font-display); font-size:2em; margin-bottom:8px; }
+.result .rank{ font-family:var(--font-mono); color:var(--gold); font-size:1.05em; margin-bottom:24px; }
+.result .xp-final{ font-family:var(--font-mono); font-size:2.2em; color:var(--bioluminescent); margin-bottom:6px; }
+.result .xp-final-label{ color:var(--mist); font-family:var(--font-mono); font-size:0.78em; margin-bottom:30px; }
+.badge-shelf{ display:flex; gap:16px; margin-bottom:36px; flex-wrap:wrap; justify-content:center; }
+.badge-item{ display:flex; flex-direction:column; align-items:center; gap:6px; opacity:0.2; transition:opacity 0.5s; }
+.badge-item.on{ opacity:1; }
+.badge-item .emoji{ font-size:2em; }
+.badge-item .name{ font-family:var(--font-mono); font-size:0.62em; color:var(--mist); max-width:88px; }
+.result .note{ color:var(--mist); max-width:520px; font-size:0.92em; }
+
+/* ---------- NAVIGATION ---------- */
+.navigation{ display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap; padding:34px 20px; background:#020508; border-top:1px solid rgba(255,255,255,0.08); }
+.nav-button{ padding:14px 24px; background:rgba(45,226,200,0.1); border:1px solid rgba(45,226,200,0.4); color:var(--bioluminescent); text-decoration:none; border-radius:10px; font-weight:600; font-family:var(--font-display); transition:all 0.25s; font-size:0.92em; }
+.nav-button:hover{ background:var(--bioluminescent); color:var(--abyss-black); }
+
+@media (prefers-reduced-motion: reduce){
+  html{ scroll-behavior:auto; }
+  .bubble, .scroll-hint{ animation:none; }
+}
+
+</style>
 </head>
 <body data-zone="1">
 
@@ -128,7 +392,313 @@
   <a href="semana22.html" class="nav-button">Próxima Semana →</a>
 </div>
 
-<script src="assets/dive-theme.js"></script>
+<script>
+/* ===========================================================
+   DIVE ENGINE — funções compartilhadas do projeto "Data Diver"
+   =========================================================== */
+
+/* ---------- BUBBLES ---------- */
+function DiveInitBubbles(containerId, count){
+  const field = document.getElementById(containerId);
+  if(!field) return;
+  for(let i=0;i<count;i++){
+    const b = document.createElement('div');
+    const size = 6 + Math.random()*22;
+    b.className = 'bubble';
+    b.style.width = size+'px';
+    b.style.height = size+'px';
+    b.style.left = (Math.random()*100)+'%';
+    b.style.setProperty('--drift', (Math.random()*60-30)+'px');
+    b.style.animationDuration = (6+Math.random()*8)+'s';
+    b.style.animationDelay = (Math.random()*8)+'s';
+    field.appendChild(b);
+  }
+}
+
+/* ---------- MODULE MAP ---------- */
+function DiveInitModuleMap(currentWeek){
+  const weeks = [
+    {n:21, zn:'Epipelágica', dep:'0-200m'},
+    {n:22, zn:'Mesopelágica', dep:'200-1.000m'},
+    {n:23, zn:'Batipelágica', dep:'1.000-4.000m'},
+    {n:24, zn:'Abissopelágica', dep:'4.000-6.000m'},
+    {n:25, zn:'Hadal', dep:'6.000-11.000m'}
+  ];
+  const map = document.getElementById('moduleMap');
+  if(!map) return;
+  weeks.forEach(w=>{
+    const a = document.createElement('a');
+    a.href = 'semana'+w.n+'.html';
+    a.className = 'map-node' + (w.n===currentWeek ? ' current' : '') + (w.n<currentWeek ? ' done' : '');
+    a.innerHTML = `<div class="dot"></div><div class="num">S${w.n}</div><div class="zn">${w.dep}</div>`;
+    map.appendChild(a);
+  });
+}
+
+/* ---------- DEPTH HUD (scroll tracking) ---------- */
+function DiveInitDepthHUD(sections){
+  // sections: [{id, label, pct}, ...]
+  const depthLabel = document.getElementById('depthLabel');
+  const depthFill = document.getElementById('depthFill');
+  if(!depthLabel || !depthFill) return;
+  const observer = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        const meta = sections.find(s=>s.id===entry.target.id);
+        if(meta){
+          depthLabel.textContent = meta.label;
+          depthFill.style.width = meta.pct+'%';
+        }
+      }
+    });
+  },{threshold:0.4});
+  sections.forEach(s=>{
+    const el = document.getElementById(s.id);
+    if(el) observer.observe(el);
+  });
+}
+
+/* ---------- XP SYSTEM ---------- */
+function DiveCreateXP(maxXP){
+  let xp = 0;
+  const nowEl = document.getElementById('xpNow');
+  const maxEl = document.getElementById('xpMax');
+  const finalEl = document.getElementById('xpFinal');
+  if(maxEl) maxEl.textContent = maxXP;
+  return {
+    add(amount){
+      xp = Math.min(maxXP, xp + amount);
+      if(nowEl) nowEl.textContent = xp;
+      if(finalEl) finalEl.textContent = xp;
+    },
+    get(){ return xp; },
+    max(){ return maxXP; }
+  };
+}
+
+/* ---------- BADGES ---------- */
+function DiveCreateBadges(ids){
+  const unlocked = {};
+  ids.forEach(id=> unlocked[id]=false);
+  return {
+    unlock(id){
+      if(unlocked[id]) return;
+      unlocked[id] = true;
+      const hudEl = document.getElementById('b'+id);
+      const shelfEl = document.getElementById('shelf'+id);
+      if(hudEl) hudEl.classList.add('on');
+      if(shelfEl) shelfEl.classList.add('on');
+    }
+  };
+}
+
+/* ---------- SINGLE-CHOICE QUIZ ---------- */
+function DiveInitQuiz(blockEl, xpSys, correctXP, wrongXP, onDone){
+  const opts = blockEl.querySelectorAll('.opt-btn');
+  const correctIdx = parseInt(blockEl.querySelector('.options').dataset.correct);
+  const fb = blockEl.querySelector('.feedback');
+  let answered = false;
+  opts.forEach((btn, idx)=>{
+    btn.addEventListener('click', ()=>{
+      if(answered) return;
+      answered = true;
+      opts.forEach((b,i)=>{ b.disabled = true; if(i===correctIdx) b.classList.add('correct'); });
+      if(idx===correctIdx){
+        fb.textContent = '✔ Correto!';
+        fb.className = 'feedback ok';
+        xpSys.add(correctXP);
+      } else {
+        btn.classList.add('wrong');
+        fb.textContent = '✘ A resposta certa está destacada acima.';
+        fb.className = 'feedback bad';
+        xpSys.add(wrongXP);
+      }
+      if(onDone) onDone(idx===correctIdx);
+    });
+  });
+}
+
+/* ---------- TRUE / FALSE LIST ---------- */
+function DiveInitTFList(listEl, data, xpSys, correctXP, wrongXP, onAllDone){
+  let answeredCount = 0;
+  data.forEach(item=>{
+    const div = document.createElement('div');
+    div.className = 'tf-item';
+    div.innerHTML = `
+      <p>${item.text}</p>
+      <div class="tf-buttons">
+        <button class="tf-btn true-btn">Verdadeiro</button>
+        <button class="tf-btn false-btn">Mito</button>
+      </div>
+      <div class="tf-explain">${item.explain}</div>
+    `;
+    listEl.appendChild(div);
+    const trueBtn = div.querySelector('.true-btn');
+    const falseBtn = div.querySelector('.false-btn');
+    function resolve(pickedTrue){
+      trueBtn.disabled = true; falseBtn.disabled = true;
+      div.classList.add('answered');
+      const correct = (pickedTrue===item.answer);
+      const pickedBtn = pickedTrue ? trueBtn : falseBtn;
+      pickedBtn.classList.add(correct?'chosen-correct':'chosen-wrong');
+      if(!correct){ (item.answer?trueBtn:falseBtn).classList.add('chosen-correct'); }
+      xpSys.add(correct?correctXP:wrongXP);
+      answeredCount++;
+      if(answeredCount===data.length && onAllDone) onAllDone();
+    }
+    trueBtn.addEventListener('click', ()=>resolve(true));
+    falseBtn.addEventListener('click', ()=>resolve(false));
+  });
+}
+
+/* ---------- CLASSIFY GAME ---------- */
+function DiveInitClassify(cardEl, buttons, feedbackEl, progressEl, items, xpSys, correctXP, wrongXP, onAllDone){
+  let i = 0;
+  function render(){
+    if(i>=items.length){
+      cardEl.textContent = '✅ Todos os itens classificados!';
+      buttons.forEach(b=>b.disabled = true);
+      progressEl.textContent = 'Completo';
+      if(onAllDone) onAllDone();
+      return;
+    }
+    cardEl.textContent = items[i].label;
+    progressEl.textContent = `Item ${i+1} de ${items.length}`;
+    feedbackEl.textContent = '';
+    buttons.forEach(b=>b.disabled = false);
+  }
+  buttons.forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      if(i>=items.length) return;
+      const correct = items[i].cat === btn.dataset.cat;
+      if(correct){
+        feedbackEl.textContent = '✔ Correto: ' + items[i].cat;
+        feedbackEl.style.color = 'var(--bioluminescent)';
+        xpSys.add(correctXP);
+      } else {
+        feedbackEl.textContent = '✘ Era ' + items[i].cat;
+        feedbackEl.style.color = 'var(--coral)';
+        xpSys.add(wrongXP);
+      }
+      buttons.forEach(b=>b.disabled = true);
+      setTimeout(()=>{ i++; render(); }, 900);
+    });
+  });
+  render();
+}
+
+/* ---------- SCENARIOS ---------- */
+function DiveInitScenarios(listEl, scenarios, rightLabel, wrongLabel, xpSys, correctXP, wrongXP, onAllDone){
+  let answeredCount = 0;
+  scenarios.forEach(sc=>{
+    const div = document.createElement('div');
+    div.className = 'scenario';
+    div.innerHTML = `
+      <p class="text">${sc.text}</p>
+      <div class="scenario-buttons">
+        <button class="scenario-btn" data-val="true">${rightLabel}</button>
+        <button class="scenario-btn" data-val="false">${wrongLabel}</button>
+      </div>
+      <div class="scenario-explain">${sc.explain}</div>
+    `;
+    listEl.appendChild(div);
+    const btns = div.querySelectorAll('.scenario-btn');
+    btns.forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const picked = btn.dataset.val === 'true';
+        const correct = picked === sc.isTrue;
+        btns.forEach(b=>b.disabled = true);
+        div.classList.add('answered');
+        btn.classList.add(correct?'right':'wrongpick');
+        if(!correct){
+          const rightBtn = [...btns].find(b=> (b.dataset.val==='true')===sc.isTrue);
+          rightBtn.classList.add('right');
+        }
+        xpSys.add(correct?correctXP:wrongXP);
+        answeredCount++;
+        if(answeredCount===scenarios.length && onAllDone) onAllDone();
+      });
+    });
+  });
+}
+
+/* ---------- SEQUENTIAL (BOSS) QUIZ ---------- */
+function DiveInitSequentialQuiz(containerEl, progressEl, questions, xpSys, correctXP, wrongXP, xpPerQLabel, onAllDone){
+  let idx = 0;
+  function render(){
+    if(idx >= questions.length){
+      container_done();
+      return;
+    }
+    progressEl.textContent = `Pergunta ${idx+1} de ${questions.length}`;
+    const item = questions[idx];
+    const block = document.createElement('div');
+    block.className = 'quiz-block';
+    block.innerHTML = `
+      <div class="q-label">${xpPerQLabel}</div>
+      <h3>${item.q}</h3>
+      <div class="options" data-correct="${item.correct}">
+        ${item.opts.map(o=>`<button class="opt-btn">${o}</button>`).join('')}
+      </div>
+      <div class="feedback"></div>
+    `;
+    containerEl.innerHTML = '';
+    containerEl.appendChild(block);
+    const opts = block.querySelectorAll('.opt-btn');
+    const fb = block.querySelector('.feedback');
+    let answered = false;
+    opts.forEach((btn, i2)=>{
+      btn.addEventListener('click', ()=>{
+        if(answered) return;
+        answered = true;
+        opts.forEach((b,j)=>{ b.disabled = true; if(j===item.correct) b.classList.add('correct'); });
+        if(i2===item.correct){
+          fb.textContent = '✔ Correto!';
+          fb.className = 'feedback ok';
+          xpSys.add(correctXP);
+        } else {
+          btn.classList.add('wrong');
+          fb.textContent = '✘ A resposta certa está destacada.';
+          fb.className = 'feedback bad';
+          xpSys.add(wrongXP);
+        }
+        setTimeout(()=>{ idx++; render(); }, 1000);
+      });
+    });
+  }
+  function container_done(){
+    containerEl.innerHTML = '<p style="color:var(--bioluminescent); font-family:var(--font-mono);">🏆 Desafio concluído!</p>';
+    progressEl.textContent = 'Completo';
+    if(onAllDone) onAllDone();
+  }
+  render();
+}
+
+/* ---------- MISSION CHECKLIST ---------- */
+function DiveInitMissionChecklist(listEl, xpSys, xpPerStep){
+  const steps = listEl.querySelectorAll('.mission-step');
+  steps.forEach(step=>{
+    step.addEventListener('click', ()=>{
+      if(step.classList.contains('done')) return;
+      step.classList.add('done');
+      step.querySelector('.check').textContent = '✓';
+      xpSys.add(xpPerStep);
+    });
+  });
+}
+
+/* ---------- FINAL RESULT ---------- */
+function DiveFinalizeResult(xpSys, rankLabelEl){
+  const percent = xpSys.get() / xpSys.max();
+  let rank;
+  if(percent >= 0.9) rank = '🥇 Cientista de Dados Sênior';
+  else if(percent >= 0.7) rank = '🥈 Analista de Big Data';
+  else if(percent >= 0.45) rank = '🥉 Explorador em Treinamento';
+  else rank = '🔰 Estagiário Curioso';
+  rankLabelEl.textContent = rank;
+}
+
+</script>
 <script>
   DiveInitBubbles('bubbleField', 16);
   DiveInitModuleMap(21);
