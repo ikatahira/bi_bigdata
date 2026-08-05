@@ -1,92 +1,193 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Semana 22 - Os 5 Vs do Big Data | BDN007</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
-        .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); overflow: hidden; }
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; text-align: center; }
-        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
-        .content { padding: 40px; }
-        .section { margin: 40px 0; }
-        .section h2 { color: #667eea; font-size: 2em; margin-bottom: 20px; border-bottom: 3px solid #667eea; padding-bottom: 10px; }
-        .objetivos { background: #f8f9fa; padding: 30px; border-radius: 10px; margin-bottom: 40px; border-left: 5px solid #667eea; }
-        .activity-card { background: white; border-radius: 10px; padding: 30px; margin-bottom: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-left: 5px solid #764ba2; }
-        .navigation { display: flex; justify-content: space-between; padding: 30px 40px; background: #f8f9fa; }
-        .nav-button { padding: 15px 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 8px; font-weight: bold; transition: transform 0.3s; }
-        .nav-button:hover { transform: scale(1.05); }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Semana 22 - Os 5 Vs do Big Data | Projeto Data Diver | BDN007</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/dive-theme.css">
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <div class="module">MÓDULO 5: Fundamentos de Big Data</div>
-            <h1>Semana 22</h1>
-            <h2>Os 5 Vs do Big Data</h2>
+<body data-zone="2">
+
+<div id="hud">
+  <div class="depth-label" id="depthLabel">200 m · Crepúsculo</div>
+  <div class="depth-track"><div class="depth-fill" id="depthFill"></div></div>
+  <div class="xp-label">XP: <span id="xpNow">0</span>/<span id="xpMax">0</span></div>
+  <div class="badges">
+    <span id="b1" title="Caçador dos 5 V's">🔦</span>
+    <span id="b2" title="Sonar Completo">📡</span>
+  </div>
+</div>
+<div id="moduleMap"></div>
+
+<section class="hero" id="hero">
+  <div id="bubbleField"></div>
+  <div class="eyebrow">Módulo 5 · Semana 22 · Projeto Data Diver — Missão 2 de 5</div>
+  <h1>Os 5 V's do<br>Big Data</h1>
+  <div class="subtitle">Zona Mesopelágica · 200–1.000 metros</div>
+  <p class="lead">A luz do sol já não chega até aqui. Para enxergar Big Data de verdade, precisamos de um "sonar" próprio: os 5 V's. Hoje aplicamos cada um deles no dataset que vocês escolheram na semana passada.</p>
+  <button class="dive-btn" onclick="document.getElementById('zone1').scrollIntoView({behavior:'smooth'})">🔦 Ligar o sonar</button>
+  <div class="scroll-hint">role para descer ↓</div>
+</section>
+
+<section class="zone" id="zone1" data-depth="200">
+  <div class="zone-inner">
+    <div class="zone-tag">Zona Mesopelágica <span class="depth-range">(200 – 1.000 m)</span></div>
+    <h2>Cinco lentes para enxergar Big Data</h2>
+    <p>Na Semana 21 vimos que Big Data não é "só muito dado". Os <strong>5 V's</strong> são os critérios que os profissionais usam para reconhecer, na prática, quando estão diante de um problema de Big Data de verdade.</p>
+
+    <div class="card-row">
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-inner">
+          <div class="flip-front"><div class="icon">📦</div><h4>Volume</h4><div class="hint">toque para virar</div></div>
+          <div class="flip-back">A quantidade total de dados gerados. Ex.: o dataset Olist tem mais de 100 mil pedidos espalhados em 9 tabelas.</div>
         </div>
-        
-        <div class="content">
-            <div class="objetivos">
-                <h2>🎯 Objetivos de Aprendizagem</h2>
-                <ul>
-                    <li>Compreender os conceitos fundamentais de os 5 vs do big data</li>
-                    <li>Aplicar técnicas práticas em cenários reais</li>
-                    <li>Desenvolver habilidades hands-on com ferramentas</li>
-                    <li>Analisar cases e melhores práticas do mercado</li>
-                </ul>
-            </div>
-            
-            <div class="section">
-                <h2>📚 Conteúdo Teórico</h2>
-                <p>Nesta semana, você aprenderá sobre <strong>Os 5 Vs do Big Data</strong>, um tópico fundamental para módulo 5: fundamentos de big data.</p>
-                <p>O conteúdo completo inclui teoria detalhada, exemplos práticos, cases reais e tutoriais passo-a-passo.</p>
-                <p><em>Nota: O conteúdo teórico completo e detalhado será disponibilizado pelo professor em sala de aula e no Moodle.</em></p>
-            </div>
-            
-            <div class="section">
-                <h2>🎬 Vídeos Recomendados</h2>
-                <p>Assista aos vídeos selecionados para complementar seu aprendizado.</p>
-                <p><em>Links para vídeos serão fornecidos pelo professor.</em></p>
-            </div>
-            
-            <div class="section">
-                <h2>✏️ Atividades Práticas</h2>
-                <div class="activity-card">
-                    <h3>Atividade 1: Pesquisa e Análise</h3>
-                    <p>Pesquise e analise cases reais relacionados a os 5 vs do big data.</p>
-                    <p><strong>Entregável:</strong> Documento de 3-5 páginas</p>
-                </div>
-                <div class="activity-card">
-                    <h3>Atividade 2: Implementação Prática</h3>
-                    <p>Implemente os conceitos aprendidos em um projeto hands-on.</p>
-                    <p><strong>Entregável:</strong> Código + Documentação</p>
-                </div>
-                <div class="activity-card">
-                    <h3>Atividade 3: Apresentação</h3>
-                    <p>Apresente seus resultados e aprendizados para a turma.</p>
-                    <p><strong>Entregável:</strong> Apresentação em slides</p>
-                </div>
-            </div>
-            
-            <div class="section">
-                <h2>📖 Materiais Complementares</h2>
-                <ul>
-                    <li>📚 Livros e artigos acadêmicos</li>
-                    <li>🎓 Tutoriais online e documentação oficial</li>
-                    <li>🛠️ Ferramentas e datasets para prática</li>
-                    <li>📄 White papers e estudos de caso</li>
-                </ul>
-            </div>
+      </div>
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-inner">
+          <div class="flip-front"><div class="icon">⚡</div><h4>Velocidade</h4><div class="hint">toque para virar</div></div>
+          <div class="flip-back">A rapidez com que os dados são gerados e precisam ser processados. Ex.: cada pedido tem timestamp de compra, pagamento e entrega.</div>
         </div>
-        
-        <div class="navigation">
-            <a href="semana21.html" class="nav-button">← Semana Anterior</a>
-            <a href="index.html" class="nav-button">🏠 Início</a>
-            <a href="semana23.html" class="nav-button">Próxima Semana →</a>
+      </div>
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-inner">
+          <div class="flip-front"><div class="icon">🧬</div><h4>Variedade</h4><div class="hint">toque para virar</div></div>
+          <div class="flip-back">Os diferentes formatos e fontes. Ex.: números de preço, texto livre nas avaliações e coordenadas de geolocalização, tudo no mesmo projeto.</div>
         </div>
+      </div>
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-inner">
+          <div class="flip-front"><div class="icon">✅</div><h4>Veracidade</h4><div class="hint">toque para virar</div></div>
+          <div class="flip-back">A confiabilidade e qualidade dos dados. Ex.: avaliações sem comentário, datas de entrega inconsistentes — dado real é dado bagunçado.</div>
+        </div>
+      </div>
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-inner">
+          <div class="flip-front"><div class="icon">💎</div><h4>Valor</h4><div class="hint">toque para virar</div></div>
+          <div class="flip-back">A utilidade real para decisões de negócio. Ex.: prever atraso de entrega ou identificar as categorias de produto mais lucrativas.</div>
+        </div>
+      </div>
     </div>
+
+    <p><em>💡 Curiosidade: no dataset Olist, os nomes reais das empresas envolvidas em cada avaliação foram substituídos por nomes de casas de "Game of Thrones" — uma forma criativa de anonimizar dados reais sem inventar dados falsos.</em></p>
+  </div>
+</section>
+
+<section class="zone" id="zone2" data-depth="500">
+  <div class="zone-inner">
+    <div class="classify-stage">
+      <div class="q-label" style="text-align:left">Jogo do Sonar · 50 XP por acerto</div>
+      <h3 style="font-family:var(--font-display); margin-bottom:16px;">Qual V essa observação representa?</h3>
+      <div class="classify-card" id="classifyCard"></div>
+      <div class="classify-buttons">
+        <button class="classify-btn" data-cat="Volume">📦 Volume</button>
+        <button class="classify-btn" data-cat="Velocidade">⚡ Velocidade</button>
+        <button class="classify-btn" data-cat="Variedade">🧬 Variedade</button>
+        <button class="classify-btn" data-cat="Veracidade">✅ Veracidade</button>
+        <button class="classify-btn" data-cat="Valor">💎 Valor</button>
+      </div>
+      <div class="classify-feedback" id="classifyFeedback"></div>
+      <div class="classify-progress" id="classifyProgress">Item 1 de 6</div>
+    </div>
+
+    <div class="quiz-block" id="q1">
+      <div class="q-label">Checkpoint · 100 XP</div>
+      <h3>Qual dos 5 V's é mais frequentemente esquecido, mas é o que justifica o projeto para a empresa?</h3>
+      <div class="options" data-correct="3">
+        <button class="opt-btn">Volume, porque quanto mais dado melhor</button>
+        <button class="opt-btn">Velocidade, porque tudo precisa ser em tempo real</button>
+        <button class="opt-btn">Variedade, porque quanto mais formatos, melhor</button>
+        <button class="opt-btn">Valor, porque sem uma decisão de negócio por trás, os outros 4 V's não importam</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+  </div>
+</section>
+
+<section class="zone" id="zone3" data-depth="850">
+  <div class="zone-inner">
+    <div class="mission-card">
+      <div class="m-label">Missão 2 · Sonar dos 5 V's</div>
+      <h3>📡 Meça os 5 V's no seu dataset</h3>
+      <div class="m-context">Volte ao dataset da Semana 21 (Kaggle Notebook ou planilha) e preencha, na prática, uma linha para cada V.</div>
+      <ul class="mission-steps" id="missionList">
+        <li class="mission-step"><div class="check"></div><span class="txt"><strong>Volume:</strong> some o número de linhas de todas as tabelas e o tamanho total em MB.</span></li>
+        <li class="mission-step"><div class="check"></div><span class="txt"><strong>Velocidade:</strong> observe a coluna de data do pedido e estime quantos pedidos aconteceram por mês.</span></li>
+        <li class="mission-step"><div class="check"></div><span class="txt"><strong>Variedade:</strong> liste quantos tipos de dado aparecem (texto, número, data, categórico) e quantas tabelas diferentes existem.</span></li>
+        <li class="mission-step"><div class="check"></div><span class="txt"><strong>Veracidade:</strong> conte quantos valores estão vazios em pelo menos uma coluna importante (ex.: comentário da avaliação).</span></li>
+        <li class="mission-step"><div class="check"></div><span class="txt"><strong>Valor:</strong> escreva uma pergunta de negócio real que esses dados poderiam responder.</span></li>
+      </ul>
+      <div class="mission-deliverable">📝 Entregável: a "Tabela dos 5 V's" — uma linha por V, com o número ou observação encontrada e uma frase explicando por que aquilo se encaixa naquele V.</div>
+    </div>
+  </div>
+</section>
+
+<section class="result" id="resultScreen">
+  <div class="medal">📡</div>
+  <h2>Sonar calibrado!</h2>
+  <div class="rank" id="rankLabel">—</div>
+  <div class="xp-final" id="xpFinal">0</div>
+  <div class="xp-final-label">XP TOTAL DA SEMANA 22</div>
+  <div class="badge-shelf">
+    <div class="badge-item" id="shelf1"><div class="emoji">🔦</div><div class="name">Caçador dos 5 V's</div></div>
+    <div class="badge-item" id="shelf2"><div class="emoji">📡</div><div class="name">Sonar Completo</div></div>
+  </div>
+  <p class="note">Na Semana 23, descemos até a Zona Batipelágica para desenhar como esses dados seriam distribuídos entre vários computadores.</p>
+</section>
+
+<div class="navigation">
+  <a href="semana21.html" class="nav-button">← Semana Anterior</a>
+  <a href="index.html" class="nav-button">🏠 Início</a>
+  <a href="semana23.html" class="nav-button">Próxima Semana →</a>
+</div>
+
+<script src="assets/dive-theme.js"></script>
+<script>
+  DiveInitBubbles('bubbleField', 16);
+  DiveInitModuleMap(22);
+  DiveInitDepthHUD([
+    {id:'hero', label:'200 m · Crepúsculo', pct:20},
+    {id:'zone1', label:'200-1.000 m · Mesopelágica', pct:35},
+    {id:'zone2', label:'500 m · Jogo do Sonar', pct:55},
+    {id:'zone3', label:'850 m · Missão 2', pct:80},
+    {id:'resultScreen', label:'1.000 m · Concluído', pct:100}
+  ]);
+
+  const xp = DiveCreateXP(500);
+  const badges = DiveCreateBadges([1,2]);
+
+  const classifyItems = [
+    {label:'O dataset tem mais de 100 mil pedidos distribuídos em 9 tabelas diferentes.', cat:'Volume'},
+    {label:'Cada pedido registra o timestamp exato de compra, pagamento, envio e entrega.', cat:'Velocidade'},
+    {label:'As avaliações misturam nota numérica, texto livre e data — três formatos num só arquivo.', cat:'Variedade'},
+    {label:'Vários registros de avaliação estão sem comentário e algumas datas de entrega aparecem incoerentes.', cat:'Veracidade'},
+    {label:'Cruzando os dados de entrega, é possível prever quais pedidos têm mais risco de atraso.', cat:'Valor'},
+    {label:'Somando todos os arquivos CSV, o dataset passa de 100 MB.', cat:'Volume'}
+  ];
+  DiveInitClassify(
+    document.getElementById('classifyCard'),
+    document.querySelectorAll('.classify-btn'),
+    document.getElementById('classifyFeedback'),
+    document.getElementById('classifyProgress'),
+    classifyItems, xp, 50, 15,
+    ()=>{ badges.unlock(1); }
+  );
+
+  DiveInitQuiz(document.getElementById('q1'), xp, 100, 40);
+
+  DiveInitMissionChecklist(document.getElementById('missionList'), xp, 20);
+  document.getElementById('missionList').addEventListener('click', ()=>{
+    const all = document.querySelectorAll('#missionList .mission-step');
+    const doneCount = document.querySelectorAll('#missionList .mission-step.done').length;
+    if(doneCount === all.length) badges.unlock(2);
+  });
+
+  const obs2 = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ DiveFinalizeResult(xp, document.getElementById('rankLabel')); } });
+  },{threshold:0.5});
+  obs2.observe(document.getElementById('resultScreen'));
+</script>
 </body>
 </html>

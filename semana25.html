@@ -1,92 +1,200 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Semana 25 - Lambda Architecture e Kappa Architecture | BDN007</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
-        .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); overflow: hidden; }
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; text-align: center; }
-        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
-        .content { padding: 40px; }
-        .section { margin: 40px 0; }
-        .section h2 { color: #667eea; font-size: 2em; margin-bottom: 20px; border-bottom: 3px solid #667eea; padding-bottom: 10px; }
-        .objetivos { background: #f8f9fa; padding: 30px; border-radius: 10px; margin-bottom: 40px; border-left: 5px solid #667eea; }
-        .activity-card { background: white; border-radius: 10px; padding: 30px; margin-bottom: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-left: 5px solid #764ba2; }
-        .navigation { display: flex; justify-content: space-between; padding: 30px 40px; background: #f8f9fa; }
-        .nav-button { padding: 15px 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 8px; font-weight: bold; transition: transform 0.3s; }
-        .nav-button:hover { transform: scale(1.05); }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Semana 25 - Lambda e Kappa Architecture | Projeto Data Diver | BDN007</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/dive-theme.css">
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <div class="module">MÓDULO 5: Fundamentos de Big Data</div>
-            <h1>Semana 25</h1>
-            <h2>Lambda Architecture e Kappa Architecture</h2>
+<body data-zone="5">
+
+<div id="hud">
+  <div class="depth-label" id="depthLabel">6.000 m · Hadal</div>
+  <div class="depth-track"><div class="depth-fill" id="depthFill"></div></div>
+  <div class="xp-label">XP: <span id="xpNow">0</span>/<span id="xpMax">0</span></div>
+  <div class="badges">
+    <span id="b1" title="Arquiteto Lambda">🔱</span>
+    <span id="b2" title="Mestre do Data Diver">🏆</span>
+  </div>
+</div>
+<div id="moduleMap"></div>
+
+<section class="hero" id="hero">
+  <div id="bubbleField"></div>
+  <div class="eyebrow">Módulo 5 · Semana 25 · Projeto Data Diver — Missão Final</div>
+  <h1>Lambda &amp; Kappa<br>Architecture</h1>
+  <div class="subtitle">Fossa das Marianas · 6.000–11.000 metros</div>
+  <p class="lead">O ponto mais profundo do oceano. Aqui fechamos o Projeto Data Diver: da ideia bruta da Semana 21 até um fluxo de arquitetura completo, pronto para apresentar.</p>
+  <button class="dive-btn" onclick="document.getElementById('recap').scrollIntoView({behavior:'smooth'})">🔱 Chegar ao fundo</button>
+  <div class="scroll-hint">role para descer ↓</div>
+</section>
+
+<section class="zone" id="recap" data-depth="6000">
+  <div class="zone-inner">
+    <div class="zone-tag">Recapitulando a jornada</div>
+    <h2>O caminho até aqui</h2>
+    <table class="cmp">
+      <tr><th>Semana</th><th>Zona</th><th>O que vocês fizeram</th></tr>
+      <tr><td>21</td><td>Epipelágica</td><td>Escolheram e exploraram o dataset Olist no Kaggle</td></tr>
+      <tr><td>22</td><td>Mesopelágica</td><td>Mediram os 5 V's diretamente nos dados</td></tr>
+      <tr><td>23</td><td>Batipelágica</td><td>Desenharam um cluster distribuído hipotético</td></tr>
+      <tr><td>24</td><td>Abissopelágica</td><td>Organizaram os dados em camadas raw/trusted/refined</td></tr>
+      <tr><td>25</td><td>Hadal</td><td>Fecham com a arquitetura Lambda e o pitch final</td></tr>
+    </table>
+  </div>
+</section>
+
+<section class="zone" id="zone1" data-depth="7500">
+  <div class="zone-inner">
+    <div class="zone-tag">Zona Hadal · Fossa das Marianas <span class="depth-range">(6.000 – 11.000 m)</span></div>
+    <h2>Como processar o passado e o presente ao mesmo tempo</h2>
+    <p>Até aqui, tratamos o processamento em blocos (batch). Mas e quando é preciso reagir a um pedido <strong>assim que ele acontece</strong>, sem perder a precisão de reprocessar todo o histórico? Duas arquiteturas respondem a essa pergunta.</p>
+
+    <div class="card-row">
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-inner">
+          <div class="flip-front"><div class="icon">🌀</div><h4>Batch Layer</h4><div class="hint">toque para virar</div></div>
+          <div class="flip-back">Reprocessa periodicamente todo o histórico de dados. Visão completa e precisa, mas com atraso (ex.: rodar toda madrugada).</div>
         </div>
-        
-        <div class="content">
-            <div class="objetivos">
-                <h2>🎯 Objetivos de Aprendizagem</h2>
-                <ul>
-                    <li>Compreender os conceitos fundamentais de lambda architecture e kappa architecture</li>
-                    <li>Aplicar técnicas práticas em cenários reais</li>
-                    <li>Desenvolver habilidades hands-on com ferramentas</li>
-                    <li>Analisar cases e melhores práticas do mercado</li>
-                </ul>
-            </div>
-            
-            <div class="section">
-                <h2>📚 Conteúdo Teórico</h2>
-                <p>Nesta semana, você aprenderá sobre <strong>Lambda Architecture e Kappa Architecture</strong>, um tópico fundamental para módulo 5: fundamentos de big data.</p>
-                <p>O conteúdo completo inclui teoria detalhada, exemplos práticos, cases reais e tutoriais passo-a-passo.</p>
-                <p><em>Nota: O conteúdo teórico completo e detalhado será disponibilizado pelo professor em sala de aula e no Moodle.</em></p>
-            </div>
-            
-            <div class="section">
-                <h2>🎬 Vídeos Recomendados</h2>
-                <p>Assista aos vídeos selecionados para complementar seu aprendizado.</p>
-                <p><em>Links para vídeos serão fornecidos pelo professor.</em></p>
-            </div>
-            
-            <div class="section">
-                <h2>✏️ Atividades Práticas</h2>
-                <div class="activity-card">
-                    <h3>Atividade 1: Pesquisa e Análise</h3>
-                    <p>Pesquise e analise cases reais relacionados a lambda architecture e kappa architecture.</p>
-                    <p><strong>Entregável:</strong> Documento de 3-5 páginas</p>
-                </div>
-                <div class="activity-card">
-                    <h3>Atividade 2: Implementação Prática</h3>
-                    <p>Implemente os conceitos aprendidos em um projeto hands-on.</p>
-                    <p><strong>Entregável:</strong> Código + Documentação</p>
-                </div>
-                <div class="activity-card">
-                    <h3>Atividade 3: Apresentação</h3>
-                    <p>Apresente seus resultados e aprendizados para a turma.</p>
-                    <p><strong>Entregável:</strong> Apresentação em slides</p>
-                </div>
-            </div>
-            
-            <div class="section">
-                <h2>📖 Materiais Complementares</h2>
-                <ul>
-                    <li>📚 Livros e artigos acadêmicos</li>
-                    <li>🎓 Tutoriais online e documentação oficial</li>
-                    <li>🛠️ Ferramentas e datasets para prática</li>
-                    <li>📄 White papers e estudos de caso</li>
-                </ul>
-            </div>
+      </div>
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-inner">
+          <div class="flip-front"><div class="icon">⚡</div><h4>Speed Layer</h4><div class="hint">toque para virar</div></div>
+          <div class="flip-back">Processa os dados novos assim que chegam. Visão aproximada, mas quase em tempo real — ideal para alertas imediatos.</div>
         </div>
-        
-        <div class="navigation">
-            <a href="semana24.html" class="nav-button">← Semana Anterior</a>
-            <a href="index.html" class="nav-button">🏠 Início</a>
-            <a href="semana26.html" class="nav-button">Próxima Semana →</a>
+      </div>
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-inner">
+          <div class="flip-front"><div class="icon">🔱</div><h4>Lambda Architecture</h4><div class="hint">toque para virar</div></div>
+          <div class="flip-back">Combina Batch Layer + Speed Layer numa Serving Layer única, que responde consultas usando o melhor das duas visões.</div>
         </div>
+      </div>
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-inner">
+          <div class="flip-front"><div class="icon">🌊</div><h4>Kappa Architecture</h4><div class="hint">toque para virar</div></div>
+          <div class="flip-back">Simplifica a Lambda: tudo passa por um único pipeline de streaming, sem manter duas arquiteturas separadas — menos complexidade operacional.</div>
+        </div>
+      </div>
     </div>
+
+    <p style="margin-top:26px;"><strong>Aplicado ao caso Olist:</strong></p>
+    <table class="cmp">
+      <tr><th>Camada</th><th>No caso Olist</th></tr>
+      <tr><td>Batch Layer</td><td>Reprocessa todo o histórico de pedidos toda noite para atualizar métricas de vendas</td></tr>
+      <tr><td>Speed Layer</td><td>Processa pedidos novos em tempo real para alertar sobre risco de atraso na entrega</td></tr>
+      <tr><td>Serving Layer</td><td>Um dashboard final — poderia ser construído em Power BI, já visto no Módulo 4</td></tr>
+    </table>
+  </div>
+</section>
+
+<section class="zone" id="zone2" data-depth="9000">
+  <div class="zone-inner">
+    <div class="mission-card">
+      <div class="m-label">Missão Final · Pitch do Data Diver</div>
+      <h3>🎤 Feche o projeto com um fluxo Lambda e uma apresentação</h3>
+      <div class="m-context">Esta é a entrega final do Projeto Data Diver — reúne o trabalho das 5 semanas em uma apresentação curta para a turma.</div>
+      <ul class="mission-steps" id="missionList">
+        <li class="mission-step"><div class="check"></div><span class="txt">Desenhe um diagrama Lambda para o caso Olist, com Batch Layer, Speed Layer e Serving Layer.</span></li>
+        <li class="mission-step"><div class="check"></div><span class="txt">Monte uma apresentação de até 5 minutos reunindo: o dataset escolhido (S21), os 5 V's medidos (S22), a arquitetura distribuída proposta (S23), a organização em Data Lake (S24) e o fluxo Lambda (hoje).</span></li>
+        <li class="mission-step"><div class="check"></div><span class="txt">Apresente para a turma na aula síncrona.</span></li>
+      </ul>
+      <div class="mission-deliverable">📝 Entregável final: os slides do pitch + o diagrama Lambda.</div>
+    </div>
+
+    <h3 class="sub">Desafio final · revisão do módulo inteiro</h3>
+    <div class="seq-progress" id="trenchProgress">Pergunta 1 de 5</div>
+    <div id="trenchQuiz"></div>
+  </div>
+</section>
+
+<section class="result" id="resultScreen">
+  <div class="medal">🏆</div>
+  <h2>Projeto Data Diver concluído!</h2>
+  <div class="rank" id="rankLabel">—</div>
+  <div class="xp-final" id="xpFinal">0</div>
+  <div class="xp-final-label">XP TOTAL DA SEMANA 25</div>
+  <div class="badge-shelf">
+    <div class="badge-item" id="shelf1"><div class="emoji">🔱</div><div class="name">Arquiteto Lambda</div></div>
+    <div class="badge-item" id="shelf2"><div class="emoji">🏆</div><div class="name">Mestre do Data Diver</div></div>
+  </div>
+  <p class="note">Vocês chegaram ao fundo da Fossa das Marianas — e ao fim do Módulo 5. No Módulo 6, essas ideias ganham ferramentas de verdade: Hadoop, HDFS e MapReduce.</p>
+</section>
+
+<div class="navigation">
+  <a href="semana24.html" class="nav-button">← Semana Anterior</a>
+  <a href="index.html" class="nav-button">🏠 Início</a>
+  <a href="semana26.html" class="nav-button">Próxima Semana →</a>
+</div>
+
+<script src="assets/dive-theme.js"></script>
+<script>
+  DiveInitBubbles('bubbleField', 16);
+  DiveInitModuleMap(25);
+  DiveInitDepthHUD([
+    {id:'hero', label:'6.000 m · Hadal', pct:75},
+    {id:'recap', label:'6.000 m · Recapitulando', pct:78},
+    {id:'zone1', label:'7.500 m · Lambda/Kappa', pct:88},
+    {id:'zone2', label:'9.000 m · Missão Final', pct:96},
+    {id:'resultScreen', label:'11.000 m · Fossa das Marianas', pct:100}
+  ]);
+
+  const xp = DiveCreateXP(525);
+  const badges = DiveCreateBadges([1,2]);
+
+  DiveInitMissionChecklist(document.getElementById('missionList'), xp, 25);
+  document.getElementById('missionList').addEventListener('click', ()=>{
+    const all = document.querySelectorAll('#missionList .mission-step');
+    const doneCount = document.querySelectorAll('#missionList .mission-step.done').length;
+    if(doneCount === all.length) badges.unlock(1);
+  });
+
+  const questions = [
+    {
+      q:'O que caracteriza melhor o Big Data (Semana 21)?',
+      opts:['Qualquer banco com mais de 1 GB','Dados tão volumosos, rápidos ou variados que ferramentas tradicionais não processam bem','Um software da Google','Sinônimo de Data Warehouse'],
+      correct:1
+    },
+    {
+      q:'Qual dos 5 V\'s justifica o projeto perante a empresa (Semana 22)?',
+      opts:['Volume','Velocidade','Valor','Variedade'],
+      correct:2
+    },
+    {
+      q:'Por que escala horizontal é preferida em Big Data (Semana 23)?',
+      opts:['É sempre mais barata que qualquer alternativa','Escala melhor e evita ponto único de falha','Dispensa replicação','Um servidor nunca falha'],
+      correct:1
+    },
+    {
+      q:'Qual a principal diferença entre Data Lake e Data Warehouse (Semana 24)?',
+      opts:['Não há diferença','Data Lake usa schema-on-read; Data Warehouse usa schema-on-write','Data Lake só aceita dados estruturados','Data Warehouse é sempre gratuito'],
+      correct:1
+    },
+    {
+      q:'Qual a principal diferença entre Lambda e Kappa Architecture (Semana 25)?',
+      opts:[
+        'Lambda mantém batch e speed layers separadas; Kappa usa um único pipeline de streaming para tudo',
+        'Kappa é mais antiga que Lambda',
+        'Lambda não processa dados em tempo real',
+        'Kappa exige duas bases de dados diferentes'
+      ],
+      correct:0
+    }
+  ];
+  DiveInitSequentialQuiz(
+    document.getElementById('trenchQuiz'),
+    document.getElementById('trenchProgress'),
+    questions, xp, 90, 30,
+    'Desafio final · 90 XP',
+    ()=>{ badges.unlock(2); }
+  );
+
+  const obs2 = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ DiveFinalizeResult(xp, document.getElementById('rankLabel')); } });
+  },{threshold:0.5});
+  obs2.observe(document.getElementById('resultScreen'));
+</script>
 </body>
 </html>

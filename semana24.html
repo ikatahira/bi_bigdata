@@ -1,92 +1,181 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Semana 24 - Data Lakes - Conceito e Implementação | BDN007</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
-        .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); overflow: hidden; }
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; text-align: center; }
-        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
-        .content { padding: 40px; }
-        .section { margin: 40px 0; }
-        .section h2 { color: #667eea; font-size: 2em; margin-bottom: 20px; border-bottom: 3px solid #667eea; padding-bottom: 10px; }
-        .objetivos { background: #f8f9fa; padding: 30px; border-radius: 10px; margin-bottom: 40px; border-left: 5px solid #667eea; }
-        .activity-card { background: white; border-radius: 10px; padding: 30px; margin-bottom: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-left: 5px solid #764ba2; }
-        .navigation { display: flex; justify-content: space-between; padding: 30px 40px; background: #f8f9fa; }
-        .nav-button { padding: 15px 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 8px; font-weight: bold; transition: transform 0.3s; }
-        .nav-button:hover { transform: scale(1.05); }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Semana 24 - Data Lakes | Projeto Data Diver | BDN007</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/dive-theme.css">
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <div class="module">MÓDULO 5: Fundamentos de Big Data</div>
-            <h1>Semana 24</h1>
-            <h2>Data Lakes - Conceito e Implementação</h2>
+<body data-zone="4">
+
+<div id="hud">
+  <div class="depth-label" id="depthLabel">4.000 m · Abissal</div>
+  <div class="depth-track"><div class="depth-fill" id="depthFill"></div></div>
+  <div class="xp-label">XP: <span id="xpNow">0</span>/<span id="xpMax">0</span></div>
+  <div class="badges">
+    <span id="b1" title="Guardião das Camadas">🪨</span>
+    <span id="b2" title="Construtor do Lago">🏗️</span>
+  </div>
+</div>
+<div id="moduleMap"></div>
+
+<section class="hero" id="hero">
+  <div id="bubbleField"></div>
+  <div class="eyebrow">Módulo 5 · Semana 24 · Projeto Data Diver — Missão 4 de 5</div>
+  <h1>Data Lakes</h1>
+  <div class="subtitle">Zona Abissopelágica · 4.000–6.000 metros</div>
+  <p class="lead">Aqui embaixo, tudo se acumula em camadas de sedimento — exatamente como um Data Lake organiza dados brutos até virarem informação refinada. Hoje, vocês constroem o próprio lago.</p>
+  <button class="dive-btn" onclick="document.getElementById('zone1').scrollIntoView({behavior:'smooth'})">🪨 Explorar as camadas</button>
+  <div class="scroll-hint">role para descer ↓</div>
+</section>
+
+<section class="zone" id="zone1" data-depth="4000">
+  <div class="zone-inner">
+    <div class="zone-tag">Zona Abissopelágica <span class="depth-range">(4.000 – 6.000 m)</span></div>
+    <h2>Um lago onde cabe qualquer formato</h2>
+    <p>No Módulo 2 vocês aprenderam Data Warehouse: um repositório estruturado, com <strong>schema definido antes</strong> de carregar os dados (schema-on-write). O <strong>Data Lake</strong> inverte a lógica: guarda os dados <strong>brutos, em qualquer formato</strong>, e só define a estrutura na hora de ler (schema-on-read) — flexível, mas exige disciplina.</p>
+
+    <div class="card-row">
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-inner">
+          <div class="flip-front"><div class="icon">🌊</div><h4>Data Lake</h4><div class="hint">toque para virar</div></div>
+          <div class="flip-back">Repositório que aceita dados estruturados, semi e não-estruturados, sem exigir um schema definido antes de guardar. Barato e flexível.</div>
         </div>
-        
-        <div class="content">
-            <div class="objetivos">
-                <h2>🎯 Objetivos de Aprendizagem</h2>
-                <ul>
-                    <li>Compreender os conceitos fundamentais de data lakes - conceito e implementação</li>
-                    <li>Aplicar técnicas práticas em cenários reais</li>
-                    <li>Desenvolver habilidades hands-on com ferramentas</li>
-                    <li>Analisar cases e melhores práticas do mercado</li>
-                </ul>
-            </div>
-            
-            <div class="section">
-                <h2>📚 Conteúdo Teórico</h2>
-                <p>Nesta semana, você aprenderá sobre <strong>Data Lakes - Conceito e Implementação</strong>, um tópico fundamental para módulo 5: fundamentos de big data.</p>
-                <p>O conteúdo completo inclui teoria detalhada, exemplos práticos, cases reais e tutoriais passo-a-passo.</p>
-                <p><em>Nota: O conteúdo teórico completo e detalhado será disponibilizado pelo professor em sala de aula e no Moodle.</em></p>
-            </div>
-            
-            <div class="section">
-                <h2>🎬 Vídeos Recomendados</h2>
-                <p>Assista aos vídeos selecionados para complementar seu aprendizado.</p>
-                <p><em>Links para vídeos serão fornecidos pelo professor.</em></p>
-            </div>
-            
-            <div class="section">
-                <h2>✏️ Atividades Práticas</h2>
-                <div class="activity-card">
-                    <h3>Atividade 1: Pesquisa e Análise</h3>
-                    <p>Pesquise e analise cases reais relacionados a data lakes - conceito e implementação.</p>
-                    <p><strong>Entregável:</strong> Documento de 3-5 páginas</p>
-                </div>
-                <div class="activity-card">
-                    <h3>Atividade 2: Implementação Prática</h3>
-                    <p>Implemente os conceitos aprendidos em um projeto hands-on.</p>
-                    <p><strong>Entregável:</strong> Código + Documentação</p>
-                </div>
-                <div class="activity-card">
-                    <h3>Atividade 3: Apresentação</h3>
-                    <p>Apresente seus resultados e aprendizados para a turma.</p>
-                    <p><strong>Entregável:</strong> Apresentação em slides</p>
-                </div>
-            </div>
-            
-            <div class="section">
-                <h2>📖 Materiais Complementares</h2>
-                <ul>
-                    <li>📚 Livros e artigos acadêmicos</li>
-                    <li>🎓 Tutoriais online e documentação oficial</li>
-                    <li>🛠️ Ferramentas e datasets para prática</li>
-                    <li>📄 White papers e estudos de caso</li>
-                </ul>
-            </div>
+      </div>
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-inner">
+          <div class="flip-front"><div class="icon">🏢</div><h4>Data Lake vs Data Warehouse</h4><div class="hint">toque para virar</div></div>
+          <div class="flip-back">DW: schema-on-write, estruturado, otimizado para BI. Data Lake: schema-on-read, aceita qualquer formato, otimizado para explorar e experimentar.</div>
         </div>
-        
-        <div class="navigation">
-            <a href="semana23.html" class="nav-button">← Semana Anterior</a>
-            <a href="index.html" class="nav-button">🏠 Início</a>
-            <a href="semana25.html" class="nav-button">Próxima Semana →</a>
+      </div>
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-inner">
+          <div class="flip-front"><div class="icon">🥉🥈🥇</div><h4>Camadas (Raw/Trusted/Refined)</h4><div class="hint">toque para virar</div></div>
+          <div class="flip-back">Raw: dado exatamente como chegou. Trusted: limpo, validado, padronizado. Refined: agregado, pronto para análise e dashboards.</div>
         </div>
+      </div>
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-inner">
+          <div class="flip-front"><div class="icon">🐊</div><h4>Data Swamp</h4><div class="hint">toque para virar</div></div>
+          <div class="flip-back">O risco do Data Lake: sem catalogação e governança, ele vira um "pântano de dados" onde ninguém encontra ou confia em nada.</div>
+        </div>
+      </div>
     </div>
+
+    <div class="quiz-block" id="q1">
+      <div class="q-label">Checkpoint · 100 XP</div>
+      <h3>Qual a principal diferença entre Data Lake e Data Warehouse?</h3>
+      <div class="options" data-correct="1">
+        <button class="opt-btn">Data Lake só aceita dados estruturados, igual ao Data Warehouse</button>
+        <button class="opt-btn">Data Lake usa schema-on-read (define a estrutura ao ler); Data Warehouse usa schema-on-write (define antes de carregar)</button>
+        <button class="opt-btn">Não existe diferença, são sinônimos</button>
+        <button class="opt-btn">Data Warehouse é sempre mais barato que Data Lake</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+  </div>
+</section>
+
+<section class="zone" id="zone2" data-depth="5000">
+  <div class="zone-inner">
+    <div class="classify-stage">
+      <div class="q-label" style="text-align:left">Jogo das Camadas · 50 XP por acerto</div>
+      <h3 style="font-family:var(--font-display); margin-bottom:16px;">Em qual camada esse dado está?</h3>
+      <div class="classify-card" id="classifyCard"></div>
+      <div class="classify-buttons">
+        <button class="classify-btn" data-cat="Raw">🥉 Raw</button>
+        <button class="classify-btn" data-cat="Trusted">🥈 Trusted</button>
+        <button class="classify-btn" data-cat="Refined">🥇 Refined</button>
+      </div>
+      <div class="classify-feedback" id="classifyFeedback"></div>
+      <div class="classify-progress" id="classifyProgress">Item 1 de 6</div>
+    </div>
+  </div>
+</section>
+
+<section class="zone" id="zone3" data-depth="5800">
+  <div class="zone-inner">
+    <div class="mission-card">
+      <div class="m-label">Missão 4 · Construindo seu Data Lake</div>
+      <h3>🏗️ Organize o dataset em camadas</h3>
+      <div class="m-context">Vocês vão simular um Data Lake usando pastas comuns (no computador ou no Google Drive) — a lógica é a mesma usada em ferramentas reais na nuvem.</div>
+      <ul class="mission-steps" id="missionList">
+        <li class="mission-step"><div class="check"></div><span class="txt">Crie 3 pastas: <code class="inline">raw</code>, <code class="inline">trusted</code> e <code class="inline">refined</code>.</span></li>
+        <li class="mission-step"><div class="check"></div><span class="txt">Coloque os CSVs originais do Olist, sem nenhuma alteração, dentro de <code class="inline">raw</code>.</span></li>
+        <li class="mission-step"><div class="check"></div><span class="txt">Crie uma versão em <code class="inline">trusted</code>: remova linhas com valores nulos em colunas críticas e padronize os nomes das colunas.</span></li>
+        <li class="mission-step"><div class="check"></div><span class="txt">Crie uma versão em <code class="inline">refined</code>: junte pelo menos 2 tabelas (ex.: pedidos + itens do pedido) numa única tabela pronta para análise.</span></li>
+      </ul>
+      <div class="mission-deliverable">📝 Entregável: prints das 3 pastas + a tabela final da camada refined.</div>
+    </div>
+  </div>
+</section>
+
+<section class="result" id="resultScreen">
+  <div class="medal">🏗️</div>
+  <h2>Data Lake construído!</h2>
+  <div class="rank" id="rankLabel">—</div>
+  <div class="xp-final" id="xpFinal">0</div>
+  <div class="xp-final-label">XP TOTAL DA SEMANA 24</div>
+  <div class="badge-shelf">
+    <div class="badge-item" id="shelf1"><div class="emoji">🪨</div><div class="name">Guardião das Camadas</div></div>
+    <div class="badge-item" id="shelf2"><div class="emoji">🏗️</div><div class="name">Construtor do Lago</div></div>
+  </div>
+  <p class="note">Na Semana 25, chegamos à Fossa das Marianas: a arquitetura Lambda/Kappa e o pitch final do projeto.</p>
+</section>
+
+<div class="navigation">
+  <a href="semana23.html" class="nav-button">← Semana Anterior</a>
+  <a href="index.html" class="nav-button">🏠 Início</a>
+  <a href="semana25.html" class="nav-button">Próxima Semana →</a>
+</div>
+
+<script src="assets/dive-theme.js"></script>
+<script>
+  DiveInitBubbles('bubbleField', 16);
+  DiveInitModuleMap(24);
+  DiveInitDepthHUD([
+    {id:'hero', label:'4.000 m · Abissal', pct:60},
+    {id:'zone1', label:'4.000-6.000 m · Abissopelágica', pct:70},
+    {id:'zone2', label:'5.000 m · Jogo das Camadas', pct:85},
+    {id:'zone3', label:'5.800 m · Missão 4', pct:95},
+    {id:'resultScreen', label:'6.000 m · Concluído', pct:100}
+  ]);
+
+  const xp = DiveCreateXP(500);
+  const badges = DiveCreateBadges([1,2]);
+
+  DiveInitQuiz(document.getElementById('q1'), xp, 100, 40, ()=>{ badges.unlock(1); });
+
+  const classifyItems = [
+    {label:'Os arquivos CSV originais baixados do Kaggle, sem nenhuma alteração.', cat:'Raw'},
+    {label:'Uma versão da tabela de pedidos sem linhas duplicadas e com nomes de coluna padronizados.', cat:'Trusted'},
+    {label:'Uma tabela única juntando pedidos, itens e produtos, pronta para um dashboard de vendas.', cat:'Refined'},
+    {label:'O arquivo de avaliações com as datas ainda no formato de texto original do Kaggle.', cat:'Raw'},
+    {label:'A tabela de clientes com CEPs corrigidos e valores nulos tratados.', cat:'Trusted'},
+    {label:'Uma tabela de faturamento mensal por categoria de produto, agregada e pronta para o Power BI.', cat:'Refined'}
+  ];
+  DiveInitClassify(
+    document.getElementById('classifyCard'),
+    document.querySelectorAll('.classify-btn'),
+    document.getElementById('classifyFeedback'),
+    document.getElementById('classifyProgress'),
+    classifyItems, xp, 50, 15
+  );
+
+  DiveInitMissionChecklist(document.getElementById('missionList'), xp, 25);
+  document.getElementById('missionList').addEventListener('click', ()=>{
+    const all = document.querySelectorAll('#missionList .mission-step');
+    const doneCount = document.querySelectorAll('#missionList .mission-step.done').length;
+    if(doneCount === all.length) badges.unlock(2);
+  });
+
+  const obs2 = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ DiveFinalizeResult(xp, document.getElementById('rankLabel')); } });
+  },{threshold:0.5});
+  obs2.observe(document.getElementById('resultScreen'));
+</script>
 </body>
 </html>

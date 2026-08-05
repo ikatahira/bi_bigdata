@@ -1,92 +1,175 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Semana 23 - Arquiteturas Distribuídas para Big Data | BDN007</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
-        .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); overflow: hidden; }
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; text-align: center; }
-        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
-        .content { padding: 40px; }
-        .section { margin: 40px 0; }
-        .section h2 { color: #667eea; font-size: 2em; margin-bottom: 20px; border-bottom: 3px solid #667eea; padding-bottom: 10px; }
-        .objetivos { background: #f8f9fa; padding: 30px; border-radius: 10px; margin-bottom: 40px; border-left: 5px solid #667eea; }
-        .activity-card { background: white; border-radius: 10px; padding: 30px; margin-bottom: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-left: 5px solid #764ba2; }
-        .navigation { display: flex; justify-content: space-between; padding: 30px 40px; background: #f8f9fa; }
-        .nav-button { padding: 15px 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 8px; font-weight: bold; transition: transform 0.3s; }
-        .nav-button:hover { transform: scale(1.05); }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Semana 23 - Arquiteturas Distribuídas | Projeto Data Diver | BDN007</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/dive-theme.css">
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <div class="module">MÓDULO 5: Fundamentos de Big Data</div>
-            <h1>Semana 23</h1>
-            <h2>Arquiteturas Distribuídas para Big Data</h2>
+<body data-zone="3">
+
+<div id="hud">
+  <div class="depth-label" id="depthLabel">1.000 m · Meia-noite</div>
+  <div class="depth-track"><div class="depth-fill" id="depthFill"></div></div>
+  <div class="xp-label">XP: <span id="xpNow">0</span>/<span id="xpMax">0</span></div>
+  <div class="badges">
+    <span id="b1" title="Engenheiro de Cluster">🖧</span>
+    <span id="b2" title="Arquiteto do Cluster">🗺️</span>
+  </div>
+</div>
+<div id="moduleMap"></div>
+
+<section class="hero" id="hero">
+  <div id="bubbleField"></div>
+  <div class="eyebrow">Módulo 5 · Semana 23 · Projeto Data Diver — Missão 3 de 5</div>
+  <h1>Arquiteturas<br>Distribuídas</h1>
+  <div class="subtitle">Zona Batipelágica · 1.000–4.000 metros</div>
+  <p class="lead">Nenhum computador sozinho aguenta o volume que vimos na semana passada. A solução: dividir o trabalho entre várias máquinas. Hoje, vocês desenham o próprio cluster.</p>
+  <button class="dive-btn" onclick="document.getElementById('zone1').scrollIntoView({behavior:'smooth'})">🖧 Montar o cluster</button>
+  <div class="scroll-hint">role para descer ↓</div>
+</section>
+
+<section class="zone" id="zone1" data-depth="1000">
+  <div class="zone-inner">
+    <div class="zone-tag">Zona Batipelágica <span class="depth-range">(1.000 – 4.000 m)</span></div>
+    <h2>Um cérebro não basta — é preciso um enxame</h2>
+    <p>Quando o volume de dados ultrapassa o que uma única máquina processa em tempo hábil, a resposta do Big Data é <strong>distribuir</strong>: em vez de um super-computador caríssimo, várias máquinas comuns trabalhando juntas, como um cluster.</p>
+
+    <div class="card-row">
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-inner">
+          <div class="flip-front"><div class="icon">📐</div><h4>Escala Vertical vs Horizontal</h4><div class="hint">toque para virar</div></div>
+          <div class="flip-back">Vertical = colocar mais poder numa única máquina (tem limite físico e fica caro). Horizontal = adicionar mais máquinas ao cluster (escala quase sem limite).</div>
         </div>
-        
-        <div class="content">
-            <div class="objetivos">
-                <h2>🎯 Objetivos de Aprendizagem</h2>
-                <ul>
-                    <li>Compreender os conceitos fundamentais de arquiteturas distribuídas para big data</li>
-                    <li>Aplicar técnicas práticas em cenários reais</li>
-                    <li>Desenvolver habilidades hands-on com ferramentas</li>
-                    <li>Analisar cases e melhores práticas do mercado</li>
-                </ul>
-            </div>
-            
-            <div class="section">
-                <h2>📚 Conteúdo Teórico</h2>
-                <p>Nesta semana, você aprenderá sobre <strong>Arquiteturas Distribuídas para Big Data</strong>, um tópico fundamental para módulo 5: fundamentos de big data.</p>
-                <p>O conteúdo completo inclui teoria detalhada, exemplos práticos, cases reais e tutoriais passo-a-passo.</p>
-                <p><em>Nota: O conteúdo teórico completo e detalhado será disponibilizado pelo professor em sala de aula e no Moodle.</em></p>
-            </div>
-            
-            <div class="section">
-                <h2>🎬 Vídeos Recomendados</h2>
-                <p>Assista aos vídeos selecionados para complementar seu aprendizado.</p>
-                <p><em>Links para vídeos serão fornecidos pelo professor.</em></p>
-            </div>
-            
-            <div class="section">
-                <h2>✏️ Atividades Práticas</h2>
-                <div class="activity-card">
-                    <h3>Atividade 1: Pesquisa e Análise</h3>
-                    <p>Pesquise e analise cases reais relacionados a arquiteturas distribuídas para big data.</p>
-                    <p><strong>Entregável:</strong> Documento de 3-5 páginas</p>
-                </div>
-                <div class="activity-card">
-                    <h3>Atividade 2: Implementação Prática</h3>
-                    <p>Implemente os conceitos aprendidos em um projeto hands-on.</p>
-                    <p><strong>Entregável:</strong> Código + Documentação</p>
-                </div>
-                <div class="activity-card">
-                    <h3>Atividade 3: Apresentação</h3>
-                    <p>Apresente seus resultados e aprendizados para a turma.</p>
-                    <p><strong>Entregável:</strong> Apresentação em slides</p>
-                </div>
-            </div>
-            
-            <div class="section">
-                <h2>📖 Materiais Complementares</h2>
-                <ul>
-                    <li>📚 Livros e artigos acadêmicos</li>
-                    <li>🎓 Tutoriais online e documentação oficial</li>
-                    <li>🛠️ Ferramentas e datasets para prática</li>
-                    <li>📄 White papers e estudos de caso</li>
-                </ul>
-            </div>
+      </div>
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-inner">
+          <div class="flip-front"><div class="icon">🧩</div><h4>Particionamento</h4><div class="hint">toque para virar</div></div>
+          <div class="flip-back">Dividir os dados em pedaços (partições/shards) segundo uma chave lógica — ex.: por região, por data — e distribuir entre os nós do cluster.</div>
         </div>
-        
-        <div class="navigation">
-            <a href="semana22.html" class="nav-button">← Semana Anterior</a>
-            <a href="index.html" class="nav-button">🏠 Início</a>
-            <a href="semana24.html" class="nav-button">Próxima Semana →</a>
+      </div>
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-inner">
+          <div class="flip-front"><div class="icon">🛟</div><h4>Replicação</h4><div class="hint">toque para virar</div></div>
+          <div class="flip-back">Cada partição é copiada em mais de um nó. Se um nó falhar, outro já tem a cópia dos dados e o sistema continua no ar.</div>
         </div>
+      </div>
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-inner">
+          <div class="flip-front"><div class="icon">👑</div><h4>Master / Worker</h4><div class="hint">toque para virar</div></div>
+          <div class="flip-back">Um nó "mestre" coordena o trabalho; os nós "trabalhadores" processam suas partições. É o padrão por trás do Hadoop (NameNode/DataNode) e do Spark — que vocês verão nos módulos 6 e 7.</div>
+        </div>
+      </div>
     </div>
+
+    <table class="cmp">
+      <tr><th>Servidor único</th><th>Cluster distribuído</th></tr>
+      <tr><td>Escala vertical: mais CPU/RAM na mesma máquina</td><td>Escala horizontal: mais máquinas no cluster</td></tr>
+      <tr><td>Um ponto único de falha</td><td>Falha de 1 nó não derruba o sistema (replicação)</td></tr>
+      <tr><td>Processa tudo em sequência</td><td>Processa partições em paralelo</td></tr>
+    </table>
+
+    <div class="quiz-block" id="q1">
+      <div class="q-label">Checkpoint · 100 XP</div>
+      <h3>Por que escala horizontal costuma ser preferida em Big Data?</h3>
+      <div class="options" data-correct="2">
+        <button class="opt-btn">Porque é sempre mais barato comprar uma máquina mais potente</button>
+        <button class="opt-btn">Porque um único servidor nunca falha</button>
+        <button class="opt-btn">Porque adicionar máquinas comuns ao cluster escala melhor e evita um ponto único de falha</button>
+        <button class="opt-btn">Porque dispensa qualquer tipo de replicação</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+  </div>
+</section>
+
+<section class="zone" id="zone2" data-depth="2500">
+  <div class="zone-inner">
+    <h3 class="sub">Boa prática ou má prática?</h3>
+    <p>Avalie cada decisão de arquitetura abaixo. <span style="font-size:0.85em; font-family:var(--font-mono); color:var(--gold);">50 XP por acerto</span></p>
+    <div id="scenarioList"></div>
+  </div>
+</section>
+
+<section class="zone" id="zone3" data-depth="3400">
+  <div class="zone-inner">
+    <div class="mission-card">
+      <div class="m-label">Missão 3 · Desenhando o Cluster</div>
+      <h3>🗺️ Particione o dataset e desenhe o cluster</h3>
+      <div class="m-context">Ainda não vamos instalar Hadoop ou Spark (isso vem nos módulos 6 e 7) — hoje o exercício é de raciocínio arquitetural, à mão.</div>
+      <ul class="mission-steps" id="missionList">
+        <li class="mission-step"><div class="check"></div><span class="txt">Escolha uma chave lógica de particionamento no dataset Olist — por exemplo, <code class="inline">customer_state</code> (estado) ou o mês do pedido.</span></li>
+        <li class="mission-step"><div class="check"></div><span class="txt">Separe (com um filtro na planilha ou notebook) os pedidos em 3 ou 4 grupos segundo essa chave, como se cada grupo fosse um nó do cluster.</span></li>
+        <li class="mission-step"><div class="check"></div><span class="txt">Desenhe um diagrama simples (papel, slides ou qualquer ferramenta) com os nós, as partições e ao menos um nó de réplica.</span></li>
+        <li class="mission-step"><div class="check"></div><span class="txt">Responda por escrito: se o nó com mais pedidos (provavelmente SP) falhasse, o que aconteceria sem replicação? E com replicação?</span></li>
+      </ul>
+      <div class="mission-deliverable">📝 Entregável: o diagrama do cluster + a resposta sobre a falha do nó.</div>
+    </div>
+  </div>
+</section>
+
+<section class="result" id="resultScreen">
+  <div class="medal">🖧</div>
+  <h2>Cluster montado!</h2>
+  <div class="rank" id="rankLabel">—</div>
+  <div class="xp-final" id="xpFinal">0</div>
+  <div class="xp-final-label">XP TOTAL DA SEMANA 23</div>
+  <div class="badge-shelf">
+    <div class="badge-item" id="shelf1"><div class="emoji">🖧</div><div class="name">Engenheiro de Cluster</div></div>
+    <div class="badge-item" id="shelf2"><div class="emoji">🗺️</div><div class="name">Arquiteto do Cluster</div></div>
+  </div>
+  <p class="note">Na Semana 24, organizamos esses mesmos dados dentro de um Data Lake — camadas raw, trusted e refined.</p>
+</section>
+
+<div class="navigation">
+  <a href="semana22.html" class="nav-button">← Semana Anterior</a>
+  <a href="index.html" class="nav-button">🏠 Início</a>
+  <a href="semana24.html" class="nav-button">Próxima Semana →</a>
+</div>
+
+<script src="assets/dive-theme.js"></script>
+<script>
+  DiveInitBubbles('bubbleField', 16);
+  DiveInitModuleMap(23);
+  DiveInitDepthHUD([
+    {id:'hero', label:'1.000 m · Meia-noite', pct:40},
+    {id:'zone1', label:'1.000-4.000 m · Batipelágica', pct:50},
+    {id:'zone2', label:'2.500 m · Boa prática?', pct:65},
+    {id:'zone3', label:'3.400 m · Missão 3', pct:85},
+    {id:'resultScreen', label:'4.000 m · Concluído', pct:100}
+  ]);
+
+  const xp = DiveCreateXP(400);
+  const badges = DiveCreateBadges([1,2]);
+
+  DiveInitQuiz(document.getElementById('q1'), xp, 100, 40, ()=>{ badges.unlock(1); });
+
+  const scenarios = [
+    {text:'Uma aplicação precisa processar 50 TB por dia. A equipe decide sempre comprar um único servidor cada vez mais potente para dar conta.', isTrue:false, explain:'Má prática: escala vertical tem limite físico e custo crescente — o caminho é escalar horizontalmente com mais máquinas.'},
+    {text:'Cada partição de dados é replicada em pelo menos duas máquinas diferentes do cluster.', isTrue:true, explain:'Boa prática: é assim que o sistema sobrevive à falha de um nó sem perder dados.'},
+    {text:'Em um cluster de 10 nós, toda a base fica armazenada em apenas 1 nó, enquanto os outros 9 só processam.', isTrue:false, explain:'Má prática: isso cria um ponto único de falha — se aquele nó cair, todo o cluster para.'},
+    {text:'Os dados são particionados por região geográfica, permitindo que cada nó processe sua fatia em paralelo.', isTrue:true, explain:'Boa prática: é exatamente isso que torna o processamento distribuído mais rápido que um servidor único.'}
+  ];
+  DiveInitScenarios(
+    document.getElementById('scenarioList'), scenarios,
+    '✅ Boa prática', '🚫 Má prática',
+    xp, 50, 15
+  );
+
+  DiveInitMissionChecklist(document.getElementById('missionList'), xp, 25);
+  document.getElementById('missionList').addEventListener('click', ()=>{
+    const all = document.querySelectorAll('#missionList .mission-step');
+    const doneCount = document.querySelectorAll('#missionList .mission-step.done').length;
+    if(doneCount === all.length) badges.unlock(2);
+  });
+
+  const obs2 = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ DiveFinalizeResult(xp, document.getElementById('rankLabel')); } });
+  },{threshold:0.5});
+  obs2.observe(document.getElementById('resultScreen'));
+</script>
 </body>
 </html>
