@@ -1,92 +1,834 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Semana 21 - Introdução ao Big Data | BDN007</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
-        .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); overflow: hidden; }
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; text-align: center; }
-        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
-        .content { padding: 40px; }
-        .section { margin: 40px 0; }
-        .section h2 { color: #667eea; font-size: 2em; margin-bottom: 20px; border-bottom: 3px solid #667eea; padding-bottom: 10px; }
-        .objetivos { background: #f8f9fa; padding: 30px; border-radius: 10px; margin-bottom: 40px; border-left: 5px solid #667eea; }
-        .activity-card { background: white; border-radius: 10px; padding: 30px; margin-bottom: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-left: 5px solid #764ba2; }
-        .navigation { display: flex; justify-content: space-between; padding: 30px 40px; background: #f8f9fa; }
-        .nav-button { padding: 15px 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 8px; font-weight: bold; transition: transform 0.3s; }
-        .nav-button:hover { transform: scale(1.05); }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Semana 21 - Mergulho no Big Data | BDN007</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --abyss-black:#040b14;
+    --deep-navy:#0a1a2e;
+    --mid-teal:#0f3a52;
+    --surface-blue:#1b5e78;
+    --bioluminescent:#2de2c8;
+    --bioluminescent-dim:#1a9e8c;
+    --gold:#f5b942;
+    --coral:#ff6b6b;
+    --foam:#eaf6f6;
+    --mist:#8fadbc;
+    --font-display:'Space Grotesk', sans-serif;
+    --font-body:'Inter', sans-serif;
+    --font-mono:'JetBrains Mono', monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:var(--font-body);
+    background:var(--abyss-black);
+    color:var(--foam);
+    line-height:1.65;
+    padding-top:56px;
+    overflow-x:hidden;
+  }
+
+  /* ---------- HUD ---------- */
+  #hud{
+    position:fixed; top:0; left:0; right:0; height:56px; z-index:1000;
+    background:rgba(4,11,20,0.92);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid rgba(45,226,200,0.25);
+    display:flex; align-items:center; gap:18px;
+    padding:0 20px;
+  }
+  #hud .depth-track{
+    flex:1; height:8px; background:#0d2233; border-radius:6px; position:relative; overflow:hidden;
+    box-shadow:inset 0 0 4px rgba(0,0,0,0.6);
+  }
+  #hud .depth-fill{
+    position:absolute; left:0; top:0; bottom:0; width:0%;
+    background:linear-gradient(90deg, var(--bioluminescent-dim), var(--bioluminescent));
+    transition:width 0.6s ease;
+  }
+  #hud .depth-marker{
+    position:absolute; top:-6px; width:2px; height:20px; background:rgba(234,246,246,0.35);
+  }
+  #hud .depth-label{
+    font-family:var(--font-mono); font-size:0.72em; color:var(--mist); white-space:nowrap;
+    min-width:88px;
+  }
+  #hud .xp-label{
+    font-family:var(--font-mono); font-weight:700; color:var(--gold); font-size:0.85em; white-space:nowrap;
+  }
+  #hud .badges{
+    display:flex; gap:6px; font-size:1.1em; min-width:110px; justify-content:flex-end;
+  }
+  #hud .badges span{opacity:0.15; transition:opacity 0.4s, transform 0.4s;}
+  #hud .badges span.on{opacity:1; transform:scale(1.15);}
+  @media (max-width:640px){
+    #hud{gap:10px; padding:0 12px;}
+    #hud .depth-label{min-width:60px; font-size:0.62em;}
+    #hud .badges{min-width:70px;}
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    min-height:92vh; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:40px 20px;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(45,226,200,0.12), transparent 60%),
+      linear-gradient(180deg, #0c2438 0%, #071726 55%, var(--abyss-black) 100%);
+    position:relative; overflow:hidden;
+  }
+  .bubble{
+    position:absolute; bottom:-40px; border-radius:50%;
+    background:rgba(234,246,246,0.08); border:1px solid rgba(234,246,246,0.15);
+    animation:rise linear infinite;
+  }
+  @keyframes rise{
+    to{ transform:translateY(-110vh) translateX(var(--drift,0px)); opacity:0; }
+  }
+  .hero .eyebrow{
+    font-family:var(--font-mono); letter-spacing:0.15em; color:var(--bioluminescent); font-size:0.85em;
+    text-transform:uppercase; margin-bottom:18px;
+  }
+  .hero h1{
+    font-family:var(--font-display); font-weight:700; font-size:clamp(2.2em, 6vw, 4.2em);
+    color:var(--foam); line-height:1.05; margin-bottom:16px;
+    text-shadow:0 0 40px rgba(45,226,200,0.25);
+  }
+  .hero p.lead{
+    max-width:640px; color:var(--mist); font-size:1.15em; margin-bottom:36px;
+  }
+  .dive-btn{
+    font-family:var(--font-display); font-weight:700; font-size:1.05em;
+    background:var(--bioluminescent); color:var(--abyss-black); border:none;
+    padding:16px 40px; border-radius:40px; cursor:pointer;
+    box-shadow:0 0 30px rgba(45,226,200,0.4);
+    transition:transform 0.25s, box-shadow 0.25s;
+  }
+  .dive-btn:hover{ transform:translateY(-3px); box-shadow:0 0 45px rgba(45,226,200,0.6); }
+  .scroll-hint{
+    margin-top:50px; color:var(--mist); font-size:0.8em; font-family:var(--font-mono);
+    animation:bob 2s ease-in-out infinite;
+  }
+  @keyframes bob{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(8px);} }
+
+  /* ---------- ZONES ---------- */
+  .zone{
+    padding:90px 20px 100px; position:relative;
+  }
+  .zone-inner{ max-width:900px; margin:0 auto; }
+  .zone-tag{
+    font-family:var(--font-mono); font-size:0.78em; color:var(--bioluminescent);
+    letter-spacing:0.12em; text-transform:uppercase; margin-bottom:10px; display:flex; align-items:center; gap:10px;
+  }
+  .zone-tag .depth-range{ color:var(--mist); }
+  .zone h2{
+    font-family:var(--font-display); font-weight:700; font-size:clamp(1.7em,4vw,2.6em);
+    color:var(--foam); margin-bottom:22px;
+  }
+  .zone p{ color:#c7dde3; margin-bottom:18px; font-size:1.03em; max-width:70ch; }
+  .zone strong{ color:var(--foam); }
+
+  #zone1{ background:linear-gradient(180deg, var(--abyss-black) 0%, #0d2c40 50%, #0a2334 100%); }
+  #zone2{ background:linear-gradient(180deg, #0a2334 0%, #0a1f30 50%, #081a28 100%); }
+  #zone3{ background:linear-gradient(180deg, #081a28 0%, #071522 50%, #060f1a 100%); }
+  #zone4{ background:linear-gradient(180deg, #060f1a 0%, #050c15 50%, #040a10 100%); }
+  #zone5{ background:linear-gradient(180deg, #040a10 0%, #03070c 50%, #020508 100%); }
+
+  /* flip cards */
+  .card-row{ display:grid; grid-template-columns:repeat(auto-fit, minmax(230px,1fr)); gap:20px; margin:30px 0; }
+  .flip-card{ perspective:1000px; height:200px; cursor:pointer; }
+  .flip-inner{
+    position:relative; width:100%; height:100%; transition:transform 0.6s; transform-style:preserve-3d;
+  }
+  .flip-card.flipped .flip-inner{ transform:rotateY(180deg); }
+  .flip-front, .flip-back{
+    position:absolute; inset:0; backface-visibility:hidden; border-radius:14px;
+    padding:22px; display:flex; flex-direction:column; justify-content:center;
+  }
+  .flip-front{
+    background:rgba(45,226,200,0.06); border:1px solid rgba(45,226,200,0.35);
+  }
+  .flip-front .icon{ font-size:1.8em; margin-bottom:10px; }
+  .flip-front h4{ font-family:var(--font-display); color:var(--bioluminescent); font-size:1.15em; }
+  .flip-front .hint{ margin-top:auto; font-family:var(--font-mono); font-size:0.7em; color:var(--mist); }
+  .flip-back{
+    background:var(--mid-teal); transform:rotateY(180deg);
+    font-size:0.92em; color:var(--foam); border:1px solid rgba(45,226,200,0.5);
+  }
+
+  /* quiz */
+  .quiz-block{
+    background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08);
+    border-radius:16px; padding:28px; margin:28px 0;
+  }
+  .quiz-block .q-label{
+    font-family:var(--font-mono); font-size:0.75em; color:var(--gold); margin-bottom:10px; text-transform:uppercase; letter-spacing:0.08em;
+  }
+  .quiz-block h3{ font-family:var(--font-display); font-size:1.25em; margin-bottom:18px; color:var(--foam); }
+  .options{ display:flex; flex-direction:column; gap:10px; }
+  .opt-btn{
+    text-align:left; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12);
+    color:var(--foam); padding:14px 18px; border-radius:10px; cursor:pointer; font-size:0.98em;
+    font-family:var(--font-body); transition:all 0.2s;
+  }
+  .opt-btn:hover:not(:disabled){ background:rgba(45,226,200,0.1); border-color:var(--bioluminescent); }
+  .opt-btn.correct{ background:rgba(45,226,200,0.18); border-color:var(--bioluminescent); color:var(--bioluminescent); }
+  .opt-btn.wrong{ background:rgba(255,107,107,0.15); border-color:var(--coral); color:#ffb3b3; }
+  .opt-btn:disabled{ cursor:default; opacity:0.75; }
+  .feedback{
+    margin-top:14px; font-size:0.9em; font-family:var(--font-mono); min-height:1.2em;
+  }
+  .feedback.ok{ color:var(--bioluminescent); }
+  .feedback.bad{ color:var(--coral); }
+
+  /* true/false chips */
+  .tf-item{
+    background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08);
+    border-radius:12px; padding:18px 20px; margin-bottom:14px;
+    display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;
+  }
+  .tf-item p{ margin:0; flex:1; min-width:220px; }
+  .tf-buttons{ display:flex; gap:8px; }
+  .tf-btn{
+    font-family:var(--font-mono); font-weight:700; font-size:0.8em; padding:9px 16px; border-radius:8px;
+    border:1px solid rgba(255,255,255,0.2); background:transparent; color:var(--foam); cursor:pointer;
+  }
+  .tf-btn.true-btn:hover:not(:disabled){ border-color:var(--bioluminescent); color:var(--bioluminescent); }
+  .tf-btn.false-btn:hover:not(:disabled){ border-color:var(--coral); color:var(--coral); }
+  .tf-btn.chosen-correct{ background:rgba(45,226,200,0.2); border-color:var(--bioluminescent); color:var(--bioluminescent); }
+  .tf-btn.chosen-wrong{ background:rgba(255,107,107,0.2); border-color:var(--coral); color:#ffb3b3; }
+  .tf-btn:disabled{ cursor:default; }
+  .tf-explain{
+    flex-basis:100%; font-size:0.85em; color:var(--mist); font-family:var(--font-mono); display:none;
+  }
+  .tf-item.answered .tf-explain{ display:block; }
+
+  /* classification game */
+  .classify-stage{
+    background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08);
+    border-radius:16px; padding:30px; margin:28px 0; text-align:center;
+  }
+  .classify-card{
+    font-family:var(--font-display); font-size:1.3em; color:var(--foam);
+    background:var(--mid-teal); border-radius:12px; padding:26px; margin-bottom:22px;
+    min-height:70px; display:flex; align-items:center; justify-content:center;
+  }
+  .classify-buttons{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+  .classify-btn{
+    font-family:var(--font-mono); font-size:0.85em; font-weight:700; padding:12px 20px;
+    border-radius:10px; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.04);
+    color:var(--foam); cursor:pointer; transition:all 0.2s;
+  }
+  .classify-btn:hover:not(:disabled){ border-color:var(--bioluminescent); }
+  .classify-progress{ margin-top:18px; font-family:var(--font-mono); font-size:0.8em; color:var(--mist); }
+  .classify-feedback{ margin-top:14px; font-family:var(--font-mono); font-size:0.95em; min-height:1.4em; }
+
+  /* comparison table */
+  table.cmp{ width:100%; border-collapse:collapse; margin:26px 0; font-size:0.92em; }
+  table.cmp th, table.cmp td{ padding:12px 14px; border-bottom:1px solid rgba(255,255,255,0.1); text-align:left; }
+  table.cmp th{ font-family:var(--font-mono); color:var(--bioluminescent); font-size:0.8em; text-transform:uppercase; letter-spacing:0.05em; }
+  table.cmp td{ color:#c7dde3; }
+
+  /* scenario quiz zone4 */
+  .scenario{
+    background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08);
+    border-radius:14px; padding:22px; margin-bottom:16px;
+  }
+  .scenario p.text{ margin-bottom:14px; }
+  .scenario-buttons{ display:flex; gap:10px; }
+  .scenario-btn{
+    flex:1; font-family:var(--font-mono); font-weight:700; font-size:0.85em; padding:12px;
+    border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:transparent; color:var(--foam); cursor:pointer;
+  }
+  .scenario-btn:disabled{ cursor:default; }
+  .scenario-btn.right{ background:rgba(45,226,200,0.2); border-color:var(--bioluminescent); color:var(--bioluminescent); }
+  .scenario-btn.wrongpick{ background:rgba(255,107,107,0.2); border-color:var(--coral); color:#ffb3b3; }
+  .scenario-explain{ margin-top:12px; font-size:0.85em; color:var(--mist); display:none; font-family:var(--font-mono); }
+  .scenario.answered .scenario-explain{ display:block; }
+
+  /* trench final quiz */
+  .trench-progress{ font-family:var(--font-mono); font-size:0.8em; color:var(--gold); margin-bottom:8px; }
+
+  /* result screen */
+  .result{
+    min-height:80vh; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:60px 20px;
+    background:radial-gradient(ellipse at 50% 30%, rgba(245,185,66,0.12), transparent 60%), var(--abyss-black);
+  }
+  .result .medal{ font-size:4em; margin-bottom:20px; }
+  .result h2{ font-family:var(--font-display); font-size:2.2em; margin-bottom:10px; }
+  .result .rank{ font-family:var(--font-mono); color:var(--gold); font-size:1.1em; margin-bottom:26px; }
+  .result .xp-final{ font-family:var(--font-mono); font-size:2.4em; color:var(--bioluminescent); margin-bottom:6px; }
+  .result .xp-final-label{ color:var(--mist); font-family:var(--font-mono); font-size:0.8em; margin-bottom:34px; }
+  .badge-shelf{ display:flex; gap:18px; margin-bottom:40px; flex-wrap:wrap; justify-content:center; }
+  .badge-item{ display:flex; flex-direction:column; align-items:center; gap:6px; opacity:0.2; transition:opacity 0.5s; }
+  .badge-item.on{ opacity:1; }
+  .badge-item .emoji{ font-size:2.2em; }
+  .badge-item .name{ font-family:var(--font-mono); font-size:0.65em; color:var(--mist); max-width:90px; }
+
+  .navigation{
+    display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap;
+    padding:36px 20px; background:#020508; border-top:1px solid rgba(255,255,255,0.08);
+  }
+  .nav-button{
+    padding:14px 26px; background:rgba(45,226,200,0.1); border:1px solid rgba(45,226,200,0.4);
+    color:var(--bioluminescent); text-decoration:none; border-radius:10px; font-weight:600;
+    font-family:var(--font-display); transition:all 0.25s; font-size:0.95em;
+  }
+  .nav-button:hover{ background:var(--bioluminescent); color:var(--abyss-black); }
+
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    .bubble, .scroll-hint{ animation:none; }
+  }
+</style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="module">MÓDULO 5: Fundamentos de Big Data</div>
-            <h1>Semana 21</h1>
-            <h2>Introdução ao Big Data</h2>
+
+<div id="hud">
+  <div class="depth-label" id="depthLabel">0 m · Superfície</div>
+  <div class="depth-track">
+    <div class="depth-fill" id="depthFill"></div>
+    <div class="depth-marker" style="left:2%"></div>
+    <div class="depth-marker" style="left:9%"></div>
+    <div class="depth-marker" style="left:36%"></div>
+    <div class="depth-marker" style="left:55%"></div>
+    <div class="depth-marker" style="left:100%"></div>
+  </div>
+  <div class="xp-label">XP: <span id="xpNow">0</span>/<span id="xpMax">1600</span></div>
+  <div class="badges">
+    <span id="b1" title="Explorador de Superfície">🌊</span>
+    <span id="b2" title="Caçador de Mitos">🔦</span>
+    <span id="b3" title="Classificador de Dados">🗂️</span>
+    <span id="b4" title="Detetive de Dados">🕵️</span>
+    <span id="b5" title="Mestre do Big Data">🏆</span>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div id="bubbleField"></div>
+  <div class="eyebrow">Módulo 5 · Semana 21</div>
+  <h1>Mergulho no<br>Big Data</h1>
+  <p class="lead">Toda a internet gera dados o tempo todo — mais do que qualquer banco de dados tradicional aguenta processar. Vamos descer, zona por zona, até a fossa mais profunda desse oceano de informação e entender por que ele mudou tudo.</p>
+  <button class="dive-btn" onclick="document.getElementById('zone1').scrollIntoView({behavior:'smooth'})">🤿 Iniciar o mergulho</button>
+  <div class="scroll-hint">role para descer ↓</div>
+</section>
+
+<!-- ZONE 1 -->
+<section class="zone" id="zone1" data-depth="0">
+  <div class="zone-inner">
+    <div class="zone-tag">Zona 1 · Eufótica <span class="depth-range">(0 – 200 m)</span></div>
+    <h2>O que é, de fato, Big Data?</h2>
+    <p>Antes de qualquer coisa: <strong>Big Data não é sinônimo de "muitos dados"</strong>. Um banco de dados de 500 GB não é Big Data só por ser grande — o termo descreve conjuntos de dados tão volumosos, rápidos ou variados que <strong>as ferramentas tradicionais (planilhas, bancos relacionais comuns) deixam de conseguir processá-los com eficiência</strong>.</p>
+    <p>Clique nos cards abaixo para comparar os dois mundos.</p>
+
+    <div class="card-row">
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-inner">
+          <div class="flip-front">
+            <div class="icon">🗄️</div>
+            <h4>Dado Tradicional</h4>
+            <div class="hint">toque para virar</div>
+          </div>
+          <div class="flip-back">Estruturado, cabe em tabelas, medido em MB/GB, processado em lote (batch), analisado depois que o evento já aconteceu.</div>
         </div>
-        
-        <div class="content">
-            <div class="objetivos">
-                <h2>🎯 Objetivos de Aprendizagem</h2>
-                <ul>
-                    <li>Compreender os conceitos fundamentais de introdução ao big data</li>
-                    <li>Aplicar técnicas práticas em cenários reais</li>
-                    <li>Desenvolver habilidades hands-on com ferramentas</li>
-                    <li>Analisar cases e melhores práticas do mercado</li>
-                </ul>
-            </div>
-            
-            <div class="section">
-                <h2>📚 Conteúdo Teórico</h2>
-                <p>Nesta semana, você aprenderá sobre <strong>Introdução ao Big Data</strong>, um tópico fundamental para módulo 5: fundamentos de big data.</p>
-                <p>O conteúdo completo inclui teoria detalhada, exemplos práticos, cases reais e tutoriais passo-a-passo.</p>
-                <p><em>Nota: O conteúdo teórico completo e detalhado será disponibilizado pelo professor em sala de aula e no Moodle.</em></p>
-            </div>
-            
-            <div class="section">
-                <h2>🎬 Vídeos Recomendados</h2>
-                <p>Assista aos vídeos selecionados para complementar seu aprendizado.</p>
-                <p><em>Links para vídeos serão fornecidos pelo professor.</em></p>
-            </div>
-            
-            <div class="section">
-                <h2>✏️ Atividades Práticas</h2>
-                <div class="activity-card">
-                    <h3>Atividade 1: Pesquisa e Análise</h3>
-                    <p>Pesquise e analise cases reais relacionados a introdução ao big data.</p>
-                    <p><strong>Entregável:</strong> Documento de 3-5 páginas</p>
-                </div>
-                <div class="activity-card">
-                    <h3>Atividade 2: Implementação Prática</h3>
-                    <p>Implemente os conceitos aprendidos em um projeto hands-on.</p>
-                    <p><strong>Entregável:</strong> Código + Documentação</p>
-                </div>
-                <div class="activity-card">
-                    <h3>Atividade 3: Apresentação</h3>
-                    <p>Apresente seus resultados e aprendizados para a turma.</p>
-                    <p><strong>Entregável:</strong> Apresentação em slides</p>
-                </div>
-            </div>
-            
-            <div class="section">
-                <h2>📖 Materiais Complementares</h2>
-                <ul>
-                    <li>📚 Livros e artigos acadêmicos</li>
-                    <li>🎓 Tutoriais online e documentação oficial</li>
-                    <li>🛠️ Ferramentas e datasets para prática</li>
-                    <li>📄 White papers e estudos de caso</li>
-                </ul>
-            </div>
+      </div>
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-inner">
+          <div class="flip-front">
+            <div class="icon">🌐</div>
+            <h4>Big Data</h4>
+            <div class="hint">toque para virar</div>
+          </div>
+          <div class="flip-back">Múltiplas fontes e formatos, medido em TB/PB/EB, muitas vezes processado em tempo real, usado para decisões enquanto o evento ainda acontece.</div>
         </div>
-        
-        <div class="navigation">
-            <a href="semana20.html" class="nav-button">← Semana Anterior</a>
-            <a href="index.html" class="nav-button">🏠 Início</a>
-            <a href="semana22.html" class="nav-button">Próxima Semana →</a>
+      </div>
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-inner">
+          <div class="flip-front">
+            <div class="icon">⚠️</div>
+            <h4>O mito comum</h4>
+            <div class="hint">toque para virar</div>
+          </div>
+          <div class="flip-back">"Muitos dados" ≠ Big Data. O que importa é a incapacidade das ferramentas tradicionais lidarem com o volume, a velocidade e a variedade — assunto da próxima semana!</div>
         </div>
+      </div>
     </div>
+
+    <div class="quiz-block" id="q1">
+      <div class="q-label">Checkpoint · 100 XP</div>
+      <h3>Qual alternativa melhor define Big Data?</h3>
+      <div class="options" data-correct="1">
+        <button class="opt-btn">Qualquer banco de dados com mais de 1 GB de tamanho</button>
+        <button class="opt-btn">Conjuntos de dados tão grandes, rápidos ou variados que ferramentas tradicionais não conseguem processá-los com eficiência</button>
+        <button class="opt-btn">Um software específico da Google para análise de dados</button>
+        <button class="opt-btn">Sinônimo direto de Data Warehouse</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ZONE 2 -->
+<section class="zone" id="zone2" data-depth="200">
+  <div class="zone-inner">
+    <div class="zone-tag">Zona 2 · Disfótica (Crepuscular) <span class="depth-range">(200 – 1.000 m)</span></div>
+    <h2>Por que Big Data virou assunto agora?</h2>
+    <p>O conceito não é novo, mas só se tornou <em>viável na prática</em> por causa de três movimentos que aconteceram quase ao mesmo tempo:</p>
+    <div class="card-row">
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-inner">
+          <div class="flip-front"><div class="icon">📱</div><h4>Explosão de geração</h4><div class="hint">toque para virar</div></div>
+          <div class="flip-back">Smartphones, redes sociais, sensores e IoT fazem o mundo gerar, hoje, um volume de dados por dia que superaria décadas de dados até os anos 2000.</div>
+        </div>
+      </div>
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-inner">
+          <div class="flip-front"><div class="icon">💾</div><h4>Armazenamento barato</h4><div class="hint">toque para virar</div></div>
+          <div class="flip-back">Nos anos 80, 1 GB custava milhares de dólares. Hoje custa centavos. Guardar deixou de ser o gargalo.</div>
+        </div>
+      </div>
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-inner">
+          <div class="flip-front"><div class="icon">⚡</div><h4>Nuvem + processamento distribuído</h4><div class="hint">toque para virar</div></div>
+          <div class="flip-back">Ferramentas como Hadoop e Spark, rodando em clusters na nuvem, tornaram possível analisar volumes que antes exigiriam um supercomputador próprio.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="quiz-block">
+      <div class="q-label">Verdadeiro ou Mito · 50 XP cada</div>
+      <h3>Marque cada afirmação</h3>
+      <div id="tfList"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ZONE 3 -->
+<section class="zone" id="zone3" data-depth="1000">
+  <div class="zone-inner">
+    <div class="zone-tag">Zona 3 · Afótica (Meia-noite) <span class="depth-range">(1.000 – 4.000 m)</span></div>
+    <h2>Nem todo dado nasce igual</h2>
+    <p>Um dos motivos do Big Data exigir novas ferramentas é a <strong>variedade de formatos</strong>. Classificamos os dados em três grandes famílias:</p>
+    <div class="card-row">
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-inner">
+          <div class="flip-front"><div class="icon">📊</div><h4>Estruturado</h4><div class="hint">toque para virar</div></div>
+          <div class="flip-back">Segue um schema fixo, organizado em linhas e colunas. Ex.: tabelas de banco relacional, planilhas.</div>
+        </div>
+      </div>
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-inner">
+          <div class="flip-front"><div class="icon">🧩</div><h4>Semi-estruturado</h4><div class="hint">toque para virar</div></div>
+          <div class="flip-back">Tem alguma organização, mas não é tabular rígido. Ex.: JSON, XML, arquivos de log.</div>
+        </div>
+      </div>
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-inner">
+          <div class="flip-front"><div class="icon">🎞️</div><h4>Não-estruturado</h4><div class="hint">toque para virar</div></div>
+          <div class="flip-back">Sem estrutura predefinida — cerca de 80% de todo o Big Data gerado. Ex.: vídeo, imagem, áudio, texto livre.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="classify-stage">
+      <div class="q-label" style="text-align:left">Jogo da Classificação · 50 XP por acerto</div>
+      <div class="classify-card" id="classifyCard"></div>
+      <div class="classify-buttons">
+        <button class="classify-btn" data-cat="Estruturado">📊 Estruturado</button>
+        <button class="classify-btn" data-cat="Semi-estruturado">🧩 Semi-estruturado</button>
+        <button class="classify-btn" data-cat="Não-estruturado">🎞️ Não-estruturado</button>
+      </div>
+      <div class="classify-feedback" id="classifyFeedback"></div>
+      <div class="classify-progress" id="classifyProgress">Item 1 de 6</div>
+    </div>
+  </div>
+</section>
+
+<!-- ZONE 4 -->
+<section class="zone" id="zone4" data-depth="4000">
+  <div class="zone-inner">
+    <div class="zone-tag">Zona 4 · Abissal <span class="depth-range">(4.000 – 6.000 m)</span></div>
+    <h2>Isso é Big Data — ou só é muito dado?</h2>
+    <p>Compare rapidamente as duas abordagens de processamento:</p>
+    <table class="cmp">
+      <tr><th>Processamento Tradicional</th><th>Big Data</th></tr>
+      <tr><td>Processamento em lote (batch), períodico</td><td>Frequentemente em tempo real ou quase real</td></tr>
+      <tr><td>Um servidor / escala vertical</td><td>Cluster distribuído / escala horizontal</td></tr>
+      <tr><td>Apenas dados estruturados</td><td>Estruturado + semi + não-estruturado</td></tr>
+      <tr><td>Capacidade limitada por hardware único</td><td>Cresce adicionando mais máquinas</td></tr>
+    </table>
+    <p>Agora avalie os cenários: é Big Data ou não?</p>
+    <div id="scenarioList"></div>
+  </div>
+</section>
+
+<!-- ZONE 5 -->
+<section class="zone" id="zone5" data-depth="6000">
+  <div class="zone-inner">
+    <div class="zone-tag">Zona 5 · Fossa Hadal (Fossa das Marianas) <span class="depth-range">(6.000 – 11.000 m)</span></div>
+    <h2>Desafio final: o fundo do poço</h2>
+    <p>A Fossa das Marianas é o ponto mais profundo já mapeado nos oceanos — cerca de <strong>11.000 metros</strong>. É a metáfora perfeita pro volume de dados do mundo moderno: parece não ter fundo. Hora do desafio final, valendo mais pontos.</p>
+    <div class="trench-progress" id="trenchProgress">Pergunta 1 de 5</div>
+    <div id="trenchQuiz"></div>
+  </div>
+</section>
+
+<!-- RESULT -->
+<section class="result" id="resultScreen">
+  <div class="medal">🏅</div>
+  <h2>Mergulho concluído!</h2>
+  <div class="rank" id="rankLabel">—</div>
+  <div class="xp-final" id="xpFinal">0</div>
+  <div class="xp-final-label">XP TOTAL CONQUISTADO</div>
+  <div class="badge-shelf">
+    <div class="badge-item" id="shelf1"><div class="emoji">🌊</div><div class="name">Explorador de Superfície</div></div>
+    <div class="badge-item" id="shelf2"><div class="emoji">🔦</div><div class="name">Caçador de Mitos</div></div>
+    <div class="badge-item" id="shelf3"><div class="emoji">🗂️</div><div class="name">Classificador de Dados</div></div>
+    <div class="badge-item" id="shelf4"><div class="emoji">🕵️</div><div class="name">Detetive de Dados</div></div>
+    <div class="badge-item" id="shelf5"><div class="emoji">🏆</div><div class="name">Mestre do Big Data</div></div>
+  </div>
+  <p style="color:var(--mist); max-width:500px; font-size:0.92em;">Guarde essa pontuação — na aula síncrona, o professor vai comentar as respostas com a turma. Na próxima semana, mergulhamos ainda mais fundo: <strong style="color:var(--foam)">os 5 V's do Big Data.</strong></p>
+</section>
+
+<div class="navigation">
+  <a href="semana20.html" class="nav-button">← Semana Anterior</a>
+  <a href="index.html" class="nav-button">🏠 Início</a>
+  <a href="semana22.html" class="nav-button">Próxima Semana →</a>
+</div>
+
+<script>
+/* ---------------- XP / BADGE STATE ---------------- */
+const XP_MAX = 1600;
+let xp = 0;
+const badgesUnlocked = {1:false,2:false,3:false,4:false,5:false};
+
+function addXP(amount){
+  xp = Math.min(XP_MAX, xp + amount);
+  document.getElementById('xpNow').textContent = xp;
+  document.getElementById('xpFinal').textContent = xp;
+}
+
+function unlockBadge(n){
+  if(badgesUnlocked[n]) return;
+  badgesUnlocked[n] = true;
+  document.getElementById('b'+n).classList.add('on');
+  document.getElementById('shelf'+n).classList.add('on');
+}
+
+function checkZoneComplete(n){
+  // called by each zone's own completion tracker below
+}
+
+/* ---------------- BUBBLES ---------------- */
+const field = document.getElementById('bubbleField');
+for(let i=0;i<18;i++){
+  const b = document.createElement('div');
+  const size = 6 + Math.random()*22;
+  b.className = 'bubble';
+  b.style.width = size+'px';
+  b.style.height = size+'px';
+  b.style.left = (Math.random()*100)+'%';
+  b.style.setProperty('--drift', (Math.random()*60-30)+'px');
+  b.style.animationDuration = (6+Math.random()*8)+'s';
+  b.style.animationDelay = (Math.random()*8)+'s';
+  field.appendChild(b);
+}
+
+/* ---------------- DEPTH HUD via IntersectionObserver ---------------- */
+const zoneMeta = [
+  {id:'hero', label:'0 m · Superfície', pct:0},
+  {id:'zone1', label:'0–200 m · Eufótica', pct:2},
+  {id:'zone2', label:'200–1.000 m · Crepuscular', pct:20},
+  {id:'zone3', label:'1.000–4.000 m · Meia-noite', pct:45},
+  {id:'zone4', label:'4.000–6.000 m · Abissal', pct:70},
+  {id:'zone5', label:'6.000–11.000 m · Fossa Hadal', pct:100}
+];
+const depthLabel = document.getElementById('depthLabel');
+const depthFill = document.getElementById('depthFill');
+const observer = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      const meta = zoneMeta.find(z=>z.id===entry.target.id);
+      if(meta){
+        depthLabel.textContent = meta.label;
+        depthFill.style.width = meta.pct+'%';
+      }
+    }
+  });
+},{threshold:0.4});
+zoneMeta.forEach(z=>{
+  const el = document.getElementById(z.id);
+  if(el) observer.observe(el);
+});
+
+/* ---------------- ZONE 1 QUIZ ---------------- */
+(function(){
+  const block = document.getElementById('q1');
+  const opts = block.querySelectorAll('.opt-btn');
+  const correctIdx = parseInt(block.querySelector('.options').dataset.correct);
+  const fb = block.querySelector('.feedback');
+  let answered = false;
+  opts.forEach((btn, idx)=>{
+    btn.addEventListener('click', ()=>{
+      if(answered) return;
+      answered = true;
+      opts.forEach((b,i)=>{
+        b.disabled = true;
+        if(i===correctIdx) b.classList.add('correct');
+      });
+      if(idx===correctIdx){
+        btn.classList.add('correct');
+        fb.textContent = '✔ Correto! Big Data é sobre o limite das ferramentas tradicionais, não sobre um número mágico de gigabytes.';
+        fb.className = 'feedback ok';
+        addXP(100);
+      } else {
+        btn.classList.add('wrong');
+        fb.textContent = '✘ Quase — a definição certa está destacada acima.';
+        fb.className = 'feedback bad';
+        addXP(40);
+      }
+      unlockBadge(1);
+    });
+  });
+})();
+
+/* ---------------- ZONE 2 TRUE/FALSE ---------------- */
+(function(){
+  const data = [
+    {text:'Antes do ano 2000, já existiam ferramentas de Big Data como Hadoop e Spark.', answer:false, explain:'Mito: o Hadoop surgiu em meados dos anos 2000, e o Spark, em 2009.'},
+    {text:'O barateamento do armazenamento foi um dos fatores que tornaram o Big Data viável.', answer:true, explain:'Verdadeiro: guardar 1 GB caiu de milhares de dólares para poucos centavos.'},
+    {text:'A computação em nuvem e o processamento distribuído foram grandes viabilizadores do Big Data.', answer:true, explain:'Verdadeiro: clusters na nuvem tornaram acessível o que antes exigia supercomputadores.'}
+  ];
+  const list = document.getElementById('tfList');
+  let answeredCount = 0;
+  data.forEach((item, idx)=>{
+    const div = document.createElement('div');
+    div.className = 'tf-item';
+    div.innerHTML = `
+      <p>${item.text}</p>
+      <div class="tf-buttons">
+        <button class="tf-btn true-btn">Verdadeiro</button>
+        <button class="tf-btn false-btn">Mito</button>
+      </div>
+      <div class="tf-explain">${item.explain}</div>
+    `;
+    list.appendChild(div);
+    const trueBtn = div.querySelector('.true-btn');
+    const falseBtn = div.querySelector('.false-btn');
+    function resolve(pickedTrue){
+      trueBtn.disabled = true; falseBtn.disabled = true;
+      div.classList.add('answered');
+      const correct = (pickedTrue===item.answer);
+      const pickedBtn = pickedTrue ? trueBtn : falseBtn;
+      pickedBtn.classList.add(correct?'chosen-correct':'chosen-wrong');
+      if(!correct){
+        (item.answer?trueBtn:falseBtn).classList.add('chosen-correct');
+      }
+      addXP(correct?50:15);
+      answeredCount++;
+      if(answeredCount===data.length) unlockBadge(2);
+    }
+    trueBtn.addEventListener('click', ()=>resolve(true));
+    falseBtn.addEventListener('click', ()=>resolve(false));
+  });
+})();
+
+/* ---------------- ZONE 3 CLASSIFY GAME ---------------- */
+(function(){
+  const items = [
+    {label:'📈 Planilha de vendas mensais (Excel)', cat:'Estruturado'},
+    {label:'📦 Arquivo JSON retornado por uma API', cat:'Semi-estruturado'},
+    {label:'🎥 Vídeo publicado no YouTube', cat:'Não-estruturado'},
+    {label:'👥 Tabela de clientes em um banco relacional', cat:'Estruturado'},
+    {label:'🖥️ Log de acessos de um servidor web', cat:'Semi-estruturado'},
+    {label:'💬 Post de texto livre em uma rede social', cat:'Não-estruturado'}
+  ];
+  let i = 0;
+  const card = document.getElementById('classifyCard');
+  const buttons = document.querySelectorAll('.classify-btn');
+  const feedback = document.getElementById('classifyFeedback');
+  const progress = document.getElementById('classifyProgress');
+
+  function render(){
+    if(i>=items.length){
+      card.textContent = '✅ Todos os itens classificados!';
+      buttons.forEach(b=>b.disabled = true);
+      progress.textContent = 'Completo';
+      unlockBadge(3);
+      return;
+    }
+    card.textContent = items[i].label;
+    progress.textContent = `Item ${i+1} de ${items.length}`;
+    feedback.textContent = '';
+    buttons.forEach(b=>b.disabled = false);
+  }
+
+  buttons.forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      if(i>=items.length) return;
+      const correct = items[i].cat === btn.dataset.cat;
+      if(correct){
+        feedback.textContent = '✔ Correto: ' + items[i].cat;
+        feedback.style.color = 'var(--bioluminescent)';
+        addXP(50);
+      } else {
+        feedback.textContent = '✘ Era ' + items[i].cat;
+        feedback.style.color = 'var(--coral)';
+        addXP(15);
+      }
+      buttons.forEach(b=>b.disabled = true);
+      setTimeout(()=>{ i++; render(); }, 900);
+    });
+  });
+  render();
+})();
+
+/* ---------------- ZONE 4 SCENARIOS ---------------- */
+(function(){
+  const scenarios = [
+    {text:'Uma pequena loja registra vendas diárias em uma planilha Excel com 500 linhas.', isBig:false, explain:'Volume e velocidade baixos, uma ferramenta tradicional resolve tranquilamente.'},
+    {text:'A Netflix analisa bilhões de eventos de streaming (cliques, pausas, avanços) de milhões de usuários em tempo real para recomendar conteúdo.', isBig:true, explain:'Alto volume, alta velocidade e múltiplas fontes — exige processamento distribuído.'},
+    {text:'Um consultório armazena o prontuário de 200 pacientes em um sistema local.', isBig:false, explain:'Volume pequeno, estruturado, cabe em um banco tradicional.'},
+    {text:'Uma rede de sensores IoT em uma fábrica gera terabytes de dados por dia sobre temperatura, vibração e desempenho de máquinas, processados continuamente.', isBig:true, explain:'Volume altíssimo e processamento contínuo — típico caso de Big Data industrial.'}
+  ];
+  const list = document.getElementById('scenarioList');
+  let answeredCount = 0;
+  scenarios.forEach(sc=>{
+    const div = document.createElement('div');
+    div.className = 'scenario';
+    div.innerHTML = `
+      <p class="text">${sc.text}</p>
+      <div class="scenario-buttons">
+        <button class="scenario-btn" data-val="true">✅ É Big Data</button>
+        <button class="scenario-btn" data-val="false">🚫 Não é Big Data</button>
+      </div>
+      <div class="scenario-explain">${sc.explain}</div>
+    `;
+    list.appendChild(div);
+    const btns = div.querySelectorAll('.scenario-btn');
+    btns.forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const picked = btn.dataset.val === 'true';
+        const correct = picked === sc.isBig;
+        btns.forEach(b=>b.disabled = true);
+        div.classList.add('answered');
+        btn.classList.add(correct?'right':'wrongpick');
+        if(!correct){
+          const rightBtn = [...btns].find(b=> (b.dataset.val==='true')===sc.isBig);
+          rightBtn.classList.add('right');
+        }
+        addXP(correct?75:20);
+        answeredCount++;
+        if(answeredCount===scenarios.length) unlockBadge(4);
+      });
+    });
+  });
+})();
+
+/* ---------------- ZONE 5 FINAL QUIZ ---------------- */
+(function(){
+  const questions = [
+    {
+      q:'O que caracteriza melhor os dados não-estruturados?',
+      opts:['Sempre vêm de bancos relacionais','Não seguem um formato ou schema predefinido, como vídeos e textos livres','São sempre menores que 1 MB','São o tipo mais fácil de analisar'],
+      correct:1
+    },
+    {
+      q:'Qual tecnologia é comumente associada ao processamento distribuído de Big Data?',
+      opts:['Microsoft Excel','Apache Hadoop / Spark','Access','Bloco de Notas'],
+      correct:1
+    },
+    {
+      q:'Antes do barateamento do armazenamento e da computação em nuvem, processar grandes volumes de dados era...',
+      opts:['Trivial e barato para qualquer empresa','Extremamente caro e limitado a poucas organizações','Impossível tecnicamente, em qualquer hipótese','Desnecessário, pois ninguém gerava dados'],
+      correct:1
+    },
+    {
+      q:'Qual cenário representa melhor um caso real de Big Data?',
+      opts:['Uma planilha de 500 linhas em uma loja pequena','Uma plataforma de streaming processando bilhões de eventos em tempo real','Um arquivo de texto com uma lista de tarefas','Um cadastro de 10 funcionários em uma pequena empresa'],
+      correct:1
+    },
+    {
+      q:'O que vamos estudar na próxima semana (Semana 22)?',
+      opts:['Os 5 Vs do Big Data','Receitas de culinária com dados','A história do Excel','Como formatar um pendrive'],
+      correct:0
+    }
+  ];
+  const container = document.getElementById('trenchQuiz');
+  const progressLabel = document.getElementById('trenchProgress');
+  let idx = 0;
+
+  function renderQuestion(){
+    if(idx >= questions.length){
+      container.innerHTML = '<p style="color:var(--bioluminescent); font-family:var(--font-mono);">🏆 Você chegou ao fundo da Fossa das Marianas!</p>';
+      progressLabel.textContent = 'Completo';
+      unlockBadge(5);
+      finalizeResults();
+      return;
+    }
+    progressLabel.textContent = `Pergunta ${idx+1} de ${questions.length}`;
+    const item = questions[idx];
+    const block = document.createElement('div');
+    block.className = 'quiz-block';
+    block.innerHTML = `
+      <div class="q-label">Desafio final · 150 XP</div>
+      <h3>${item.q}</h3>
+      <div class="options" data-correct="${item.correct}">
+        ${item.opts.map(o=>`<button class="opt-btn">${o}</button>`).join('')}
+      </div>
+      <div class="feedback"></div>
+    `;
+    container.innerHTML = '';
+    container.appendChild(block);
+
+    const opts = block.querySelectorAll('.opt-btn');
+    const fb = block.querySelector('.feedback');
+    let answered = false;
+    opts.forEach((btn, i2)=>{
+      btn.addEventListener('click', ()=>{
+        if(answered) return;
+        answered = true;
+        opts.forEach((b,j)=>{
+          b.disabled = true;
+          if(j===item.correct) b.classList.add('correct');
+        });
+        if(i2===item.correct){
+          fb.textContent = '✔ Correto!';
+          fb.className = 'feedback ok';
+          addXP(150);
+        } else {
+          btn.classList.add('wrong');
+          fb.textContent = '✘ A resposta certa está destacada.';
+          fb.className = 'feedback bad';
+          addXP(50);
+        }
+        setTimeout(()=>{ idx++; renderQuestion(); }, 1100);
+      });
+    });
+  }
+  renderQuestion();
+})();
+
+/* ---------------- FINAL RESULTS ---------------- */
+function finalizeResults(){
+  const rankLabel = document.getElementById('rankLabel');
+  const percent = xp / XP_MAX;
+  let rank;
+  if(percent >= 0.9) rank = '🥇 Cientista de Dados Sênior';
+  else if(percent >= 0.7) rank = '🥈 Analista de Big Data';
+  else if(percent >= 0.45) rank = '🥉 Explorador em Treinamento';
+  else rank = '🔰 Estagiário Curioso';
+  rankLabel.textContent = rank;
+  document.getElementById('xpFinal').textContent = xp;
+}
+document.getElementById('xpMax').textContent = XP_MAX;
+</script>
 </body>
 </html>
